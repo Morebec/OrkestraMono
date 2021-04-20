@@ -24,6 +24,9 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         __DIR__ . '/components',
     ]);
 
+    $parameters->set(Option::DEFAULT_BRANCH_NAME, '2.x');
+    $parameters->set(Option::PACKAGE_ALIAS_FORMAT, '<major>.<minor>.x-dev');
+
     // for "merge" command
     $parameters->set(Option::DATA_TO_APPEND, [
         ComposerJsonSection::REQUIRE_DEV => [
