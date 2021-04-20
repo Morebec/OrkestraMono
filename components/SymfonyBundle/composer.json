@@ -9,10 +9,10 @@
         }
     ],
     "require": {
-        "morebec/orkestra-datetime": "^2.1",
-        "morebec/orkestra-event-sourcing": "^2.1",
-        "morebec/orkestra-messaging": "^2.1",
-        "morebec/orkestra-normalization": "^2.1",
+        "morebec/orkestra-datetime": "^2.2",
+        "morebec/orkestra-event-sourcing": "^2.2",
+        "morebec/orkestra-messaging": "^2.2",
+        "morebec/orkestra-normalization": "^2.2",
         "symfony/dependency-injection": "5.*",
         "symfony/framework-bundle": "5.2.*",
         "symfony/config": "5.*",
