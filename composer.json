@@ -1,0 +1,137 @@
+{
+    "name": "morebec/orkestra",
+    "repositories": [
+        {
+            "options": {
+                "symlink": true
+            },
+            "type": "path",
+            "url": "components/SymfonyBundle"
+        }
+    ],
+    "extra": {
+        "symfony": {
+            "allow-contrib": false,
+            "require": "5.2.*"
+        }
+    },
+    "description": "Orkestra is a library of infrastructure and architecture helpers for creating CQRS and Event Sourced applications",
+    "authors": [
+        {
+            "name": "Jwillp",
+            "email": "jwilliam.perreault@morebec.com"
+        },
+        {
+            "name": "jwillp",
+            "email": "jwilliam.perreault@morebec.com"
+        }
+    ],
+    "require": {
+        "cakephp/chronos": "^2.0",
+        "doctrine/annotations": "1.12.1",
+        "doctrine/dbal": "^3.0",
+        "doctrine/instantiator": "1.*",
+        "ext-ctype": "*",
+        "ext-iconv": "*",
+        "ext-json": "*",
+        "ext-pcntl": "*",
+        "ext-pdo_pgsql": "*",
+        "ext-pgsql": "*",
+        "ext-posix": "*",
+        "ext-sodium": "*",
+        "php": ">=7.3",
+        "php-di/phpdoc-reader": "2.*",
+        "ramsey/uuid": "^4.1",
+        "symfony/config": "5.*",
+        "symfony/console": "5.2.*",
+        "symfony/dependency-injection": "5.*",
+        "symfony/dotenv": "5.2.*",
+        "symfony/flex": "^1.3.1",
+        "symfony/framework-bundle": "5.2.*",
+        "symfony/http-client": "5.2.*",
+        "symfony/http-kernel": "^5.0",
+        "symfony/lock": "5.*",
+        "symfony/yaml": "5.2.*",
+        "ext-pdo": "*"
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\Morebec\\OrkestraSymfonyBundle\\": "components/SymfonyBundle/Tests/",
+            "Tests\\Morebec\\Orkestra\\Collections\\": "components/Collections/tests",
+            "Tests\\Morebec\\Orkestra\\DateTime\\": "components/DateTime/tests",
+            "Tests\\Morebec\\Orkestra\\Enum\\": "components/Enum/tests",
+            "Tests\\Morebec\\Orkestra\\EventSourcing\\": "components/EventSourcing/tests",
+            "Tests\\Morebec\\Orkestra\\Exceptions\\": "components/Exceptions/tests",
+            "Tests\\Morebec\\Orkestra\\Messaging\\": "components/Messaging/tests",
+            "Tests\\Morebec\\Orkestra\\Modeling\\": "components/Modeling/tests",
+            "Tests\\Morebec\\Orkestra\\Normalization\\": "components/Normalization/tests",
+            "Tests\\Morebec\\Orkestra\\OrkestraServer\\": "components/Server/tests/",
+            "Tests\\Morebec\\Orkestra\\PostgreSqlDocumentStore\\": "components/PostgreSQLDocumentStore/tests",
+            "Tests\\Morebec\\Orkestra\\PostgreSqlEventStore\\": "components/PostgreSQLEventStore/tests",
+            "Tests\\Morebec\\Orkestra\\PostgreSqlPersonalInformationStore\\": "components/PostgreSQLPersonalInformationStore/tests",
+            "Tests\\Morebec\\Orkestra\\PostgreSqlTimerStorage\\": "components/PostgreSQLTimerStorage/tests",
+            "Tests\\Morebec\\Orkestra\\Privacy\\": "components/Privacy/tests",
+            "Tests\\Morebec\\Orkestra\\Retry\\": "components/Retry/tests",
+            "Tests\\Morebec\\Orkestra\\SymfonyBundle\\": "components/SymfonyBundle/Tests/"
+        }
+    },
+    "require-dev": {
+        "ext-dom": "*",
+        "friendsofphp/php-cs-fixer": "^2.16",
+        "phpstan/phpstan": "^0.12.7",
+        "phpunit/phpunit": "^9.5",
+        "symfony/var-dumper": "5.*",
+        "symplify/monorepo-builder": "^9.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Morebec\\OrkestraSymfonyBundle\\": "components/SymfonyBundle/.",
+            "Morebec\\Orkestra\\Collections\\": "components/Collections/src",
+            "Morebec\\Orkestra\\DateTime\\": "components/DateTime/src",
+            "Morebec\\Orkestra\\Enum\\": "components/Enum/src",
+            "Morebec\\Orkestra\\EventSourcing\\": "components/EventSourcing/src",
+            "Morebec\\Orkestra\\Exceptions\\": "components/Exceptions/src",
+            "Morebec\\Orkestra\\Messaging\\": "components/Messaging/src",
+            "Morebec\\Orkestra\\Modeling\\": "components/Modeling/src",
+            "Morebec\\Orkestra\\Normalization\\": "components/Normalization/src",
+            "Morebec\\Orkestra\\OrkestraServer\\": "components/Server/src/",
+            "Morebec\\Orkestra\\PostgreSqlDocumentStore\\": "components/PostgreSQLDocumentStore/src",
+            "Morebec\\Orkestra\\PostgreSqlEventStore\\": "components/PostgreSQLEventStore/src",
+            "Morebec\\Orkestra\\PostgreSqlPersonalInformationStore\\": "components/PostgreSQLPersonalInformationStore/src",
+            "Morebec\\Orkestra\\PostgreSqlTimerStorage\\": "components/PostgreSQLTimerStorage/src",
+            "Morebec\\Orkestra\\Privacy\\": "components/Privacy/src",
+            "Morebec\\Orkestra\\Retry\\": "components/Retry/src",
+            "Morebec\\Orkestra\\SymfonyBundle\\": "components/SymfonyBundle/."
+        }
+    },
+    "replace": {
+        "morebec/orkestra-collections": "2.2.0",
+        "morebec/orkestra-datetime": "2.2.0",
+        "morebec/orkestra-demo": "2.2.0",
+        "morebec/orkestra-enum": "2.2.0",
+        "morebec/orkestra-event-sourcing": "2.2.0",
+        "morebec/orkestra-exceptions": "2.2.0",
+        "morebec/orkestra-messaging": "2.2.0",
+        "morebec/orkestra-modeling": "2.2.0",
+        "morebec/orkestra-normalization": "2.2.0",
+        "morebec/orkestra-postgresql-document-store": "2.2.0",
+        "morebec/orkestra-postgresql-eventstore": "2.2.0",
+        "morebec/orkestra-postgresql-personal-information-store": "2.2.0",
+        "morebec/orkestra-postgresql-timer-storage": "2.2.0",
+        "morebec/orkestra-privacy": "2.2.0",
+        "morebec/orkestra-retry": "2.2.0",
+        "morebec/orkestra-server": "2.2.0",
+        "morebec/orkestra-symfony-bundle": "2.2.0",
+        "symfony/polyfill-ctype": "2.2.0",
+        "symfony/polyfill-iconv": "2.2.0",
+        "symfony/polyfill-php72": "2.2.0"
+    },
+    "scripts": {
+        "auto-scripts": {
+            "cache:clear": "symfony-cmd",
+            "assets:install %PUBLIC_DIR%": "symfony-cmd"
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
