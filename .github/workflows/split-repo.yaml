@@ -39,11 +39,11 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Monorepo Split of ${{ matrix.package }}
-        uses: symplify/github-action-monorepo-split@master
+        uses: symplify/github-action-monorepo-split@2.0
         env:
           GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         with:
-          package-directory: 'components/${{ matrix.package }}'
+          package-directory: 'components/${{ matrix.package.local_path }}'
           split-repository-organization: 'Morebec'
           split-repository-name: '${{ matrix.package }}'
           user-name: "Morebot"
