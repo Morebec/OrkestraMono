@@ -5,25 +5,26 @@
     "license": "proprietary",
     "minimum-stability": "dev",
     "prefer-stable": true,
-    "repositories": [{
-        "type": "path",
-        "url": "components/SymfonyBundle",
-        "options": {
-            "symlink": true
+    "repositories": [
+        {
+            "type": "path",
+            "url": "components/SymfonyBundle",
+            "options": {
+                "symlink": true
+            }
         }
-    }],
+    ],
     "require": {
-        "morebec/orkestra-datetime": "2.*",
-        "morebec/orkestra-enum": "2.*",
-        "morebec/orkestra-normalization": "2.*",
-        "morebec/orkestra-modeling": "2.*",
-        "morebec/orkestra-messaging": "2.*",
-        "morebec/orkestra-event-sourcing": "2.*",
-        "morebec/orkestra-postgresql-eventstore": "2.*",
-        "morebec/orkestra-postgresql-timer-storage": "2.*",
-        "morebec/orkestra-retry": "2.*",
-        "morebec/orkestra-symfony-bundle": "2.*",
-
+        "morebec/orkestra-datetime": "^2.0",
+        "morebec/orkestra-enum": "^2.0",
+        "morebec/orkestra-normalization": "^2.0",
+        "morebec/orkestra-modeling": "^2.0",
+        "morebec/orkestra-messaging": "^2.0",
+        "morebec/orkestra-event-sourcing": "^2.0",
+        "morebec/orkestra-postgresql-eventstore": "^2.0",
+        "morebec/orkestra-postgresql-timer-storage": "^2.0",
+        "morebec/orkestra-retry": "^2.0",
+        "morebec/orkestra-symfony-bundle": "^2.0",
         "php": ">=7.3",
         "ext-ctype": "*",
         "ext-iconv": "*",
@@ -33,8 +34,6 @@
         "symfony/framework-bundle": "5.2.*",
         "symfony/http-client": "5.2.*",
         "symfony/yaml": "5.2.*"
-    },
-    "require-dev": {
     },
     "config": {
         "optimize-autoloader": true,

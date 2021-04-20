@@ -1,5 +1,5 @@
 # Repository  
-This document explains the general setup of the repository to develop, release and maintain Orkestra.
+*This document explains the general setup of the repository to develop, release and maintain Orkestra and its components*.
 
 ## Monorepo
 This repository is a Monorepo containing the source code for Orkestra, its different components,
@@ -10,7 +10,7 @@ You can still use the different components independently by requiring them using
 they are simply maintained as a single unit in this repository.
 
 For contributing to Orkestra, you must contribute on this repository and not the standalone repositories
-for the different components. The same goes for issues on github.
+for the different components. The same goes for issues on GitHub.
 
 
 ### Directory structure
@@ -37,23 +37,32 @@ The following sections need to be modified in the appropriate component's config
   
 The rest can be changed without any problem.
 
+#### Validate interdependencies
 To ensure the dependencies are in sync between all components, run the following command:
 ```shell
 vendor/bin/monorepo-builder validate
 ```
-
+#### Merge `composer.json` files
 To perform a merge run the following command:
 ```shell
 vendor/bin/monorepo-builder merge
 ```
-> **Note**: The merge command also performs a validate prior to merging, meaning you don't have to run validate
+> **Note**: The merge command also performs `validate` prior to merging, meaning you don't have to run validate
 > every time you make changes to one of the component's `composer.json`.
 
+#### Bump version number of all components
+When a new version is in preparation for a release, it is important to bump the version number in all the `composer.json` files.
+The following command allows to automate that task:
 
-
-To release a new version:
 ```shell
-vendor/bin/monorepo-builder release v7.0 --dry-run
+vendor/bin/monorepo-builder bump-interdependency "^2.0"
+```
+
+
+#### Release a new version
+To release a new version execute the following command:
+```shell
+vendor/bin/monorepo-builder release v2.0 --dry-run
 ```
 > The --dry-run option allows seeing only what the steps the command will perform.
 
