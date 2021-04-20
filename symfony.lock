@@ -1,0 +1,8 @@
+{
+    "doctrine/deprecations": {
+        "version": "v0.5.3"
+    },
+    "symfony/http-client": {
+        "version": "v5.2.6"
+    }
+}

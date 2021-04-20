@@ -1,0 +1,35 @@
+{
+    "name": "morebec/orkestra-normalization",
+    "description": "Orkestra Component allowing to easily normalize complex object graphs to arrays of primitives for persistence purposes",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Jwillp",
+            "email": "jwilliam.perreault@morebec.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.3",
+        "doctrine/instantiator": "1.*",
+        "php-di/phpdoc-reader": "2.*",
+        "ext-json": "*",
+        "morebec/orkestra-datetime": "2.*"
+    },
+    "require-dev": {
+        "ext-dom": "*",
+        "phpunit/phpunit": "^9.5",
+        "phpstan/phpstan": "^0.12.7",
+        "friendsofphp/php-cs-fixer": "^2.16",
+        "symfony/var-dumper": "5.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Morebec\\Orkestra\\Normalization\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\Morebec\\Orkestra\\Normalization\\": "tests"
+        }
+    }
+}

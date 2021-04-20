@@ -1,0 +1,18 @@
+{
+	admin 0.0.0.0:2019
+}
+
+# This config is used for development purposes.
+localhost {
+    root * /srv/app/components/Server/public
+	encode gzip
+	php_fastcgi php:9000
+	file_server
+	log {
+		output file /srv/app/var/log/caddy/access.log {
+			roll_keep_for 48h # 90 days
+		}
+	}
+	tls /srv/tls/localhost.pem /srv/tls/localhost-key.pem
+}
+

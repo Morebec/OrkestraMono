@@ -1,0 +1,29 @@
+<?php
+
+$finder = PhpCsFixer\Finder::create()
+     ->in(['components'])
+;
+
+return PhpCsFixer\Config::create()
+    ->setRules([
+        '@Symfony' => true,
+        '@Symfony:risky' => true,
+        '@PHPUnit75Migration:risky' => true,
+        '@PHP73Migration' => true,
+        'php_unit_dedicate_assert' => ['target' => '5.6'],
+        'array_syntax' => ['syntax' => 'short'],
+        'fopen_flags' => false,
+        'protected_to_private' => false,
+        'combine_nested_dirname' => true,
+        'yoda_style' => [
+            'identical' => false,
+            'equal' => false,
+            'less_and_greater' => false,
+        ],
+        'increment_style' => ['style' => 'post'],
+        'ordered_imports' => true,
+        'ordered_class_elements' => true,
+    ])
+    ->setRiskyAllowed(true)
+    ->setFinder($finder)
+;

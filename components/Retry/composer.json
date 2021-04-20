@@ -1,0 +1,31 @@
+{
+    "name": "morebec/orkestra-retry",
+    "description": "Orkestra component providing utilities for retrying operations when they fail",
+    "type": "library",
+    "authors": [
+        {
+            "name": "jwillp",
+            "email": "jwilliam.perreault@morebec.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.3"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.5",
+        "ext-dom": "*",
+        "phpstan/phpstan": "^0.12.7",
+        "friendsofphp/php-cs-fixer": "^2.16",
+        "symfony/var-dumper": "5.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Morebec\\Orkestra\\Retry\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\Morebec\\Orkestra\\Retry\\": "tests"
+        }
+    }
+}

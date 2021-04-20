@@ -1,0 +1,38 @@
+{
+    "name": "morebec/orkestra-postgresql-timer-storage",
+    "description": "PostgreSQL Timer Storage for Orkestra",
+    "type": "library",
+    "authors": [
+        {
+            "name": "jwillp",
+            "email": "jwilliam.perreault@morebec.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.3",
+        "ext-json": "*",
+        "ext-pgsql": "*",
+        "ext-pdo_pgsql": "*",
+        "doctrine/dbal": "^3.0",
+        "morebec/orkestra-datetime": "2.*",
+        "morebec/orkestra-messaging": "2.*",
+        "morebec/orkestra-normalization": "2.*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.5",
+        "ext-dom": "*",
+        "phpstan/phpstan": "^0.12.7",
+        "friendsofphp/php-cs-fixer": "^2.16",
+        "symfony/var-dumper": "5.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Morebec\\Orkestra\\PostgreSqlTimerStorage\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\Morebec\\Orkestra\\PostgreSqlTimerStorage\\": "tests"
+        }
+    }
+}

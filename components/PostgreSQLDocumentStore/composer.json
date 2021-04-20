@@ -1,0 +1,36 @@
+{
+    "name": "morebec/orkestra-postgresql-document-store",
+    "description": "Orkestra Component allowing to easily use postgreSQL as a Document Store.",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Jwillp",
+            "email": "jwilliam.perreault@morebec.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.3",
+        "doctrine/dbal": "^3.0",
+        "ext-json": "*",
+        "morebec/orkestra-datetime": "2.*",
+        "morebec/orkestra-enum": "2.*",
+        "morebec/orkestra-modeling": "2.*"
+    },
+    "require-dev": {
+        "ext-dom": "*",
+        "phpunit/phpunit": "^9.5",
+        "phpstan/phpstan": "^0.12.7",
+        "friendsofphp/php-cs-fixer": "^2.16",
+        "symfony/var-dumper": "5.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Morebec\\Orkestra\\PostgreSqlDocumentStore\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\Morebec\\Orkestra\\PostgreSqlDocumentStore\\": "tests"
+        }
+    }
+}
