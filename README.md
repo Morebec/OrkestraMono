@@ -21,6 +21,9 @@ Here's a list of the current core components of Orkestra:
   different means to get the current time in different contexts, such as time travel.
 - **[Normalization](https://github.com/Morebec/orkestra-normalization)**: This component allows transforming complex object trees into simple PHP arrays of primitives for easy serialization in any format. As a side effect it greatly reduces the need for
   ORMs while decoupling persistence mechanism from the domain model as it does not require annotations or inheriting interfaces. In short, it provides ways to do: `Entity -> array -> dump to database (MongoDb, PostgreSql, Redis etc.)`
+- **[Enum](https://github.com/Morebec/orkestra-enum)**: Provides typed Enum to PHP.
+- **[Collections](https://github.com/Morebec/orkestra-collections)**: Provides typed Collections.
+- **[Exceptions](https://github.com/Morebec/orkestra-collections)**: Provides common exceptions.
 - **[Messaging](https://github.com/Morebec/orkestra-messaging)**: Provides the building block to define messages and handlers such as Commands, Queries, Events, Time based messages called (Timers).
   It also includes the basic mechanisms to integrate intra-process message buses to an application to map messages to their message handlers while providing hooks
   to alter the behaviour of sending messages to their handlers. In short, it's the Mediator pattern with helpers for CQRS.
@@ -42,15 +45,12 @@ There are also infrastructure specific implementations of some the Interfaces fr
 
 #### Framework Integrations
 Here are additional components for easier integration with specific frameworks:
-- **[SymfonyBundle](https://github.com/Morebec/orkestra-symfony-bundle)**: Integrates various Orkestra Components with Symfony, while also providing a Module system in order to structure projects
-in a Bounded Context oriented approach.
+- **[SymfonyBundle](https://github.com/Morebec/orkestra-symfony-bundle)**: Integrates various Orkestra Components with Symfony, while also providing a Module system in order to structure projects in a Bounded Context oriented approach.
 
 
 ## Monorepo
 The current repository is maintained as a Monorepo, all issues and pull requests for any of the components should be done in this repository.
 Internally whenever a new release is made it is propagated to the standalone repositories of the different components.
-
-For more information see `docs/RepositoryMaintenance.md`.
 
 ## Getting Started
 To get started, please read the following [page]() from the documentation.
