@@ -25,6 +25,12 @@ class ReadStreamOptions
      */
     public $maxCount = 1000;
 
+    /** @var EventType[] */
+    public $eventTypes = [];
+
+    /** @var EventType[] */
+    public $ignoredEventTypes = [];
+
     /**
      * Position from which the reading should be performed.
      * Depending on the stream it is either a sequence number for the global stream or a version number for all the other streams.
@@ -126,6 +132,30 @@ class ReadStreamOptions
             }
         }
         $this->position = $position;
+
+        return $this;
+    }
+
+    /**
+     * @param EventType[] $types
+     *
+     * @return $this
+     */
+    public function filterEventTypes(array $types): self
+    {
+        $this->eventTypes = $types;
+
+        return $this;
+    }
+
+    /**
+     * @param EventType[] $types
+     *
+     * @return $this
+     */
+    public function ignoreEventTypes(array $types): self
+    {
+        $this->ignoredEventTypes = $types;
 
         return $this;
     }
