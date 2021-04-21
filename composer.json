@@ -6,7 +6,7 @@
                 "symlink": true
             },
             "type": "path",
-            "url": "components/SymfonyBundle"
+            "url": "components/orkestra-symfony-bundle"
         }
     ],
     "extra": {
@@ -56,23 +56,23 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Tests\\Morebec\\OrkestraSymfonyBundle\\": "components/SymfonyBundle/Tests/",
-            "Tests\\Morebec\\Orkestra\\Collections\\": "components/Collections/tests",
-            "Tests\\Morebec\\Orkestra\\DateTime\\": "components/DateTime/tests",
-            "Tests\\Morebec\\Orkestra\\Enum\\": "components/Enum/tests",
-            "Tests\\Morebec\\Orkestra\\EventSourcing\\": "components/EventSourcing/tests",
-            "Tests\\Morebec\\Orkestra\\Exceptions\\": "components/Exceptions/tests",
-            "Tests\\Morebec\\Orkestra\\Messaging\\": "components/Messaging/tests",
-            "Tests\\Morebec\\Orkestra\\Modeling\\": "components/Modeling/tests",
-            "Tests\\Morebec\\Orkestra\\Normalization\\": "components/Normalization/tests",
-            "Tests\\Morebec\\Orkestra\\OrkestraServer\\": "components/Server/tests/",
-            "Tests\\Morebec\\Orkestra\\PostgreSqlDocumentStore\\": "components/PostgreSQLDocumentStore/tests",
-            "Tests\\Morebec\\Orkestra\\PostgreSqlEventStore\\": "components/PostgreSQLEventStore/tests",
-            "Tests\\Morebec\\Orkestra\\PostgreSqlPersonalInformationStore\\": "components/PostgreSQLPersonalInformationStore/tests",
-            "Tests\\Morebec\\Orkestra\\PostgreSqlTimerStorage\\": "components/PostgreSQLTimerStorage/tests",
-            "Tests\\Morebec\\Orkestra\\Privacy\\": "components/Privacy/tests",
-            "Tests\\Morebec\\Orkestra\\Retry\\": "components/Retry/tests",
-            "Tests\\Morebec\\Orkestra\\SymfonyBundle\\": "components/SymfonyBundle/Tests/"
+            "Tests\\Morebec\\OrkestraSymfonyBundle\\": "components/orkestra-symfony-bundle/Tests/",
+            "Tests\\Morebec\\Orkestra\\Collections\\": "components/orkestra-collections/tests",
+            "Tests\\Morebec\\Orkestra\\DateTime\\": "components/orkestra-datetime/tests",
+            "Tests\\Morebec\\Orkestra\\Enum\\": "components/orkestra-enum/tests",
+            "Tests\\Morebec\\Orkestra\\EventSourcing\\": "components/orkestra-event-sourcing/tests",
+            "Tests\\Morebec\\Orkestra\\Exceptions\\": "components/orkestra-exceptions/tests",
+            "Tests\\Morebec\\Orkestra\\Messaging\\": "components/orkestra-messaging/tests",
+            "Tests\\Morebec\\Orkestra\\Modeling\\": "components/orkestra-modeling/tests",
+            "Tests\\Morebec\\Orkestra\\Normalization\\": "components/orkestra-normalization/tests",
+            "Tests\\Morebec\\Orkestra\\OrkestraServer\\": "components/server/tests/",
+            "Tests\\Morebec\\Orkestra\\PostgreSqlDocumentStore\\": "components/orkestra-postgresql-document-store/tests",
+            "Tests\\Morebec\\Orkestra\\PostgreSqlEventStore\\": "components/postgresql-eventstore/tests",
+            "Tests\\Morebec\\Orkestra\\PostgreSqlPersonalInformationStore\\": "components/postgresql-personal-information-store/tests",
+            "Tests\\Morebec\\Orkestra\\PostgreSqlTimerStorage\\": "components/postgresql-timer-storage/tests",
+            "Tests\\Morebec\\Orkestra\\Privacy\\": "components/orkestra-privacy/tests",
+            "Tests\\Morebec\\Orkestra\\Retry\\": "components/orkestra-retry/tests",
+            "Tests\\Morebec\\Orkestra\\SymfonyBundle\\": "components/orkestra-symfony-bundle/Tests/"
         }
     },
     "require-dev": {
@@ -85,23 +85,23 @@
     },
     "autoload": {
         "psr-4": {
-            "Morebec\\OrkestraSymfonyBundle\\": "components/SymfonyBundle/.",
-            "Morebec\\Orkestra\\Collections\\": "components/Collections/src",
-            "Morebec\\Orkestra\\DateTime\\": "components/DateTime/src",
-            "Morebec\\Orkestra\\Enum\\": "components/Enum/src",
-            "Morebec\\Orkestra\\EventSourcing\\": "components/EventSourcing/src",
-            "Morebec\\Orkestra\\Exceptions\\": "components/Exceptions/src",
-            "Morebec\\Orkestra\\Messaging\\": "components/Messaging/src",
-            "Morebec\\Orkestra\\Modeling\\": "components/Modeling/src",
-            "Morebec\\Orkestra\\Normalization\\": "components/Normalization/src",
-            "Morebec\\Orkestra\\OrkestraServer\\": "components/Server/src/",
-            "Morebec\\Orkestra\\PostgreSqlDocumentStore\\": "components/PostgreSQLDocumentStore/src",
-            "Morebec\\Orkestra\\PostgreSqlEventStore\\": "components/PostgreSQLEventStore/src",
-            "Morebec\\Orkestra\\PostgreSqlPersonalInformationStore\\": "components/PostgreSQLPersonalInformationStore/src",
-            "Morebec\\Orkestra\\PostgreSqlTimerStorage\\": "components/PostgreSQLTimerStorage/src",
-            "Morebec\\Orkestra\\Privacy\\": "components/Privacy/src",
-            "Morebec\\Orkestra\\Retry\\": "components/Retry/src",
-            "Morebec\\Orkestra\\SymfonyBundle\\": "components/SymfonyBundle/."
+            "Morebec\\OrkestraSymfonyBundle\\": "components/orkestra-symfony-bundle/.",
+            "Morebec\\Orkestra\\Collections\\": "components/orkestra-collections/src",
+            "Morebec\\Orkestra\\DateTime\\": "components/orkestra-datetime/src",
+            "Morebec\\Orkestra\\Enum\\": "components/orkestra-enum/src",
+            "Morebec\\Orkestra\\EventSourcing\\": "components/orkestra-event-sourcing/src",
+            "Morebec\\Orkestra\\Exceptions\\": "components/orkestra-exceptions/src",
+            "Morebec\\Orkestra\\Messaging\\": "components/orkestra-messaging/src",
+            "Morebec\\Orkestra\\Modeling\\": "components/orkestra-modeling/src",
+            "Morebec\\Orkestra\\Normalization\\": "components/orkestra-normalization/src",
+            "Morebec\\Orkestra\\OrkestraServer\\": "components/server/src/",
+            "Morebec\\Orkestra\\PostgreSqlDocumentStore\\": "components/orkestra-postgresql-document-store/src",
+            "Morebec\\Orkestra\\PostgreSqlEventStore\\": "components/postgresql-eventstore/src",
+            "Morebec\\Orkestra\\PostgreSqlPersonalInformationStore\\": "components/postgresql-personal-information-store/src",
+            "Morebec\\Orkestra\\PostgreSqlTimerStorage\\": "components/postgresql-timer-storage/src",
+            "Morebec\\Orkestra\\Privacy\\": "components/orkestra-privacy/src",
+            "Morebec\\Orkestra\\Retry\\": "components/orkestra-retry/src",
+            "Morebec\\Orkestra\\SymfonyBundle\\": "components/orkestra-symfony-bundle/."
         }
     },
     "replace": {

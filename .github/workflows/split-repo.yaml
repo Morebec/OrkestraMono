@@ -43,7 +43,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         with:
-          package-directory: 'components/${{ matrix.package.local_path }}'
+          package-directory: 'components/${{ matrix.package }}'
           split-repository-organization: 'Morebec'
           split-repository-name: '${{ matrix.package }}'
           user-name: "Morebot"
