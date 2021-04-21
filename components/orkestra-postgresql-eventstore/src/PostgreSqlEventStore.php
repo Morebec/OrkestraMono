@@ -293,7 +293,7 @@ class PostgreSqlEventStore implements EventStoreInterface
                 $mQb->where(sprintf('%s = %s', EventsTableKeys::STREAM_ID, $mQb->createPositionalParameter((string) $streamId)));
             }
 
-            $result = $mQb->execute();
+            $result = $mQb->executeQuery();
             $position = $result->fetchAssociative()['max'] + 1;
         }
 
@@ -317,6 +317,26 @@ class PostgreSqlEventStore implements EventStoreInterface
                 ->setFirstResult(0)
                 ->setMaxResults($options->maxCount)
             ;
+        }
+
+        // Filter by event types
+        if ($options->eventTypes) {
+            $eventTypesAsStrings = array_map(static function (EventType $t) {
+                return (string) $t;
+            }, $options->eventTypes);
+
+            $eventTypes = implode(',', $eventTypesAsStrings);
+            $qb->andWhere(sprintf('%s IN (%s)', EventsTableKeys::TYPE, $qb->createPositionalParameter($eventTypes)));
+        }
+
+        // Ignore event types
+        if ($options->ignoredEventTypes) {
+            $eventTypesAsStrings = array_map(static function (EventType $t) {
+                return (string) $t;
+            }, $options->ignoredEventTypes);
+
+            $eventTypes = implode(',', $eventTypesAsStrings);
+            $qb->andWhere(sprintf('%s NOT IN (%s)', EventsTableKeys::TYPE, $qb->createPositionalParameter($eventTypes)));
         }
 
         // Run Query.
@@ -350,7 +370,7 @@ class PostgreSqlEventStore implements EventStoreInterface
             ->where(StreamsTableKeys::ID.' = '.$qb->createPositionalParameter((string) $streamId))
         ;
 
-        $result = $qb->execute();
+        $result = $qb->executeQuery();
         $streamData = $result->fetchAssociative();
 
         return $streamData ? new EventStream($streamId, EventStreamVersion::fromInt($streamData[StreamsTableKeys::VERSION])) : null;

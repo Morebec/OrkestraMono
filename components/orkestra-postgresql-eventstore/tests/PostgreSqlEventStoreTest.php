@@ -158,7 +158,7 @@ class PostgreSqlEventStoreTest extends TestCase
                 ),
                 new EventDescriptor(
                     EventId::fromString('event3'),
-                    EventType::fromString('user_account_registered'),
+                    EventType::fromString('user_account_updated'),
                     new EventData([
                         'username' => 'user_3',
                         'emailAddress' => 'email2@address.com',
@@ -203,7 +203,45 @@ class PostgreSqlEventStoreTest extends TestCase
             ->forward()
             ->from($lastEventSeqNumber->toInt() - 1)
         );
+        $this->assertCount(1, $events);
 
+        // Filter event types
+        $events = $this->store->readStream(
+            $this->store->getGlobalStreamId(),
+            ReadStreamOptions::read()
+                ->filterEventTypes([
+                    EventType::fromString('user_account_updated'),
+                ])
+        );
+        $this->assertCount(1, $events);
+
+        $events = $this->store->readStream(
+            $this->store->getGlobalStreamId(),
+            ReadStreamOptions::read()
+                ->filterEventTypes([
+                    EventType::fromString('user_account_registered'),
+                ])
+        );
+        $this->assertCount(2, $events);
+
+        // Ignore event types
+        // Filter event pes
+        $events = $this->store->readStream(
+            $this->store->getGlobalStreamId(),
+            ReadStreamOptions::read()
+                ->ignoreEventTypes([
+                    EventType::fromString('user_account_updated'),
+                ])
+        );
+        $this->assertCount(2, $events);
+
+        $events = $this->store->readStream(
+            $this->store->getGlobalStreamId(),
+            ReadStreamOptions::read()
+                ->ignoreEventTypes([
+                    EventType::fromString('user_account_registered'),
+                ])
+        );
         $this->assertCount(1, $events);
     }
 
