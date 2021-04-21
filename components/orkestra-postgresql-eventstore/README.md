@@ -6,7 +6,7 @@ Under the hood, it uses DBAL for communication with PostgreSQL.
 
 ## Installation
 ```shell
-composer require morebec/orkestra-postgresql-eventstore
+composer require morebec/orkestra-orkestra-postgresql-eventstore
 ```
 
 ## Usage

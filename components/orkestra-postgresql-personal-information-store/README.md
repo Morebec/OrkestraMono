@@ -7,7 +7,7 @@ It relies on DBAL for communication with PostgreSQL.
 ## Installation
 The component can be installed using composer.
 ```shell
-composer require morebec/orkestra-postgresql-personal-information-store
+composer require morebec/orkestra-orkestra-postgresql-personal-information-store
 ```
 
 ## Usage

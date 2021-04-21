@@ -5,7 +5,7 @@ using PostgreSQL.
 ## Installation
 
 ```shell
-composer require orkestra-postgresql-timer-storage
+composer require orkestra-orkestra-postgresql-timer-storage
 ```
 
 ## Usage

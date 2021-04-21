@@ -1,6 +1,6 @@
 {
     "name": "morebec/orkestra-postgresql-personal-information-store",
-    "description": "PostgreSQL Timer Storage for Orkestra",
+    "description": "PostgreSQL Personal Information Storage for Orkestra",
     "type": "library",
     "authors": [
         {
