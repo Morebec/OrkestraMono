@@ -18,10 +18,6 @@
     "description": "Orkestra is a library of infrastructure and architecture helpers for creating CQRS and Event Sourced applications",
     "authors": [
         {
-            "name": "Jwillp",
-            "email": "jwilliam.perreault@morebec.com"
-        },
-        {
             "name": "jwillp",
             "email": "jwilliam.perreault@morebec.com"
         }
@@ -121,7 +117,10 @@
         "morebec/orkestra-privacy": "2.2.0",
         "morebec/orkestra-retry": "2.2.0",
         "morebec/orkestra-server": "2.2.0",
-        "morebec/orkestra-symfony-bundle": "2.2.0"
+        "morebec/orkestra-symfony-bundle": "2.2.0",
+        "symfony/polyfill-ctype": "*",
+        "symfony/polyfill-iconv": "*",
+        "symfony/polyfill-php72": "*"
     },
     "scripts": {
         "auto-scripts": {
