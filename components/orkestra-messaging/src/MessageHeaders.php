@@ -8,6 +8,8 @@ namespace Morebec\Orkestra\Messaging;
  * that can also be stored, as long as it contains only the aforementioned value types.
  *
  * This class contains constant for common types of metadata.
+ *
+ * These headers can be modified by the different middleware freely. This class is not intended to be immutable.
  */
 class MessageHeaders
 {
