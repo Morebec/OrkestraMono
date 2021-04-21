@@ -12,7 +12,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * Console Command used to debug message routes.
  */
-class DebugMessageClassMap extends Command
+class DebugMessageClassMapConsoleCommand extends Command
 {
     protected static $defaultName = 'orkestra:orkestra-messaging:debug-classmap';
 
