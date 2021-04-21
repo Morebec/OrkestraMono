@@ -1,4 +1,6 @@
 # Orkestra
+[![Monorepo Split](https://github.com/Morebec/OrkestraMono/actions/workflows/split-repo.yaml/badge.svg)](https://github.com/Morebec/OrkestraMono/actions/workflows/split-repo.yaml)
+
 Orkestra is a set of PHP components for building Systems and Applications using concepts from
 Domain Driven Design (DDD), Command Query Responsibility Segregation (CQRS) and Event Souring (ES).
 
