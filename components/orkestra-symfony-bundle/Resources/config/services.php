@@ -26,7 +26,7 @@ use Morebec\Orkestra\Messaging\Validation\ValidateMessageMiddleware;
 use Morebec\Orkestra\Normalization\ObjectNormalizer;
 use Morebec\Orkestra\Normalization\ObjectNormalizerInterface;
 use Morebec\Orkestra\SymfonyBundle\Command\DebugMessageClassMapConsoleCommand;
-use Morebec\Orkestra\SymfonyBundle\Command\DebugMessageRouter;
+use Morebec\Orkestra\SymfonyBundle\Command\DebugMessageRouterConsoleCommand;
 use Morebec\Orkestra\SymfonyBundle\DependencyInjection\SymfonyMessageClassMapFactory;
 use Morebec\Orkestra\SymfonyBundle\Messaging\MessageRouterCache;
 use Morebec\Orkestra\SymfonyBundle\Module\SymfonyOrkestraModuleContainerConfigurator;
@@ -128,6 +128,6 @@ return static function (ContainerConfigurator $configurator) {
 //        ;
 
     // Console commands.
-    $services->set(DebugMessageRouter::class)->tag('console.command');
+    $services->set(DebugMessageRouterConsoleCommand::class)->tag('console.command');
     $services->set(DebugMessageClassMapConsoleCommand::class)->tag('console.command');
 };
