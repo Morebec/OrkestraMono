@@ -48,3 +48,4 @@ jobs:
           split-repository-name: '${{ matrix.package }}'
           user-name: "Morebot"
           user-email: "info@morebec.com"
+          branch: "2.x"
