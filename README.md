@@ -37,12 +37,12 @@ Here's a list of the current core components of Orkestra:
 There are also infrastructure specific implementations of some the Interfaces from the core Components:
 - **[PostgreSQLDocumentStore](https://github.com/Morebec/orkestra-postgresql-document-store)**: Allows to treat PostgreSQL like a Document Store.
 - **[PostgreSQLEventStore](https://github.com/Morebec/orkestra-postgresql-event-store)**: Implementation of an Event Store in PostgreSQL.
-- **[PostgreSQLPersonalInformationStore](https://github.com/Morebec/orkestra-postgresql-personal-information-store)**: To be used with the [Privacy]() component, allows storing personal data of users in an encrypted form in a PostgreSQL Database.
-- **[PostgreSQLTimerStorage](https://github.com/Morebec/orkestra-postgresql-timer-storage)**: Allows to store timers of the [Messaging]() component, making it easy to trigger tasks in the future in a much more complex way than Cron by using custom logic.
+- **[PostgreSQLPersonalInformationStore](https://github.com/Morebec/orkestra-postgresql-personal-information-store)**: To be used with the [Privacy](https://github.com/Morebec/orkestra-privacy) component, allows storing personal data of users in an encrypted form in a PostgreSQL Database.
+- **[PostgreSQLTimerStorage](https://github.com/Morebec/orkestra-postgresql-timer-storage)**: Allows to store timers of the [Messaging](https://github.com/Morebec/orkestra-messaging) component, making it easy to trigger tasks in the future in a much more complex way than Cron by using custom logic.
 
 #### Framework Integrations
 Here are additional components for easier integration with specific frameworks:
-- [SymfonyBundle](https://github.com/Morebec/orkestra-symfony-bundle): Integrates various Orkestra Components with Symfony, while also providing a Module system in order to structure projects
+- **[SymfonyBundle](https://github.com/Morebec/orkestra-symfony-bundle)**: Integrates various Orkestra Components with Symfony, while also providing a Module system in order to structure projects
 in a Bounded Context oriented approach.
 
 
