@@ -1,9 +1,8 @@
 version: '3.7'
 services:
     php:
-        container_name: orkestra_framework_php
         build:
-            context: docker/php-fpm
+            context: ./php-fpm
             target: php_dev
         restart: always
         ports:
@@ -17,14 +16,13 @@ services:
             - ~/.ssh/:/root/.ssh/
 
             # PHP Ini config
-            - ./docker/php-fpm/conf.d:/usr/local/etc/php/conf.d:rw
+            - ./php-fpm/conf.d:/usr/local/etc/php/conf.d:rw
 
         environment:
             - PHP_DATE_TIMEZONE=${TIMEZONE:-UTC}
         command: php-fpm
 
     caddy:
-        container_name: orkestra_framework_caddy
         image: caddy:2.2.1-alpine
         restart: always
         ports:
@@ -35,21 +33,20 @@ services:
             # Monorepo
             - ../../:/srv/app/
             - ./tls:/srv/tls
-            - ./docker/caddy/Caddyfile:/etc/caddy/Caddyfile:rw
-            - orkestra_framework_caddy_data:/data
-            - orkestra_framework_caddy_config:/config
+            - ./caddy/Caddyfile:/etc/caddy/Caddyfile:rw
+            - orkestra_framework_dev_caddy_data:/data
+            - orkestra_framework_dev_caddy_config:/config
     postgresql:
-        container_name: orkestra_framework_postgresql
         image: 'docker.io/bitnami/postgresql:11-debian-10'
         ports:
             - '5432:5432'
         volumes:
-            - 'postgresql_data:/bitnami/postgresql'
+            - 'orkesta_framework_dev_postgresql_data:/bitnami/postgresql'
         environment:
             - 'ALLOW_EMPTY_PASSWORD=yes'
 
 volumes:
-    orkestra_framework_caddy_data:
-    orkestra_framework_caddy_config:
-    postgresql_data:
+    orkestra_framework_dev_caddy_data:
+    orkestra_framework_dev_caddy_config:
+    orkesta_framework_dev_postgresql_data:
         driver: local
