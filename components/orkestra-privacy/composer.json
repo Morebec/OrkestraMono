@@ -9,6 +9,9 @@
             "email": "jwilliam.perreault@morebec.com"
         }
     ],
+    "suggest": {
+        "morebec/orkestra-postgresql-personal-information-store": "PostgreSQL implementation of the Personal Information Store with encryption"
+    },
     "require": {
         "php": ">=7.3",
         "morebec/orkestra-datetime": "^2.2"

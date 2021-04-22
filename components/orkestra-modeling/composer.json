@@ -9,6 +9,9 @@
             "email": "jwilliam.perreault@morebec.com"
         }
     ],
+    "suggest": {
+        "morebec/orkestra-postgresql-document-store": "PostgreSQL implementation a document store to easily persist Aggregates without an ORM"
+    },
     "require": {
         "php": ">=7.3",
         "morebec/orkestra-collections": "^2.2",

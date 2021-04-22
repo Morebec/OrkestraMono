@@ -9,6 +9,9 @@
             "email": "jwilliam.perreault@morebec.com"
         }
     ],
+    "suggest": {
+        "morebec/orkestra-postgresql-event-store": "PostgreSQL implementation of an Event Store"
+    },
     "require": {
         "php": ">=7.3",
         "ramsey/uuid": "^4.1",

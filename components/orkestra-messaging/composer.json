@@ -26,6 +26,9 @@
         "friendsofphp/php-cs-fixer": "^2.16",
         "symfony/var-dumper": "5.*"
     },
+    "suggest": {
+        "morebec/orkestra-postgresql-timer-storage": "PostgreSQL implementation of the Timer Storage"
+    },
     "autoload": {
         "psr-4": {
             "Morebec\\Orkestra\\Messaging\\": "src"
