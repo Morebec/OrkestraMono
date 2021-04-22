@@ -326,7 +326,7 @@ class PostgreSqlPersonalInformationStore implements PersonalInformationStoreInte
 
             $piiTable->addColumn(self::DATA_KEY, 'blob', ['notnull' => true]);
 
-            $piiTable->addColumn(self::DISPOSED_AT_KEY, 'orkestra-datetime', ['notnull' => false]);
+            $piiTable->addColumn(self::DISPOSED_AT_KEY, 'datetime', ['notnull' => false]);
             $piiTable->addIndex([self::DISPOSED_AT_KEY]);
         }
 
