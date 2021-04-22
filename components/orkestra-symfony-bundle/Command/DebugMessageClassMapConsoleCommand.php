@@ -14,7 +14,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class DebugMessageClassMapConsoleCommand extends Command
 {
-    protected static $defaultName = 'orkestra:orkestra-messaging:debug-classmap';
+    protected static $defaultName = 'orkestra:messaging:debug-classmap';
 
     /**
      * @var MessageClassMapInterface

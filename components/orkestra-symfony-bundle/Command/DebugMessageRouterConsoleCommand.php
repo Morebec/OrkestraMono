@@ -15,7 +15,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class DebugMessageRouterConsoleCommand extends Command
 {
-    protected static $defaultName = 'orkestra:orkestra-messaging:debug-router';
+    protected static $defaultName = 'orkestra:messaging:debug-router';
 
     /**
      * @var MessageRouterInterface
