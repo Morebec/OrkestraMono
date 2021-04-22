@@ -1,7 +1,7 @@
 version: '3.7'
 services:
     php:
-        container_name: orkestra_server_php
+        container_name: orkestra_framework_php
         build:
             context: docker/php-fpm
             target: php_dev
@@ -11,7 +11,7 @@ services:
 
         volumes:
             # Monorepo
-            - ../../:/srv/app/
+            - ./:/srv/app/
 
             # Mount ssh keys
             - ~/.ssh/:/root/.ssh/
@@ -24,7 +24,7 @@ services:
         command: php-fpm
 
     caddy:
-        container_name: orkestra_server_caddy
+        container_name: orkestra_framework_caddy
         image: caddy:2.2.1-alpine
         restart: always
         ports:
@@ -33,13 +33,13 @@ services:
             - 2019:2019
         volumes:
             # Monorepo
-            - ../../:/srv/app/
+            - ./:/srv/app/
             - ./tls:/srv/tls
             - ./docker/caddy/Caddyfile:/etc/caddy/Caddyfile:rw
-            - orkestra_server_caddy_data:/data
-            - orkestra_server_caddy_config:/config
+            - orkestra_framework_caddy_data:/data
+            - orkestra_framework_caddy_config:/config
     postgresql:
-        container_name: orkestra_server_postgresql
+        container_name: orkestra_framework_postgresql
         image: 'docker.io/bitnami/postgresql:11-debian-10'
         ports:
             - '5432:5432'
@@ -49,7 +49,7 @@ services:
             - 'ALLOW_EMPTY_PASSWORD=yes'
 
 volumes:
-    orkestra_server_caddy_data:
-    orkestra_server_caddy_config:
+    orkestra_framework_caddy_data:
+    orkestra_framework_caddy_config:
     postgresql_data:
         driver: local

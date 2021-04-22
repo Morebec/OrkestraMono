@@ -18,6 +18,7 @@ for the different components. The same goes for issues on GitHub.
 ```
 docs/ # Contains the documentation of Orkestra and this repository.
 components/ # Contains the different components of Orkestra
+docker/ # Contains some docker-compose files in order to ease the **development** of orkestra components. 
 ```
 
 ### Development
