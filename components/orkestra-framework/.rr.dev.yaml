@@ -10,6 +10,13 @@ http:
     dir: "public"
     forbid: [ ".php", ".htaccess" ]
 
+  http2:
+    h2c: false
+    max_concurrent_streams: 128
+
+status:
+  address: localhost:2114
+
 logs:
   mode: development
   channels:

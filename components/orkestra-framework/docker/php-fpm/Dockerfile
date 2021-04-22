@@ -35,13 +35,6 @@ ENV COMPOSER_ALLOW_SUPERUSER=1
 RUN curl --insecure https://getcomposer.org/composer.phar -o /usr/bin/composer && chmod +x /usr/bin/composer
 RUN composer self-update --stable
 
-# Instal Yarn
-RUN apt-get update && apt-get install -y wget gnupg
-RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
-RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
-RUN apt update && apt install -y yarn
-RUN yarn install
-
 # Set timezone
 RUN rm /etc/localtime
 RUN ln -s /usr/share/zoneinfo/${PHP_DATE_TIMEZONE:-UTC} /etc/localtime

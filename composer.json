@@ -23,7 +23,7 @@
         }
     ],
     "require": {
-        "baldinof/roadrunner-bundle": "2.0.1",
+        "baldinof/roadrunner-bundle": "^2.0",
         "cakephp/chronos": "^2.0",
         "doctrine/annotations": "1.12.1",
         "doctrine/dbal": "^3.0",
@@ -37,6 +37,7 @@
         "ext-pgsql": "*",
         "ext-posix": "*",
         "ext-sodium": "*",
+        "monolog/monolog": "^2.0",
         "php": ">=7.3",
         "php-di/phpdoc-reader": "2.*",
         "ramsey/uuid": "^4.1",

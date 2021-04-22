@@ -19,6 +19,7 @@ use Morebec\Orkestra\OrkestraFramework\Framework\ConsoleCommand\MainProjectionEv
 use Morebec\Orkestra\OrkestraFramework\Framework\ConsoleCommand\MainTimerProcessorConsoleCommand;
 use Morebec\Orkestra\OrkestraFramework\Framework\ConsoleCommand\OrkestraFrameworkQuickstartConsoleCommand;
 use Morebec\Orkestra\OrkestraFramework\Framework\Projection\PostgreSqlProjectorGroup;
+use Morebec\Orkestra\OrkestraFramework\Framework\Web\DefaultController;
 use Morebec\Orkestra\PostgreSqlDocumentStore\PostgreSqlDocumentStore;
 use Morebec\Orkestra\PostgreSqlDocumentStore\PostgreSqlDocumentStoreConfiguration;
 use Morebec\Orkestra\PostgreSqlEventStore\PostgreSqlEventStore;
@@ -65,11 +66,14 @@ class FrameworkModuleConfigurator implements SymfonyOrkestraModuleConfiguratorIn
 
         if ($_ENV['APP_ENV'] === 'dev') {
             $config->consoleCommand(OrkestraFrameworkQuickstartConsoleCommand::class);
+            $config->controller(DefaultController::class);
         }
+
     }
 
     public function configureRoutes(RoutingConfigurator $routes): void
     {
+        $routes->import(__DIR__ . '/../Web', 'annotation');
     }
 
     /**
