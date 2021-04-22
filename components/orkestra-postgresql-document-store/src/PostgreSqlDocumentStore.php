@@ -62,8 +62,8 @@ final class PostgreSqlDocumentStore
 
         $table->addColumn(CollectionTableColumnKeys::DATA, 'json');
 
-        $table->addColumn(CollectionTableColumnKeys::CREATED_AT, 'orkestra-datetime');
-        $table->addColumn(CollectionTableColumnKeys::UPDATED_AT, 'orkestra-datetime');
+        $table->addColumn(CollectionTableColumnKeys::CREATED_AT, 'datetime');
+        $table->addColumn(CollectionTableColumnKeys::UPDATED_AT, 'datetime');
 
         $queries = $schema->toSql($this->connection->getDatabasePlatform());
         foreach ($queries as $query) {
