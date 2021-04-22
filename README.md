@@ -51,6 +51,7 @@ Here are additional components for easier integration with specific frameworks:
 ## Monorepo
 The current repository is maintained as a Monorepo, all issues and pull requests for any of the components should be done in this repository.
 Internally whenever a new release is made it is propagated to the standalone repositories of the different components.
+For more information please read the [Contribution Guide](./docs/ContributionGuide.md).
 
 ## Getting Started
 To get started, please read the following [page]() from the documentation.
@@ -61,5 +62,5 @@ we will try our best to help you.
 
 ## Contributing
 Orkestra is open for contributions. If you want to contribute to one of the components or the documentation, please read
-the [Contribution Guide]().
+the [Contribution Guide](./docs/ContributionGuide.md).
 
