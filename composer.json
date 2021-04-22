@@ -23,6 +23,7 @@
         }
     ],
     "require": {
+        "baldinof/roadrunner-bundle": "2.0.1",
         "cakephp/chronos": "^2.0",
         "doctrine/annotations": "1.12.1",
         "doctrine/dbal": "^3.0",
@@ -61,7 +62,9 @@
             "Tests\\Morebec\\Orkestra\\Messaging\\": "components/orkestra-messaging/tests",
             "Tests\\Morebec\\Orkestra\\Modeling\\": "components/orkestra-modeling/tests",
             "Tests\\Morebec\\Orkestra\\Normalization\\": "components/orkestra-normalization/tests",
-            "Tests\\Morebec\\Orkestra\\OrkestraServer\\": "components/server/tests/",
+            "Tests\\Morebec\\Orkestra\\OrkestraFramework\\": "components/orkestra-framework/tests/",
+            "Tests\\Morebec\\Orkestra\\OrkestraFramework\\Framework\\": "components/orkestra-framework/tests/Framework",
+            "Tests\\Morebec\\Orkestra\\OrkestraServer\\": "components/orkestra-server/tests/",
             "Tests\\Morebec\\Orkestra\\PostgreSqlDocumentStore\\": "components/orkestra-postgresql-document-store/tests",
             "Tests\\Morebec\\Orkestra\\PostgreSqlEventStore\\": "components/orkestra-postgresql-eventstore/tests",
             "Tests\\Morebec\\Orkestra\\PostgreSqlPersonalInformationStore\\": "components/orkestra-postgresql-personal-information-store/tests",
@@ -77,6 +80,7 @@
         "phpstan/phpstan": "^0.12.7",
         "phpunit/phpunit": "^9.5",
         "symfony/var-dumper": "5.*",
+        "symplify/composer-json-manipulator": "^9.2",
         "symplify/monorepo-builder": "^9.2"
     },
     "autoload": {
@@ -90,7 +94,9 @@
             "Morebec\\Orkestra\\Messaging\\": "components/orkestra-messaging/src",
             "Morebec\\Orkestra\\Modeling\\": "components/orkestra-modeling/src",
             "Morebec\\Orkestra\\Normalization\\": "components/orkestra-normalization/src",
-            "Morebec\\Orkestra\\OrkestraServer\\": "components/server/src/",
+            "Morebec\\Orkestra\\OrkestraFramework\\": "components/orkestra-framework/src/",
+            "Morebec\\Orkestra\\OrkestraFramework\\Framework\\": "components/orkestra-framework/src/Framework",
+            "Morebec\\Orkestra\\OrkestraServer\\": "components/orkestra-server/src/",
             "Morebec\\Orkestra\\PostgreSqlDocumentStore\\": "components/orkestra-postgresql-document-store/src",
             "Morebec\\Orkestra\\PostgreSqlEventStore\\": "components/orkestra-postgresql-eventstore/src",
             "Morebec\\Orkestra\\PostgreSqlPersonalInformationStore\\": "components/orkestra-postgresql-personal-information-store/src",
@@ -107,6 +113,7 @@
         "morebec/orkestra-enum": "2.2.0",
         "morebec/orkestra-event-sourcing": "2.2.0",
         "morebec/orkestra-exceptions": "2.2.0",
+        "morebec/orkestra-framework": "self.version",
         "morebec/orkestra-messaging": "2.2.0",
         "morebec/orkestra-modeling": "2.2.0",
         "morebec/orkestra-normalization": "2.2.0",
