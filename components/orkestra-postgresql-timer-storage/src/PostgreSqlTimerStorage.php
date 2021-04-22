@@ -145,7 +145,7 @@ class PostgreSqlTimerStorage implements TimerStorageInterface
             $eventsTable = $schema->createTable($configuration->timerTableName);
             $eventsTable->addColumn(self::ID_KEY, 'string', ['notnull' => true]);
             $eventsTable->setPrimaryKey([self::ID_KEY]);
-            $eventsTable->addColumn(self::END_AT_KEY, 'orkestra-datetime', ['notnull' => true]);
+            $eventsTable->addColumn(self::END_AT_KEY, 'datetime', ['notnull' => true]);
             $eventsTable->addColumn(self::MESSAGE_PAYLOAD_KEY, 'json', ['notnull' => true]);
             $eventsTable->addColumn(self::MESSAGE_HEADERS, 'json', ['notnull' => true]);
             $eventsTable->addColumn(self::MESSAGE_TYPE_NAME_KEY, 'string', ['notnull' => true]);
