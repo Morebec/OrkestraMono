@@ -1,6 +1,7 @@
 {
     "name": "morebec/orkestra-datetime",
     "description": "Extension of CakePHP/Chronos that adds utility functions around DateTime manipulation.",
+    "license": "Apache-2.0",
     "require": {
         "php": ">=7.3",
         "cakephp/chronos": "^2.0"

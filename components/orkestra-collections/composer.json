@@ -2,6 +2,7 @@
     "name": "morebec/orkestra-collections",
     "description": "The Collections component provides classes and functionality to use Typed collections.",
     "type": "library",
+    "license": "Apache-2.0",
     "authors": [
         {
             "name": "jwillp",

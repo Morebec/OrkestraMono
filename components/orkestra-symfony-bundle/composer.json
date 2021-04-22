@@ -2,6 +2,7 @@
     "name": "morebec/orkestra-symfony-bundle",
     "description": "Symfony Bundle for the Orkestra Framework",
     "type": "symfony-bundle",
+    "license": "Apache-2.0",
     "authors": [
         {
             "name": "jwillp",

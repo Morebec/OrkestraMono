@@ -2,6 +2,7 @@
     "name": "morebec/orkestra-retry",
     "description": "Orkestra component providing utilities for retrying operations when they fail",
     "type": "library",
+    "license": "Apache-2.0",
     "authors": [
         {
             "name": "jwillp",

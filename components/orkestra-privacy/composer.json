@@ -2,6 +2,7 @@
     "name": "morebec/orkestra-privacy",
     "description": "Orkestra Component providing Privacy utilities.",
     "type": "library",
+    "license": "Apache-2.0",
     "authors": [
         {
             "name": "jwillp",

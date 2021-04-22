@@ -2,6 +2,7 @@
     "name": "morebec/orkestra-normalization",
     "description": "Orkestra Component allowing to easily normalize complex object graphs to arrays of primitives for persistence purposes",
     "type": "library",
+    "license": "Apache-2.0",
     "authors": [
         {
             "name": "jwillp",

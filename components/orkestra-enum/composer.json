@@ -2,6 +2,7 @@
     "name": "morebec/orkestra-enum",
     "description": "Orkestra component providing enums",
     "type": "library",
+    "license": "Apache-2.0",
     "authors": [
         {
             "name": "jwillp",

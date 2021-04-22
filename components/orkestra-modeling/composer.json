@@ -2,6 +2,7 @@
     "name": "morebec/orkestra-modeling",
     "description": "Orkestra component providing classes and utilities for DDD modeling",
     "type": "library",
+    "license": "Apache-2.0",
     "authors": [
         {
             "name": "jwillp",

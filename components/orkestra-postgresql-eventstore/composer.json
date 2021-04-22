@@ -2,6 +2,7 @@
     "name": "morebec/orkestra-postgresql-eventstore",
     "description": "PostgreSQL Event Store for Orkestra",
     "type": "library",
+    "license": "Apache-2.0",
     "authors": [
         {
             "name": "jwillp",

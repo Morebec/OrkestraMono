@@ -2,6 +2,7 @@
     "name": "morebec/orkestra-postgresql-document-store",
     "description": "Orkestra Component allowing to easily use postgreSQL as a Document Store.",
     "type": "library",
+    "license": "Apache-2.0",
     "authors": [
         {
             "name": "jwillp",

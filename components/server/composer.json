@@ -2,7 +2,7 @@
     "name": "morebec/orkestra-server",
     "description": "Orkestra Server",
     "type": "project",
-    "license": "proprietary",
+    "license": "Apache-2.0",
     "minimum-stability": "dev",
     "prefer-stable": true,
     "repositories": [
