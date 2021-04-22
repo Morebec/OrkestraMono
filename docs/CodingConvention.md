@@ -2,6 +2,44 @@
 This document describes the coding standards and conventions for developing Orkestra in order to make
 its code consistent.
 
+## Committing
+Commits messages should have the following form:
+```
+[ComponentName] Your commit message
+```
+
+Commit messages should always be in the imperative mood:
+```
+[Messaging] Update the Getting Started Documentation
+[DateTime] Fix the offset not being applied correctly to the OffsetClock
+[Normalization] Add documentation for the XYZ class
+```
+
+If you make a commit that changes multiple components at once, you can combine the component prefixes:
+```
+[Messaging][Normalization] Improve the bridge between messaging and Normalization
+```
+
+If you need to make changes to a lot of components, instead of combining component prefixes, try to see if 
+it would not be possible to split your commit into multiple commits.
+
+In some cases, there can be modifications that touches all the components, such as adding licenses, or changing
+the coding standard, in this case the [All] Component prefix is accepted.
+
+> Note that the name of the components between brackets, should not include the `orkestra-` prefix. Simply use the 
+> actual name of the component in a PascalCase. E.g: Normalization, PostgreSQLEventStore, Messaging, Retry etc.
+
+## Coding Standard
+The coding standard is enforced using the `firendsofsymfony/php-cs-fixer` composer package that
+provides a binary to fix the files according to the standard defined in the `php_cs.dist` file located 
+at the root of the repository.
+
+Before every commit you should run the following command:
+```shell
+vendor/bin/php-cs-fixer fix components/
+```
+This will ensure all the files you have modified adhere to the coding standard.
+
 ## Changelog
 Every meaningful change should be documented in the `CHANGELOG.md` file located at the root of the directory
 of the changed component. A meaningful change corresponds to new features and deprecations in minor or major versions.
@@ -32,7 +70,7 @@ Here's an example file:
 ```
 
 > **Note:** Since Orkestra is a monorepo all component versions are kept in sync and therefore this should be reflected in the `CHANGELOG.md`file of each component.
-> For more information on this see the [Repository](./Repository.md#Versioning) document.
+> For more information on this see the [Repository](ContributionGuide.md#Versioning) document.
 
 
 ## Deprecating code
