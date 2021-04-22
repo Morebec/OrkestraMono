@@ -134,7 +134,7 @@ class PostgreSqlEventStore implements EventStoreInterface
             $eventsTable->addColumn(EventsTableKeys::TYPE, 'string');
             $eventsTable->addColumn(EventsTableKeys::METADATA, 'json');
             $eventsTable->addColumn(EventsTableKeys::DATA, 'json');
-            $eventsTable->addColumn(EventsTableKeys::RECORDED_AT, 'orkestra-datetime');
+            $eventsTable->addColumn(EventsTableKeys::RECORDED_AT, 'datetime');
 
             $eventsTable->addColumn(EventsTableKeys::SEQUENCE_NUMBER, 'integer', ['autoincrement' => true]);
             $eventsTable->addIndex([EventsTableKeys::SEQUENCE_NUMBER]);
