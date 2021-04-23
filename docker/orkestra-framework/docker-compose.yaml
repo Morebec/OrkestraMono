@@ -2,51 +2,29 @@ version: '3.7'
 services:
     php:
         build:
-            context: ./php-fpm
+            context: ../../components/orkestra-framework
             target: php_dev
         restart: always
         ports:
-            - 9000:9000
-
+            - 9090:9090
         volumes:
             # Monorepo
             - ../../:/srv/app/
-
+            - ./supervisor.ini:/etc/supervisor.d/supervisor.ini
             # Mount ssh keys
             - ~/.ssh/:/root/.ssh/
 
-            # PHP Ini config
-            - ./php-fpm/conf.d:/usr/local/etc/php/conf.d:rw
 
-        environment:
-            - PHP_DATE_TIMEZONE=${TIMEZONE:-UTC}
-        command: php-fpm
-
-    caddy:
-        image: caddy:2.2.1-alpine
-        restart: always
-        ports:
-            - 80:80
-            - 443:443
-            - 2019:2019
-        volumes:
-            # Monorepo
-            - ../../:/srv/app/
-            - ./tls:/srv/tls
-            - ./caddy/Caddyfile:/etc/caddy/Caddyfile:rw
-            - orkestra_framework_dev_caddy_data:/data
-            - orkestra_framework_dev_caddy_config:/config
     postgresql:
+        container_name: orkestra_framework_postgresql
         image: 'docker.io/bitnami/postgresql:11-debian-10'
         ports:
-            - '5432:5432'
+            - 5432:5432
         volumes:
-            - 'orkesta_framework_dev_postgresql_data:/bitnami/postgresql'
+            - orkesta_framework_dev_postgresql_data:/bitnami/postgresql
         environment:
             - 'ALLOW_EMPTY_PASSWORD=yes'
 
 volumes:
-    orkestra_framework_dev_caddy_data:
-    orkestra_framework_dev_caddy_config:
     orkesta_framework_dev_postgresql_data:
         driver: local
