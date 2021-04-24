@@ -8,7 +8,6 @@ services:
         ports:
             - 9090:9090
         volumes:
-            # Monorepo
             - ../../:/srv/app/
             - ./supervisor.ini:/etc/supervisor.d/supervisor.ini
             # Mount ssh keys

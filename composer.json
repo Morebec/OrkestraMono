@@ -51,6 +51,7 @@
         "symfony/http-kernel": "^5.0",
         "symfony/lock": "5.*",
         "symfony/monolog-bundle": "^3.7",
+        "symfony/process": "5.2.*",
         "symfony/yaml": "5.2.*"
     },
     "autoload-dev": {

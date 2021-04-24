@@ -33,3 +33,7 @@ phpunit.xml
 .phpunit.result.cache
 ###< phpunit/phpunit ###
 
+###> supervisord
+supervisord.log
+supervisord.pid
+###< supervisord
