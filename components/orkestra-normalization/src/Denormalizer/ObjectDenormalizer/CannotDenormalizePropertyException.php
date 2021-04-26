@@ -5,6 +5,9 @@ namespace Morebec\Orkestra\Normalization\Denormalizer\ObjectDenormalizer;
 use Morebec\Orkestra\Normalization\Denormalizer\DenormalizationExceptionInterface;
 use Throwable;
 
+/**
+ * Thrown when a property cannot be denormalized because of a type mismatch.
+ */
 class CannotDenormalizePropertyException extends \InvalidArgumentException implements DenormalizationExceptionInterface
 {
     /**

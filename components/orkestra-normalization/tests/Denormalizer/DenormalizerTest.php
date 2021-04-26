@@ -9,7 +9,27 @@ use PHPUnit\Framework\TestCase;
 
 class DenormalizerTest extends TestCase
 {
-    public function testDenormalize()
+    public function testDenormalizePropertySubset(): void
+    {
+        $obj = $this->createObject();
+
+        $denormalizer = new Denormalizer();
+
+        $data = [
+            'username' => 'user123',
+            'emailAddress' => 'user123@email.com',
+
+            // Having additional properties should not throw error, and should only be ignored.
+            'additionalProperty' => 456
+        ];
+
+        $denormalizedObject = $denormalizer->denormalize(new DenormalizationContext($data, \get_class($obj)));
+
+        $this->assertEquals($data['username'], $denormalizedObject->username);
+        $this->assertEquals($data['emailAddress'], $denormalizedObject->emailAddress);
+    }
+
+    public function testDenormalizeNullableDateTime()
     {
         $obj = $this->createNullableDateTimeObject();
         // Make sure strings for date times that are nullable work as expected
@@ -25,9 +45,33 @@ class DenormalizerTest extends TestCase
             DateTime::createFromFormat(DateTime::RFC3339_EXTENDED, '2020-01-01T00:00:00.000+00:00'),
             $denormalizedObject->date
         );
+
+        $data = [
+            'date' => null,
+        ];
+
+        $denormalizedObject = $denormalizer->denormalize(new DenormalizationContext($data, \get_class($obj)));
+
+        $this->assertNull($denormalizedObject->date);
     }
 
-    public function createNullableDateTimeObject()
+    private function createObject()
+    {
+        return new class() {
+
+            /** @var string */
+            public $username;
+
+            /** @var string */
+            public $emailAddress;
+
+            public function __construct()
+            {
+            }
+        };
+    }
+
+    private function createNullableDateTimeObject()
     {
         return new class() {
             /** @var DateTime|null */
