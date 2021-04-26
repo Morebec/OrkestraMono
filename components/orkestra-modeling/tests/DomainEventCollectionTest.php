@@ -18,6 +18,20 @@ class DomainEventCollectionTest extends TestCase
         $this->assertEmpty($collection);
     }
 
+    public function testMap(): void
+    {
+        $collection = new DomainEventCollection([
+           $this->createEventA(),
+           $this->createEventB(),
+        ]);
+
+        $typeNames = $collection->map(static function (DomainEventInterface $event) {
+            return $event::getTypeName();
+        });
+
+        $this->assertEquals(['event_a', 'event_b'], $typeNames);
+    }
+
     public function testToArray(): void
     {
         $collection = new DomainEventCollection();

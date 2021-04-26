@@ -65,6 +65,11 @@ class DomainEventCollection implements DomainEventCollectionInterface
         return new self($filtered);
     }
 
+    public function map(callable $callable): array
+    {
+        return array_map($callable, $this->events);
+    }
+
     public function toArray(): array
     {
         return $this->events;

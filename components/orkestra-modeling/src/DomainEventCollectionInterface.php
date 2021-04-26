@@ -68,6 +68,12 @@ interface DomainEventCollectionInterface extends Iterator, \Countable
     public function filter(callable $predicate): self;
 
     /**
+     * Applies a given callable to every element in the collection and
+     * returns the result as an array.
+     */
+    public function map(callable $callable): array;
+
+    /**
      * Converts this collection to an array.
      *
      * @return DomainEventInterface[]
