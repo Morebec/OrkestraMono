@@ -1,5 +1,5 @@
 # Messaging
-This document explains the core concepts that make up the Messaging Component and how it should be used.
+*This document explains the core concepts that make up the Messaging Component and how it should be used.*
 
 The Messaging component provides functionality to route Messages to Handlers in a uniform way. 
 It is responsible for routing these messages from one component to others. It serves as a way to implement Pub/Sub
@@ -12,8 +12,8 @@ a Marketing email list or subscribed to the company's CRM, statistics can be com
 These use cases can be numerous. In a traditional non-message based system, these operations would likely happen in a single 
 Web Controller. However, this has a lot of drawbacks and shortcomings:
 - This can very quickly make the controller handle too many responsibilities,
-- One of these operation could fail, leaving the system in an inconsistent state, use registered, but not added to CRM, or Welcome Email not send.
-- If we ever allow a different client such as a CLI application, Androind App, or a completely different system, to use the feature, the logic would need to be duplicated
+- One of these operation could fail, leaving the system in an inconsistent state, e.g. user was registered, but not added to CRM, or Welcome Email not send.
+- If we ever allow a different client such as a CLI application, Android App, or a completely different system, to use the feature, the logic would need to be duplicated
 in different locations.
 - Unit testing all these operations would become harder and one would be forced to test the whole work of the controller as a single unit, instead of on a per-operation basis.
 
@@ -21,7 +21,7 @@ This is where Messaging Patterns can come to the rescue. Messaging allows to hav
 as well as providing extensibility in how these messages travel from one point to another when needed. 
 
 In essence, a messaging mechanism means that the flow of a program would instead be changed as follows:
-- A `Message Producer` (Such as a Controller, or a GRPC endpoint)  will produce a `MessageInterface` that will be sent, and handled by a `MessageHandlerInterface`.
+- A `Message Producer` (Such as a Controller, or a GRPC endpoint)  will produce a `Message` that will be sent, and handled by a `Message Handler`.
 
 This is somewhat similar to the HTTP protocol where a Client (Message Producer)  sends a Request (Message) to a server  (Message Handler) that handles it 
 and returns a response indicating how the handling of the request went.
@@ -68,7 +68,7 @@ Indeed, this is because they represent specific intents or facts.
 > In a few circumstances, it can make sense to alter messages. Some of these use cases are outlined in later sections
 > such as [Middleware](#Middleware) and [Interceptors](#Message Interceptors) for various uses cases.
 
-#### Domain Commands
+### Domain Commands
 Domain Commands represent a desire or intent to do something in the system. (e.g. Registering a user account, activating/deactivating it etc).
 They can be implemented using the `DomainCommandInterface` that inherits the `DomainMessageInterface`.
 For example, we might have `RegisterUserAccount`, `OrderProduct`, `CancelOrder` etc.
@@ -95,7 +95,7 @@ class RegisterUserAccountCommand implements DomainCommandInterface
 }
 ```
 
-#### Domain Queries
+### Domain Queries
 Queries represent a request for information on something. 
 They can be implemented using the `DomainQueryInterface` that inherits the `DomainMessageInterface`.
 For example, we might have `GetRegisteredUsersDuringTimeFrame`, `GetCanceledOrders`, `GetMostExpensiveOrder` etc.
@@ -122,7 +122,7 @@ class GetRegisteredUsersDuringTimeFrameQuery implements DomainQueryInterface
 }
 ```
 
-#### Domain Events
+### Domain Events
 Domain Events are a very different type of message. They conceptually represent things that happened in the past and are immutable facts.
 They can be implemented using the `DomainEventInterface` that inherits the `DomainMessageInterface`.
 For example, we might have `UserAccountRegistered`, `ProductOrdered`, `OrderCancelled` etc.
@@ -334,8 +334,33 @@ Messages are handled by Handlers. Since we define by default three types of doma
 - Event Handlers -> Handle Event messages to trigger side effects and implement the `DomainEventHandlerInterface`
 - Query Handlers -> Handle Query messages to return information and implement the `DomainQueryHandlerInterface`
 
+From an implementation point of view, creating a message handlkers only requries to implement the  MessageHandlerInterface`
+and having a public method with a single argument being the typed message:
 
-TODO: Example message handler
+```php
+class RegisterUserCommandHandler implements DomainCommandHandlerInterface
+{
+    public function __invoke(RegisterUserCommand $command): void
+    {
+        // Perform work here.
+    }
+}
+```
+> The name of the method is irrelevant for the the `RouteMessageMiddleware` and `HandleMessageMiddleware`. They only expect
+> the method to be public and have a single argument being the typed message to be handled.
+
+The `RouteMessageMiddleware` and `HandleMessageMiddleware` also support adding a second parameter to the signature of the handling method
+in order to provide the `MessageHeaders`:
+
+```php
+class RegisterUserCommandHandler implements DomainCommandHandlerInterface
+{
+    public function __invoke(RegisterUserCommand $command, MessageHeaders $headers): void
+    {
+        // Perform work here.
+    }
+}
+```
 
 ## Timers
 In some occasions you might have business rules that need to be executed in the future after a certain time has elapsed.

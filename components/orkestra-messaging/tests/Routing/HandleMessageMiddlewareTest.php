@@ -33,13 +33,13 @@ class HandleMessageMiddlewareTest extends TestCase
             MessageHeaders::DESTINATION_HANDLER_NAMES => ['somHandler::willFail'],
         ]);
         $nextMiddleware = static function (MessageInterface $message, MessageHeaders $headers) {
-            return new MessageHandlerResponse('handlerName', MessageBusResponseStatusCode::SUCCEEDED());
+            throw new \RuntimeException('THIS SHOULD NOT BE CALLED');
         };
 
         $message = $this->createMessage();
         $response = $middleware($message, $headers, $nextMiddleware);
 
-        $this->assertEquals($response->getStatusCode(), MessageBusResponseStatusCode::SUCCEEDED());
+        $this->assertEquals(MessageBusResponseStatusCode::SUCCEEDED(), $response->getStatusCode());
     }
 
     public function testInvokeWithNoHandler()
@@ -80,8 +80,9 @@ class HandleMessageMiddlewareTest extends TestCase
                 return MessageBusResponseStatusCode::FAILED();
             }
 
-            public function willSucceed(MessageInterface $message): MessageBusResponseStatusCode
+            public function willSucceed(MessageInterface $message, MessageHeaders $headers): MessageBusResponseStatusCode
             {
+                // Note: We include headers here to ensure that the middleware calls with the headers when required.
                 return MessageBusResponseStatusCode::SUCCEEDED();
             }
         };

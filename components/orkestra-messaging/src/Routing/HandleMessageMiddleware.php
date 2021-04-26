@@ -83,7 +83,7 @@ class HandleMessageMiddleware implements MessageBusMiddlewareInterface
             }
 
             // Invoke handler
-            $response = $this->invokeMessageHandler($message, $handler, $handlerMethodName);
+            $response = $this->invokeMessageHandler($message, $headers, $handler, $handlerMethodName);
 
             // Invoke interceptors
             $context->replaceResponse($response);
@@ -118,10 +118,22 @@ class HandleMessageMiddleware implements MessageBusMiddlewareInterface
     /**
      * Invokes a message handler.
      */
-    protected function invokeMessageHandler(MessageInterface $message, MessageHandlerInterface $handler, string $handlerMethodName): MessageBusResponseInterface
+    protected function invokeMessageHandler(MessageInterface $message, MessageHeaders $headers, MessageHandlerInterface $handler, string $handlerMethodName): MessageBusResponseInterface
     {
+        $includeHeaders = false;
+        $class = new \ReflectionClass($handler);
+        $method = $class->getMethod($handlerMethodName);
+
+        if ($method->getNumberOfRequiredParameters() === 2) {
+            $reflectionType = $method->getParameters()[1]->getType();
+            $includeHeaders = is_a((string) $reflectionType, MessageHeaders::class, true);
+        }
+
         try {
-            $payload = $handler->{$handlerMethodName}($message);
+            $payload = $includeHeaders ?
+                $handler->{$handlerMethodName}($message, $headers) :
+                $handler->{$handlerMethodName}($message)
+            ;
         } catch (Throwable $throwable) {
             $payload = $throwable;
         }

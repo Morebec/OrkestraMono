@@ -12,7 +12,7 @@ use Morebec\Orkestra\Messaging\MessageInterface;
 interface MessageRouteInterface
 {
     /**
-     * Indicates.
+     * Indicates if this route matches a given message with headers.
      */
     public function matches(MessageInterface $message, MessageHeaders $messageHeaders): bool;
 

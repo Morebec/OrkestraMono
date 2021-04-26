@@ -2,6 +2,7 @@
 
 namespace Morebec\Orkestra\Messaging\Routing;
 
+use Morebec\Orkestra\Messaging\MessageHeaders;
 use Morebec\Orkestra\Messaging\MessageInterface;
 use ReflectionClass;
 use ReflectionException;
@@ -63,7 +64,8 @@ class MessageHandlerRouteBuilder
             }
 
             $params = $method->getParameters();
-            if (\count($params) !== 1) {
+            $nbParameters = $method->getNumberOfRequiredParameters();
+            if ($nbParameters !== 1 && $nbParameters !== 2) {
                 continue;
             }
 
@@ -71,6 +73,14 @@ class MessageHandlerRouteBuilder
             $eventClassName = $eventClass->getClass()->getName();
             if (!is_subclass_of($eventClassName, MessageInterface::class, true)) {
                 continue;
+            }
+
+            if ($nbParameters === 2) {
+                $secondArgClass = $params[1];
+                $secondArgClassName = $secondArgClass->getClass()->getName();
+                if (!is_subclass_of($secondArgClassName, MessageHeaders::class, true)) {
+                    continue;
+                }
             }
 
             $routes[] = new MessageRoute($eventClassName::getTypeName(), $reflectionClass->getName(), $method->getName());
