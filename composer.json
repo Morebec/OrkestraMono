@@ -127,10 +127,7 @@
         "morebec/orkestra-privacy": "2.0.0",
         "morebec/orkestra-retry": "2.0.0",
         "morebec/orkestra-server": "2.0.0",
-        "morebec/orkestra-symfony-bundle": "2.0.0",
-        "symfony/polyfill-ctype": "2.0.0",
-        "symfony/polyfill-iconv": "2.0.0",
-        "symfony/polyfill-php72": "2.0.0"
+        "morebec/orkestra-symfony-bundle": "2.0.0"
     },
     "scripts": {
         "auto-scripts": {
