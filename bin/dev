@@ -40,7 +40,12 @@ case "$command" in
   ;;
 
   fix-cs)
-      vendor/bin/php-cs-fixer fix components/
+      directory=components
+      if [ $2 ]; then
+          directory="components/orkestra-$2"
+      fi
+      echo "Fixing directory $directory ..."
+      vendor/bin/php-cs-fixer fix "$directory"
   ;;
 
   help)
