@@ -1,0 +1,56 @@
+#!/usr/bin/bash
+################################################################################
+# Help                                                                         #
+################################################################################
+displayHelp()
+{
+   # Display Help
+   echo ""
+   echo "Orkestra Monorepo Dev"
+   echo "====================="
+   echo ""
+   echo "This script allows to ease the development of this Monorepo by providing shorthands for the most common commands."
+   echo ""
+   echo "Usage:"
+   echo "  dev [options] [COMMAND] [ARGS...]"
+   echo "Commands:"
+   echo "  merge-deps    Merges the composer.json of the different components."
+   echo "  fix-cs        Fixes the files for coding style."
+   echo "  help          Displays this help message."
+   echo
+}
+
+command=$1
+
+case "$command" in
+  merge-deps)
+        if vendor/bin/monorepo-builder merge ; then
+          case "$2" in
+            -u|--update)
+              composer update
+            ;;
+            -*|--*=) # unsupported flags
+              echo "Error: Unsupported flag $2" >&2
+              exit 1
+          esac
+          exit 0
+        else
+          exit 1
+        fi
+  ;;
+
+  fix-cs)
+      vendor/bin/php-cs-fixer fix components/
+  ;;
+
+  help)
+    displayHelp
+  ;;
+
+  *)
+    echo "Invalid command \"$command\"" 1>&2
+    displayHelp
+    exit 1;
+  ;;
+esac
+
