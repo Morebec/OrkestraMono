@@ -28,16 +28,20 @@ jobs:
     needs: provide_packages_json
     # Containers must run in Linux based operating systems
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package: ${{fromJson(needs.provide_packages_json.outputs.matrix)}}
 
     # Service containers to run with `unit_tests`
     services:
       # Label used to access the service container
       postgres:
         # Docker Hub image
-        image: postgres
+        image: docker.io/bitnami/postgresql:11-debian-10
         # Provide the password for postgres
         env:
-          POSTGRES_PASSWORD: postgres
+          ALLOW_EMPTY_PASSWORD: yes
         # Set health checks to wait until postgres has started
         options: >-
           --health-cmd pg_isready
@@ -59,7 +63,7 @@ jobs:
       - name: Install Composer dependencies
         uses: "ramsey/composer-install@v1"
 
-      - name: Run Unit Tests
+      - name: Run Unit Tests ${{ matrix.package }}
         run: vendor/bin/phpunit components/${{ matrix.package }}
 
 
