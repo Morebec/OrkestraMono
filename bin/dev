@@ -46,7 +46,14 @@ case "$command" in
       fi
       echo "Fixing directory $directory ..."
       vendor/bin/php-cs-fixer fix "$directory"
+      exit 0
   ;;
+
+  make-release)
+    shift
+    vendor/bin/monorepo-builder release "$@"
+    exit 0
+    ;;
 
   help)
     displayHelp
