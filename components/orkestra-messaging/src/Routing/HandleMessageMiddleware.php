@@ -125,8 +125,9 @@ class HandleMessageMiddleware implements MessageBusMiddlewareInterface
         $method = $class->getMethod($handlerMethodName);
 
         if ($method->getNumberOfRequiredParameters() === 2) {
-            $reflectionType = $method->getParameters()[1]->getType();
-            $includeHeaders = is_a((string) $reflectionType, MessageHeaders::class, true);
+            if ($reflectionClass = $method->getParameters()[1]->getClass()) {
+                $includeHeaders = is_a($reflectionClass->getName(), MessageHeaders::class, true);
+            }
         }
 
         try {
