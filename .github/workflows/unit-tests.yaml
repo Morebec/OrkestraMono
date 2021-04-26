@@ -5,13 +5,11 @@ env:
     COMPOSER_ROOT_VERSION: "dev-main"
 jobs:
   # Label of the container job
-  container-job:
+  unit_tests:
     # Containers must run in Linux based operating systems
     runs-on: ubuntu-latest
-    # Docker Hub image that `container-job` executes in
-    container: php:7.3-cli
 
-    # Service containers to run with `container-job`
+    # Service containers to run with `unit_tests`
     services:
       # Label used to access the service container
       postgres:
