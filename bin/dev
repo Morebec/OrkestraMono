@@ -49,6 +49,16 @@ case "$command" in
       exit 0
   ;;
 
+  run-tests)
+      directory=components
+      if [ $2 ]; then
+          directory="components/orkestra-$2"
+      fi
+      echo "Testing directory $directory ..."
+      vendor/bin/phpunit "$directory"
+      exit 0
+  ;;
+
   make-release)
     shift
     vendor/bin/monorepo-builder release "$@"
