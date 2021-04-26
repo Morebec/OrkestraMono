@@ -20,7 +20,7 @@ class DenormalizerTest extends TestCase
             'emailAddress' => 'user123@email.com',
 
             // Having additional properties should not throw error, and should only be ignored.
-            'additionalProperty' => 456
+            'additionalProperty' => 456,
         ];
 
         $denormalizedObject = $denormalizer->denormalize(new DenormalizationContext($data, \get_class($obj)));
@@ -58,7 +58,6 @@ class DenormalizerTest extends TestCase
     private function createObject()
     {
         return new class() {
-
             /** @var string */
             public $username;
 
