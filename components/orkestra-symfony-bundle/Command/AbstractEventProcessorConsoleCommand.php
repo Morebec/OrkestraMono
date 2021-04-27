@@ -1,6 +1,6 @@
 <?php
 
-namespace Morebec\OrkestraSymfonyBundle\Command;
+namespace Morebec\Orkestra\SymfonyBundle\Command;
 
 use Doctrine\DBAL\Exception;
 use Morebec\Orkestra\EventSourcing\EventProcessor\ListenableEventProcessorListenerInterface;

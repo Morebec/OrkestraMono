@@ -1,6 +1,6 @@
 <?php
 
-namespace Morebec\OrkestraSymfonyBundle\Command;
+namespace Morebec\Orkestra\SymfonyBundle\Command;
 
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
