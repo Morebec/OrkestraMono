@@ -38,6 +38,7 @@ class MessageBusContextEventStoreDecoratorTest extends TestCase
         $contextProvider->method('getContext')->willReturn(new MessageBusContext($message, new MessageHeaders([
             MessageHeaders::MESSAGE_ID => 'test_message',
             MessageHeaders::CORRELATION_ID => 'test_correlation',
+            MessageHeaders::CAUSATION_ID => 'test_causation',
             MessageHeaders::APPLICATION_ID => 'test_app',
             MessageHeaders::TENANT_ID => 'test_tenant',
             MessageHeaders::USER_ID => 'test_user',
@@ -57,7 +58,7 @@ class MessageBusContextEventStoreDecoratorTest extends TestCase
         $store->appendToStream($streamId, [$event], AppendStreamOptions::append());
         $event = $store->readStream($streamId, ReadStreamOptions::lastEvent())->getFirst();
 
-        $this->assertEquals('test_message', $event->getEventMetadata()->getValue(MessageHeaders::CAUSATION_ID));
+        $this->assertEquals('test_causation', $event->getEventMetadata()->getValue(MessageHeaders::CAUSATION_ID));
         $this->assertEquals('test_correlation', $event->getEventMetadata()->getValue(MessageHeaders::CORRELATION_ID));
         $this->assertEquals('test_app', $event->getEventMetadata()->getValue(MessageHeaders::APPLICATION_ID));
         $this->assertEquals('test_tenant', $event->getEventMetadata()->getValue(MessageHeaders::TENANT_ID));
