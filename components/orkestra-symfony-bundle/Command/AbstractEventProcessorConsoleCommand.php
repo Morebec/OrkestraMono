@@ -3,11 +3,11 @@
 namespace Morebec\Orkestra\SymfonyBundle\Command;
 
 use Doctrine\DBAL\Exception;
-use Morebec\Orkestra\EventSourcing\EventProcessor\ListenableEventProcessorListenerInterface;
+use Morebec\Orkestra\EventSourcing\EventProcessor\EventProcessorListenerInterface;
+use Morebec\Orkestra\EventSourcing\EventProcessor\ListenableEventProcessorInterface;
 use Morebec\Orkestra\EventSourcing\EventProcessor\ReplayableEventProcessorInterface;
 use Morebec\Orkestra\EventSourcing\EventProcessor\TrackingEventProcessor;
-use Morebec\Orkestra\EventSourcing\EventStore\EventStreamVersion;
-use Morebec\Orkestra\EventSourcing\EventStore\ReadStreamOptions;
+use Morebec\Orkestra\EventSourcing\EventProcessor\TrackingEventProcessorInspector;
 use Morebec\Orkestra\EventSourcing\EventStore\RecordedEventDescriptor;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\HelpCommand;
@@ -19,7 +19,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-class AbstractEventProcessorConsoleCommand extends Command implements ListenableEventProcessorListenerInterface
+class AbstractEventProcessorConsoleCommand extends Command implements EventProcessorListenerInterface
 {
     /** @var SymfonyStyle */
     protected $io;
@@ -47,21 +47,21 @@ class AbstractEventProcessorConsoleCommand extends Command implements Listenable
         $this->processor->addListener($this);
     }
 
-    public function onStart(TrackingEventProcessor $processor): void
+    public function onStart(ListenableEventProcessorInterface $processor): void
     {
         $this->io->writeln('Processor Started');
     }
 
-    public function onStop(TrackingEventProcessor $processor): void
+    public function onStop(ListenableEventProcessorInterface $processor): void
     {
         $this->io->writeln('Processor Stopped.');
     }
 
-    public function beforeEvent(TrackingEventProcessor $processor, RecordedEventDescriptor $eventDescriptor): void
+    public function beforeEvent(ListenableEventProcessorInterface $processor, RecordedEventDescriptor $eventDescriptor): void
     {
     }
 
-    public function afterEvent(TrackingEventProcessor $processor, RecordedEventDescriptor $eventDescriptor): void
+    public function afterEvent(ListenableEventProcessorInterface $processor, RecordedEventDescriptor $eventDescriptor): void
     {
         if ($this->replayProgressBar) {
             $this->replayProgressBar->advance();
@@ -234,36 +234,22 @@ class AbstractEventProcessorConsoleCommand extends Command implements Listenable
             return;
         }
 
-        $streamId = $this->processor->getStreamId();
-        $eventStore = $this->processor->getEventStore();
-        if ($streamId->isEqualTo($eventStore->getGlobalStreamId())) {
-            $firstEvent = $eventStore->readStream($streamId, ReadStreamOptions::firstEvent())->getFirst();
-            $firstPosition = $firstEvent ? $firstEvent->getSequenceNumber()->toInt() : -1;
+        $inspector = new TrackingEventProcessorInspector();
+        $progress = $inspector->inspect($this->processor);
 
-            $lastEvent = $eventStore->readStream($streamId, ReadStreamOptions::lastEvent())->getLast();
-            $lastPosition = $lastEvent ? $lastEvent->getSequenceNumber()->toInt() : -1;
-        } else {
-            $stream = $eventStore->getStream($streamId);
-            $streamVersion = $stream ? $stream->getVersion()->toInt() : 0;
-            $firstPosition = $streamVersion === EventStreamVersion::INITIAL_VERSION ? EventStreamVersion::INITIAL_VERSION : $streamVersion;
-            $lastPosition = $streamVersion;
-        }
+        $totalNumberEvents = $progress->getTotalNumberEvents();
+        $numberEventProcessed = $progress->getNumberEventProcessed();
 
-        $totalNbEvents = $lastPosition - $firstPosition;
-
-        $currentPosition = $this->processor->getPosition();
-
-        $nbEventsProcessed = $currentPosition == EventStreamVersion::INITIAL_VERSION ? 0 : $currentPosition - $firstPosition;
-        $nbEventsToBeProcessed = $totalNbEvents - $nbEventsProcessed;
-
-        $progress = round($nbEventsProcessed / ($totalNbEvents !== 0 ? $totalNbEvents : 1) * 100, 2);
-
-        $this->io->writeln(sprintf('Stream ID: <info>%s</info>', $streamId));
-        $this->io->writeln("Last stream position: <info>$lastPosition</info>");
-        $this->io->writeln("Current stream position: <info>$currentPosition</info>");
-        $this->io->writeln("Total events: <info>$totalNbEvents</info>");
-        $this->io->writeln("Events Processed: <info>$nbEventsProcessed</info>");
-        $this->io->writeln("Events to process: <info>$nbEventsToBeProcessed</info>");
-        $this->io->writeln("Progress: $nbEventsProcessed / $totalNbEvents <info>($progress %)</info>");
+        $this->io->writeln(sprintf('Stream ID: <info>%s</info>', $progress->getStreamId()));
+        $this->io->writeln("Last stream position: <info>{$progress->getLastPosition()}</info>");
+        $this->io->writeln("Current stream position: <info>{$progress->getCurrentPosition()}</info>");
+        $this->io->writeln("Total events: <info>{$totalNumberEvents}</info>");
+        $this->io->writeln("Events Processed: <info>{$numberEventProcessed}</info>");
+        $this->io->writeln("Events to process: <info>{$progress->getNumberEventsToProcess()}</info>");
+        $this->io->writeln(sprintf('Progress: %s / %s <info>(%s %%)</info>',
+                $numberEventProcessed,
+                $totalNumberEvents,
+            $progress->getProgressPercentage())
+        );
     }
 }
