@@ -62,14 +62,6 @@ class MessageHeaders
     public const SENT_AT = 'sentAt';
 
     /**
-     * Key in the headers representing the orkestra-datetime at which this message is scheduled to be sent.
-     * Expected Value: milliseconds precise timestamp|null.
-     *
-     * @var string
-     */
-    public const SCHEDULED_AT = 'scheduledAt';
-
-    /**
      * Key in the headers representing the ID of a tenant to which this message is belongs or is directed.
      * Expected Value: string|null.
      *
