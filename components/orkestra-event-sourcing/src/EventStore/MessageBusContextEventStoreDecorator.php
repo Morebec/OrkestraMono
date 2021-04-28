@@ -83,14 +83,14 @@ class MessageBusContextEventStoreDecorator implements EventStoreInterface
         $this->eventStore->subscribeToStream($streamId, $subscriber);
     }
 
-    private function processMetadata(EventDescriptorInterface $eventDescriptor, MessageBusContext $context): MutableEventMetadata
+    protected function processMetadata(EventDescriptorInterface $eventDescriptor, MessageBusContext $context): MutableEventMetadata
     {
         $headers = $context->getMessageHeaders();
 
         $metadata = new MutableEventMetadata($eventDescriptor->getEventMetadata()->toArray());
 
         $metadata->putValue('correlationId', $headers->get(MessageHeaders::CORRELATION_ID));
-        $metadata->putValue('causationId', $context->getMessageId());
+        $metadata->putValue('causationId', $headers->get(MessageHeaders::CAUSATION_ID));
         $metadata->putValue('applicationId', $headers->get(MessageHeaders::APPLICATION_ID));
         $metadata->putValue('userId', $headers->get(MessageHeaders::USER_ID));
         $metadata->putValue('tenantId', $headers->get(MessageHeaders::TENANT_ID));

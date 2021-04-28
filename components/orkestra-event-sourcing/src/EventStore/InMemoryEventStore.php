@@ -191,6 +191,18 @@ class InMemoryEventStore implements EventStoreInterface
         }
 
         $this->subscribers[$streamIdStr][] = $subscriber;
+        $subscriptionOptions = $subscriber->getOptions();
+        if ($subscriptionOptions->position !== SubscriptionOptions::POSITION_END) {
+            $lastPosition = $subscriptionOptions->position;
+            $isGlobalStream = $streamId->isEqualTo(self::getGlobalStreamId());
+            while ($events = $this->readStream($streamId, ReadStreamOptions::read()->forward()->maxCount(1000)->from($lastPosition))) {
+                /** @var RecordedEventDescriptor $event */
+                foreach ($events as $event) {
+                    $subscriber->onEvent($this, $event);
+                    $lastPosition = $isGlobalStream ? $event->getSequenceNumber() : $event->getStreamVersion();
+                }
+            }
+        }
     }
 
     public function clear()

@@ -1,6 +1,6 @@
 # Projection
-A Projection is a specific representation of Events into data structure. These data structure are also known as Read Models,
-or view.
+A Projection is a specific representation of Events into data structures. 
+These data structures are also known as Read Models, or view.
 
 ## Projectors
 A Projector is the computational unit responsible for transforming Events to Projections.
@@ -38,14 +38,14 @@ class UserProjector implements ProjectorInterface
             
             $this->database->insert(
                 new User(
-                    $data['id'],
-                    $data['username'],
-                    $data['fullname'],
-                    $data['emailAddress']
+                    $event->id,
+                    $event->username,
+                    $event->fullname,
+                    $event->emailAddress
                 )
             );
         }
-        
+       
     }
     
     public function shutdown() : void
@@ -95,7 +95,8 @@ class UserProjector extends AbstractTypedEventProjector
        );
    }
    
-   public function onUserEmailAddressChanged(UserEmailAddressChangedEvent $event): void
+   // The descriptor can also be provided if you add a second argument to the method.
+   public function onUserEmailAddressChanged(UserEmailAddressChangedEvent $event, RecordedEventDescriptor $descriptor): void
    {
         $user = $this->database->find($event->id);
         $user->emailAddress= $event->emailAddress;
@@ -117,6 +118,9 @@ class UserProjector extends AbstractTypedEventProjector
     }
 }
 ```
+It routes the events to the right methods by using the convention of a method starting with `on` and having an
+argument typehinted with the event type the method can handle. A second argument can also be provided by typehinting
+the RecordedEventDescriptor class.
 
 ## Dispatching Events to Projectors
 The way to dispatch events to projectors is through the `EventProcessorInterface`. 
@@ -141,3 +145,8 @@ $processor->start();
 
 $posgreSqlProjector->shutdown();
 ```
+
+### Projection Groups
+Projection groups represented by the `ProjectorGroup` class allows grouping multiple projectors together in a single cohesive unit, so they can all be operated 
+as if they were one. This is useful in cases where some projector needs to perform lookups to projections
+of other projectors in order to do its work.

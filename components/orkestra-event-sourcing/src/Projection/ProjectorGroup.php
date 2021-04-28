@@ -5,7 +5,7 @@ namespace Morebec\Orkestra\EventSourcing\Projection;
 use Morebec\Orkestra\EventSourcing\EventStore\RecordedEventDescriptor;
 
 /**
- * A ProjectorGroup allows to group multiple projectors together in a single cohesive unit so they can all be operated
+ * A ProjectorGroup allows grouping multiple projectors together in a single cohesive unit, so that they can all be operated
  * as if they were one.
  *
  * It allows to ensure a given set of projectors either succeed together or fail together.

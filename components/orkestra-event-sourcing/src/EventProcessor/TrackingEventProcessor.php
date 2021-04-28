@@ -34,7 +34,7 @@ use RuntimeException;
  * This processor also supports {@link TrackingEventProcessorListenerInterface} that can be used to hook into
  * the work of this processor.
  */
-class TrackingEventProcessor implements ListenableEventProcessor, ReplayableEventProcessorInterface
+class TrackingEventProcessor implements ListenableEventProcessorInterface, ReplayableEventProcessorInterface
 {
     /** @var bool */
     protected $running;
@@ -55,7 +55,7 @@ class TrackingEventProcessor implements ListenableEventProcessor, ReplayableEven
      */
     protected $options;
 
-    /** @var ListenableEventProcessorListenerInterface[] */
+    /** @var EventProcessorListenerInterface[] */
     protected $listeners;
 
     public function __construct(
@@ -159,7 +159,7 @@ class TrackingEventProcessor implements ListenableEventProcessor, ReplayableEven
     /**
      * {@inheritDoc}
      */
-    public function addListener(ListenableEventProcessorListenerInterface $listener): void
+    public function addListener(EventProcessorListenerInterface $listener): void
     {
         $this->listeners[] = $listener;
     }
@@ -167,9 +167,9 @@ class TrackingEventProcessor implements ListenableEventProcessor, ReplayableEven
     /**
      * {@inheritDoc}
      */
-    public function removeListener(ListenableEventProcessorListenerInterface $listener): void
+    public function removeListener(EventProcessorListenerInterface $listener): void
     {
-        $this->listeners = array_filter($this->listeners, static function (ListenableEventProcessorListenerInterface $l) use ($listener) {
+        $this->listeners = array_filter($this->listeners, static function (EventProcessorListenerInterface $l) use ($listener) {
             return $listener !== $l;
         });
     }

@@ -16,7 +16,7 @@ use Morebec\Orkestra\EventSourcing\EventStore\SubscriptionOptions;
  * It can be useful for example to provide an API that sends change streams to clients
  * such as Web Apps.
  */
-class SubscribedEventProcessor implements EventProcessorInterface, EventStoreSubscriberInterface
+class SubscribedEventProcessor implements EventProcessorInterface, EventStoreSubscriberInterface, ListenableEventProcessorInterface
 {
     /**
      * @var EventPublisherInterface
@@ -31,11 +31,19 @@ class SubscribedEventProcessor implements EventProcessorInterface, EventStoreSub
     /** @var bool */
     private $running;
 
-    public function __construct(string $name, EventPublisherInterface $eventPublisher)
+    /** @var EventProcessorListenerInterface[] */
+    private $listeners;
+
+    public function __construct(string $name, EventPublisherInterface $eventPublisher, iterable $listeners = [])
     {
         $this->eventPublisher = $eventPublisher;
         $this->name = $name;
         $this->running = false;
+        $this->listeners = [];
+
+        foreach ($listeners as $listener) {
+            $this->addListener($listener);
+        }
     }
 
     public function onEvent(EventStoreInterface $eventStore, RecordedEventDescriptor $eventDescriptor): void
@@ -68,5 +76,17 @@ class SubscribedEventProcessor implements EventProcessorInterface, EventStoreSub
     public function isRunning(): bool
     {
         return $this->running;
+    }
+
+    public function addListener(EventProcessorListenerInterface $listener): void
+    {
+        $this->listeners[] = $listener;
+    }
+
+    public function removeListener(EventProcessorListenerInterface $listener): void
+    {
+        $this->listeners = array_filter($this->listeners, static function (EventProcessorListenerInterface $l) use ($listener) {
+            return $listener !== $l;
+        });
     }
 }
