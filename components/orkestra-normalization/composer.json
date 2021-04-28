@@ -14,7 +14,7 @@
         "doctrine/instantiator": "1.*",
         "php-di/phpdoc-reader": "2.*",
         "ext-json": "*",
-        "morebec/orkestra-datetime": "^2.1"
+        "morebec/orkestra-datetime": "^2.0.6"
     },
     "require-dev": {
         "ext-dom": "*",
