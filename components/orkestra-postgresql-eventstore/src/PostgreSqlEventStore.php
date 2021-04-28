@@ -340,7 +340,7 @@ class PostgreSqlEventStore implements EventStoreInterface
         }
 
         // Run Query.
-        $result = $qb->execute();
+        $result = $qb->executeQuery();
         $events = [];
         while ($queryData = $result->fetchAssociative()) {
             $queryData[EventsTableKeys::DATA] = json_decode($queryData[EventsTableKeys::DATA], true);
@@ -400,7 +400,7 @@ class PostgreSqlEventStore implements EventStoreInterface
      */
     public function dropTables(): void
     {
-        $sm = $this->connection->getSchemaManager();
+        $sm = $this->connection->createSchemaManager();
         $sm->dropTable($this->configuration->eventsTableName);
         $sm->dropTable($this->configuration->streamsTableName);
     }
@@ -411,9 +411,14 @@ class PostgreSqlEventStore implements EventStoreInterface
         // Catchup if required
         $subscriptionOptions = $subscriber->getOptions();
         if ($subscriptionOptions->position !== SubscriptionOptions::POSITION_END) {
-            $events = $this->readStream($streamId, ReadStreamOptions::read()->forward()->maxCount(0)->from($subscriptionOptions->position));
-            foreach ($events as $event) {
-                $subscriber->onEvent($this, $event);
+            $lastPosition = $subscriptionOptions->position;
+            $isGlobalStream = $streamId->isEqualTo(self::getGlobalStreamId());
+            while ($events = $this->readStream($streamId, ReadStreamOptions::read()->forward()->maxCount(1000)->from($lastPosition))) {
+                /** @var RecordedEventDescriptor $event */
+                foreach ($events as $event) {
+                    $subscriber->onEvent($this, $event);
+                    $lastPosition = $isGlobalStream ? $event->getSequenceNumber() : $event->getStreamVersion();
+                }
             }
         }
     }
