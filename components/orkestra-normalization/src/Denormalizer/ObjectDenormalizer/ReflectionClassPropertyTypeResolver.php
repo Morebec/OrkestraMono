@@ -52,7 +52,7 @@ class ReflectionClassPropertyTypeResolver
      *
      * @return string[]
      */
-    public function detectPropertyType(ReflectionProperty $property): array
+    public function detectPropertyTypes(ReflectionProperty $property): array
     {
         $fallback = [];
         // PHP 7.4
@@ -284,12 +284,12 @@ class ReflectionClassPropertyTypeResolver
             /** @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection */
             $propertyType = $property->getType();
             if ($propertyType) {
-                $typeAsString = (string) $propertyType;
+                $types = [(string) $propertyType];
                 if ($propertyType->allowsNull()) {
-                    $typeAsString .= '|null';
+                    $types[] = 'null';
                 }
 
-                return [$typeAsString];
+                return $types;
             }
         }
 

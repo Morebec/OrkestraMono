@@ -58,7 +58,7 @@ class ReflectionClassDenormalizer extends AbstractObjectDenormalizer implements 
 
         // Detect the type of the property if it was not possible to determine the type
         // we will delegate this work to a method that can be overloaded by subclasses.
-        $types = $this->propertyTypeResolver->detectPropertyType($property);
+        $types = $this->propertyTypeResolver->detectPropertyTypes($property);
         if (!$types) {
             throw new UndefinedPropertyTypeException($property->getName(), $property->getDeclaringClass()->getName());
         }

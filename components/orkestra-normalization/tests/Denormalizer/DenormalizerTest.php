@@ -61,7 +61,7 @@ class DenormalizerTest extends TestCase
             /** @var string */
             public $username;
 
-            /** @var string */
+            /** @var string|null */
             public $emailAddress;
 
             public function __construct()
