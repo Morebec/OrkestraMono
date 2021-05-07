@@ -9,6 +9,7 @@ use Morebec\Orkestra\DateTime\DateTime;
  */
 class PersonalData implements PersonalDataInterface
 {
+    public const UNDEFINED_REFERENCE_TOKEN = 'UNDEFINED';
     /**
      * The person that is the owner of the record.
      *
@@ -78,6 +79,11 @@ class PersonalData implements PersonalDataInterface
      */
     public $metadata = [];
 
+    /**
+     * @var string
+     */
+    private $referenceToken;
+
     public function __construct(string $personalToken, string $keyName, $value, string $source)
     {
         $this->personalToken = $personalToken;
@@ -87,6 +93,14 @@ class PersonalData implements PersonalDataInterface
         $this->disposedAt = null;
         $this->reasons = [];
         $this->processingRequirements = [];
+        $this->referenceToken = PersonalInformationStoreInterface::UNDEFINED_REFERENCE_TOKEN;
+    }
+
+    public function referenceToken(string $value): self
+    {
+        $this->referenceToken = $value;
+
+        return $this;
     }
 
     public function disposedAt(?DateTime $disposedAt): self
@@ -165,5 +179,10 @@ class PersonalData implements PersonalDataInterface
     public function getValue()
     {
         return $this->value;
+    }
+
+    public function getReferenceToken(): string
+    {
+        return $this->referenceToken;
     }
 }

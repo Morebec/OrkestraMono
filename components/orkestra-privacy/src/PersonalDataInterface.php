@@ -25,7 +25,7 @@ use Morebec\Orkestra\DateTime\DateTime;
  * MARKETING_PROCESSING: Personally Identifiable Information that is stored under these terms are processed
  * in order to allow our marketing department to do their standard operations. It will be stored in a computer owned by the organization
  * as well as an AWS S3 storage. It will be stored and encrypted using these algorithm.
- * These could also refer more categories of lawful basis such as
+ * These could also refer to categories of lawful basis such as
  * - user_consent,
  * - contract,
  * - legal_requirement
@@ -48,8 +48,13 @@ use Morebec\Orkestra\DateTime\DateTime;
  * - Legal basis
  * - Sharing with 3rd parties.
  */
-interface PersonalDataInterface
+interface PersonalDataInterface extends ContainsPersonalDataInterface
 {
+    /**
+     * Returns the reference token of this personal data.
+     */
+    public function getReferenceToken(): string;
+
     /**
      * Personal token used to relate this information to a specific data subject or person.
      */
@@ -91,7 +96,7 @@ interface PersonalDataInterface
 
     /**
      * This metadata should be used to track additional information related to this data
-     * the 3rd parties involved with this PII that should be notified upon breaches
+     * such as the 3rd parties involved with this PII that should be notified upon breaches
      * or invocation of the right to erasure.
      *
      * @return mixed[]

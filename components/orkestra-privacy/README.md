@@ -113,10 +113,6 @@ The value can be any PHP scalar primitive or array of scalar primitives.
 > If an entry of Personal Data for the same `personal token` and `key` combination exists, it will be overwritten, 
 > see the Updating Data section for more information.
 
-> This method does not provide any idempotency guarantees meaning that
-> consecutive calls to this method with the same personal data, might return
-> different reference tokens.
-
 ### Retrieving Personal Data
 The primary way of retrieving data is using the `reference token` of the data:
 ```php
@@ -150,13 +146,18 @@ Updating data can be performed simply by overwriting some personal data already 
 use Morebec\Orkestra\Privacy\PersonalData;
 $data = new PersonalData('usr123456', 'emailAddress', 'jane.doe123@email.com', 'account_settings');
 
-// You can use this reference token to reference this personal data within the store.
 $referenceToken = $store->put($data);
 ```
+> If the data did not exist, it will be equivalent to adding new data to the store.
 
-If the data did not exist, it will be equivalent to adding new data to the store.
+Or using the more explicit `replace` method:
 
-> Even if the data already existed in the store, a new reference token will be returned.
+```php
+use Morebec\Orkestra\Privacy\PersonalData;
+$data = new PersonalData('usr123456', 'emailAddress', 'jane.doe123@email.com', 'account_settings');
+
+$referenceToken = $store->replace($referenceToken, $data);
+```
 
 ### Removing Data
 There are two different ways to remove data form the store.

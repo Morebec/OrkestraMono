@@ -32,23 +32,22 @@ class InMemoryPersonalInformationStore implements PersonalInformationStoreInterf
             $this->personalTokens[$personalToken] = [];
         }
 
-        $referenceToken = uniqid('pii:');
-        $recorded = new RecordedPersonalData(
-            $data->getPersonalToken(),
-            $referenceToken,
-            $data->getKeyName(),
-            $data->getValue(),
-            $data->getSource(),
-            $data->getReasons(),
-            $data->getProcessingRequirements(),
-            $data->getDisposedAt(),
-            $data->getMetadata(),
-            $this->clock->now()
-        );
+        $referenceToken = uniqid("pii:$personalToken/");
+        $recorded = $this->convertPersonalTokenToRecordedToken($referenceToken, $data);
 
         $this->personalTokens[$personalToken][$referenceToken] = $recorded;
 
         return $referenceToken;
+    }
+
+    public function replace(string $referenceToken, PersonalDataInterface $data): void
+    {
+        if (!$this->findOneByReferenceToken($referenceToken)) {
+            throw PersonalDataNotFoundException::forReferenceToken($referenceToken);
+        }
+
+        $recorded = $this->convertPersonalTokenToRecordedToken($referenceToken, $data);
+        $this->personalTokens[$data->getPersonalToken()][$referenceToken] = $recorded;
     }
 
     /**
@@ -85,8 +84,10 @@ class InMemoryPersonalInformationStore implements PersonalInformationStoreInterf
     public function findOneByReferenceToken(string $referenceToken): ?RecordedPersonalDataInterface
     {
         foreach ($this->personalTokens as $personalToken) {
-            foreach ($personalToken as $data) {
-                return $data;
+            foreach ($personalToken as $refToken => $data) {
+                if ($referenceToken === $refToken) {
+                    return $data;
+                }
             }
         }
 
@@ -121,6 +122,22 @@ class InMemoryPersonalInformationStore implements PersonalInformationStoreInterf
     public function erase(string $personalToken): void
     {
         unset($this->personalTokens[$personalToken]);
+    }
+
+    protected function convertPersonalTokenToRecordedToken(string $referenceToken, PersonalDataInterface $data): RecordedPersonalData
+    {
+        return new RecordedPersonalData(
+            $data->getPersonalToken(),
+            $referenceToken,
+            $data->getKeyName(),
+            $data->getValue(),
+            $data->getSource(),
+            $data->getReasons(),
+            $data->getProcessingRequirements(),
+            $data->getDisposedAt(),
+            $data->getMetadata(),
+            $this->clock->now()
+        );
     }
 
     private function hasPersonalToken(string $personalToken): bool

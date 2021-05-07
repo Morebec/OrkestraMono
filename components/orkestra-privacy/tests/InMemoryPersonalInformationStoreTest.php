@@ -5,6 +5,7 @@ namespace Tests\Morebec\Orkestra\Privacy;
 use Morebec\Orkestra\DateTime\SystemClock;
 use Morebec\Orkestra\Privacy\InMemoryPersonalInformationStore;
 use Morebec\Orkestra\Privacy\PersonalData;
+use Morebec\Orkestra\Privacy\PersonalDataNotFoundException;
 use PHPUnit\Framework\TestCase;
 
 class InMemoryPersonalInformationStoreTest extends TestCase
@@ -35,6 +36,29 @@ class InMemoryPersonalInformationStoreTest extends TestCase
         $referenceToken = $this->store->put($record);
 
         $this->assertNotNull($referenceToken);
+
+        // Test replace
+        $record = new PersonalData('test-user-token', 'emailAddress', 'test@email.com', 'registration_form');
+        $newReferenceToken = $this->store->put($record);
+
+        $this->assertNotEquals($referenceToken, $newReferenceToken);
+    }
+
+    public function testReplace(): void
+    {
+        $record = new PersonalData('test-user-token', 'emailAddress', 'test@email.com', 'registration_form');
+        $referenceToken = $this->store->put($record);
+
+        $this->store->replace($referenceToken, new PersonalData('test-user-token', 'emailAddress', 'test@email.com', 'user_account_settings'));
+
+        $this->assertNotNull($referenceToken);
+
+        $recorded = $this->store->findOneByReferenceToken($referenceToken);
+        $this->assertEquals('user_account_settings', $recorded->getSource());
+
+        $this->expectException(PersonalDataNotFoundException::class);
+        $record = new PersonalData('test-user-token', 'emailAddress', 'test@email.com', 'registration_form');
+        $this->store->replace('not_found_token', $record);
     }
 
     public function testFindByPersonalToken(): void
