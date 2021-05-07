@@ -9,6 +9,7 @@ use Morebec\Orkestra\DateTime\SystemClock;
 use Morebec\Orkestra\Normalization\ObjectNormalizer;
 use Morebec\Orkestra\Normalization\ObjectNormalizerInterface;
 use Morebec\Orkestra\Privacy\PersonalDataInterface;
+use Morebec\Orkestra\Privacy\PersonalDataNotFoundException;
 use Morebec\Orkestra\Privacy\PersonalInformationStoreInterface;
 use Morebec\Orkestra\Privacy\RecordedPersonalData;
 use Morebec\Orkestra\Privacy\RecordedPersonalDataInterface;
@@ -80,21 +81,9 @@ class PostgreSqlPersonalInformationStore implements PersonalInformationStoreInte
     public function put(PersonalDataInterface $data): string
     {
         $personalToken = $data->getPersonalToken();
-        $referenceToken = sprintf('pii:%s/%s', $personalToken, Uuid::uuid4());
-        $disposedAt = $data->getDisposedAt();
+        $referenceToken = $this->generateReferenceToken($personalToken);
+        $recorded = $this->convertPersonalDataToRecordedData($data, $referenceToken);
 
-        $recorded = new RecordedPersonalData(
-            $data->getPersonalToken(),
-            $referenceToken,
-            $data->getKeyName(),
-            $data->getValue(),
-            $data->getSource(),
-            $data->getReasons(),
-            $data->getProcessingRequirements(),
-            $data->getDisposedAt(),
-            $data->getMetadata(),
-            $this->clock->now()
-        );
         $normalizedData = $this->normalizer->normalize($recorded);
         $encryptedData = $this->encryptRecord($normalizedData, $this->configuration->encryptionKey);
 
@@ -112,7 +101,7 @@ class PostgreSqlPersonalInformationStore implements PersonalInformationStoreInte
                 VALUES (:personalToken, :referenceToken, :keyName, :disposedAt, :personalData)
                 ON CONFLICT ({$keys['personalToken']}, {$keys['keyName']})
                 DO UPDATE
-                SET {$keys['personalToken']} = excluded.{$keys['personalToken']},
+                SET
                     {$keys['referenceToken']} = excluded.{$keys['referenceToken']},
                     {$keys['keyName']} = excluded.{$keys['keyName']},
                     {$keys['disposedAt']} = excluded.{$keys['disposedAt']},
@@ -121,14 +110,50 @@ class PostgreSqlPersonalInformationStore implements PersonalInformationStoreInte
             SQL;
 
         $this->connection->executeStatement($sql, [
-            'personalToken' => $personalToken,
+            'personalToken' => $data->getPersonalToken(),
             'referenceToken' => $referenceToken,
             'keyName' => $data->getKeyName(),
-            'disposedAt' => $disposedAt,
+            'disposedAt' => $data->getDisposedAt(),
             'personalData' => $encryptedData,
         ]);
 
         return $referenceToken;
+    }
+
+    public function replace(string $referenceToken, PersonalDataInterface $data): void
+    {
+        if (!$this->findOneByReferenceToken($referenceToken)) {
+            throw PersonalDataNotFoundException::forReferenceToken($referenceToken);
+        }
+
+        $recorded = $this->convertPersonalDataToRecordedData($data, $referenceToken);
+        $normalizedData = $this->normalizer->normalize($recorded);
+        $encryptedData = $this->encryptRecord($normalizedData, $this->configuration->encryptionKey);
+
+        $keys = [
+            'referenceToken' => self::REFERENCE_TOKEN_KEY,
+            'data' => self::DATA_KEY,
+            'disposedAt' => self::DISPOSED_AT_KEY,
+            'keyName' => self::KEY_NAME_KEY,
+        ];
+
+        $sql = <<<SQL
+                UPDATE {$this->configuration->personallyIdentifiableInformationTableName}
+                SET
+                    {$keys['keyName']} = :keyName,
+                    {$keys['disposedAt']} = :disposedAt,
+                    {$keys['data']} = :personalData
+                WHERE
+                    {$keys['referenceToken']} = :referenceToken
+            ;
+            SQL;
+
+        $this->connection->executeStatement($sql, [
+            'referenceToken' => $referenceToken,
+            'keyName' => $data->getKeyName(),
+            'disposedAt' => $data->getDisposedAt(),
+            'personalData' => $encryptedData,
+        ]);
     }
 
     public function findOneByKeyName(string $personalToken, string $keyName): ?RecordedPersonalDataInterface
@@ -269,6 +294,29 @@ class PostgreSqlPersonalInformationStore implements PersonalInformationStoreInte
         $rotateKeyForRecords->bindTo($this);
 
         $this->connection->transactional($rotateKeyForRecords);
+    }
+
+    protected function convertPersonalDataToRecordedData(PersonalDataInterface $data, string $referenceToken): RecordedPersonalData
+    {
+        $recorded = new RecordedPersonalData(
+            $data->getPersonalToken(),
+            $referenceToken,
+            $data->getKeyName(),
+            $data->getValue(),
+            $data->getSource(),
+            $data->getReasons(),
+            $data->getProcessingRequirements(),
+            $data->getDisposedAt(),
+            $data->getMetadata(),
+            $this->clock->now()
+        );
+
+        return $recorded;
+    }
+
+    protected function generateReferenceToken(string $personalToken): string
+    {
+        return sprintf('pii:%s/%s', $personalToken, Uuid::uuid4());
     }
 
     private function encryptRecord(array $normalizedRecord, string $encryptionKey): string

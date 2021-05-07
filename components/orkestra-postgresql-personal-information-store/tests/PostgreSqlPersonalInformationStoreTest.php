@@ -8,6 +8,7 @@ use Morebec\Orkestra\Normalization\ObjectNormalizer;
 use Morebec\Orkestra\PostgreSqlPersonalInformationStore\PostgreSqlPersonalInformationStore;
 use Morebec\Orkestra\PostgreSqlPersonalInformationStore\PostgreSqlPersonalInformationStoreConfiguration;
 use Morebec\Orkestra\Privacy\PersonalData;
+use Morebec\Orkestra\Privacy\PersonalDataNotFoundException;
 use PHPUnit\Framework\TestCase;
 
 class PostgreSqlPersonalInformationStoreTest extends TestCase
@@ -70,6 +71,26 @@ class PostgreSqlPersonalInformationStoreTest extends TestCase
                 'secondary' => 'French',
             ],
         ], $record->getValue());
+    }
+
+    public function testReplace(): void
+    {
+        $record = new PersonalData('test-user-token', 'emailAddress', 'test@email.com', 'registration_form');
+        $referenceToken = $this->store->put($record);
+
+        $this->store->replace($referenceToken, new PersonalData('test-user-token', 'emailAddress', 'test@email.com', 'user_account_settings'));
+
+        $this->assertNotNull($referenceToken);
+
+        $recorded = $this->store->findOneByReferenceToken($referenceToken);
+        $this->assertEquals('user_account_settings', $recorded->getSource());
+
+        $this->assertEquals($referenceToken, $recorded->getReferenceToken());
+
+        // Not found exception
+        $this->expectException(PersonalDataNotFoundException::class);
+        $record = new PersonalData('test-user-token', 'emailAddress', 'test@email.com', 'user_acccount');
+        $this->store->replace('not_found_token', $record);
     }
 
     public function testFindByPersonalToken(): void
