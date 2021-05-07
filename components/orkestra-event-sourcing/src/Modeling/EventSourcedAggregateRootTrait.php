@@ -18,6 +18,11 @@ trait EventSourcedAggregateRootTrait
      */
     protected function onDomainEvent(DomainEventInterface $event): void
     {
+        $this->applyDomainEvent($event);
+    }
+
+    protected function applyDomainEvent(DomainEventInterface $event): void
+    {
         $eventClass = \get_class($event);
         $self = new \ReflectionClass($this);
 
