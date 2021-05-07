@@ -54,9 +54,16 @@ class ReflectionClassPropertyTypeResolver
      */
     public function detectPropertyType(ReflectionProperty $property): array
     {
+        $fallback = [];
         // PHP 7.4
         if ($types = $this->detectFromReflection($property)) {
-            return $types;
+            // PHP 7.4 does not allow to specify TypedObject[]
+            // which is better for denormalization let's see if it has a @var annotation or getters
+            // and falling back to the detected type.
+            if ($types !== ['array']) {
+                return $types;
+            }
+            $fallback = $types;
         }
 
         // phpDocComment
@@ -69,7 +76,7 @@ class ReflectionClassPropertyTypeResolver
             return $types;
         }
 
-        return [];
+        return $fallback;
     }
 
     /**
@@ -277,7 +284,12 @@ class ReflectionClassPropertyTypeResolver
             /** @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection */
             $propertyType = $property->getType();
             if ($propertyType) {
-                return [(string) $propertyType];
+                $typeAsString = (string) $propertyType;
+                if ($propertyType->allowsNull()) {
+                    $typeAsString .= '|null';
+                }
+
+                return [$typeAsString];
             }
         }
 
