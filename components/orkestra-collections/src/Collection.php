@@ -12,18 +12,47 @@ class Collection implements \Iterator, \Countable
      */
     protected $elements;
 
-    public function __construct(iterable $elements = [])
+    public function __construct(iterable $elements = [], bool $preserveKeys = false)
     {
         $this->elements = [];
-        foreach ($elements as $element) {
-            $this->add($element);
+
+        foreach ($elements as $key => $element) {
+            if ($preserveKeys) {
+                $this->addAt($key, $element);
+            } else {
+                $this->add($element);
+            }
         }
+    }
+
+    /**
+     * Groups values by keys.
+     * The callable takes a key and a value and returns the key that the provided value belongs to.
+     *
+     * @return static<T>
+     */
+    public function groupBy(callable $callable, bool $preserveKeys = false): self
+    {
+        $groups = [];
+        foreach ($this->elements as $key => $element) {
+            $groupKey = $callable($key, $element);
+            if (!\array_key_exists($groupKey, $groups)) {
+                $groups[$groupKey] = [];
+            }
+            if ($preserveKeys) {
+                $groups[$groupKey][$key] = $element;
+            } else {
+                $groups[$groupKey][] = $element;
+            }
+        }
+
+        return new self($groups, true);
     }
 
     /**
      * Flattens each {@link \Iterator} element of this collection as a new collection.
      *
-     * @return Collection<T>
+     * @return static<T>
      */
     public function flatten(): self
     {
@@ -45,7 +74,7 @@ class Collection implements \Iterator, \Countable
      * Projects each element of this collection into a new collection preserving
      * the index.
      *
-     * @return Collection<T>
+     * @return static<T>
      */
     public function map(callable $p): self
     {
@@ -55,7 +84,7 @@ class Collection implements \Iterator, \Countable
     /**
      * Filters this collection and returns a new collection with the results.
      *
-     * @return Collection<T>
+     * @return static<T>
      */
     public function filter(callable $p): self
     {
@@ -77,9 +106,9 @@ class Collection implements \Iterator, \Countable
      */
     public function isAny(callable $p): bool
     {
-        $c = $this->filter($p);
+        $c = $this->findFirstOrDefault($p);
 
-        return !$c->isEmpty();
+        return $c !== null;
     }
 
     /**
@@ -230,6 +259,17 @@ class Collection implements \Iterator, \Countable
     }
 
     /**
+     * Adds a value to this collection at a specified key.
+     *
+     * @param mixed $key
+     * @param T     $element
+     */
+    public function addAt($key, $element): void
+    {
+        $this->elements[$key] = $element;
+    }
+
+    /**
      * Adds an element at the beginning of this collection.
      *
      * @param T $element
@@ -304,7 +344,7 @@ class Collection implements \Iterator, \Countable
     /**
      * Returns a copy of this collection.
      *
-     * @return Collection<T>
+     * @return static<T>
      */
     public function copy(): self
     {

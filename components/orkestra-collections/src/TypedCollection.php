@@ -12,10 +12,10 @@ class TypedCollection extends Collection
      */
     protected $className;
 
-    public function __construct(string $className, iterable $elements = [])
+    public function __construct(string $className, iterable $elements = [], bool $preserveKeys = false)
     {
         $this->className = $className;
-        parent::__construct($elements);
+        parent::__construct($elements, $preserveKeys);
     }
 
     public function add($element): void

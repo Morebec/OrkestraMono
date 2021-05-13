@@ -388,4 +388,23 @@ class CollectionTest extends TestCase
 
         $this->assertEquals([$john, $jane], $persons->toArray());
     }
+
+    public function testGroupBy(): void
+    {
+        $values = [
+            ['name' => 'orange', 'kind' => 'fruit'],
+            ['name' => 'apple', 'kind' => 'fruit'],
+            ['name' => 'celery', 'kind' => 'vegetable'],
+            ['name' => 'carrot', 'kind' => 'vegetable'],
+        ];
+
+        $fruitsAndVegetables = (new Collection($values))->groupBy(static function ($key, $value) {
+            return $value['kind'];
+        });
+
+        $this->assertCount(2, $fruitsAndVegetables);
+
+        $this->assertCount(2, $fruitsAndVegetables->get('fruit'));
+        $this->assertCount(2, $fruitsAndVegetables->get('vegetable'));
+    }
 }
