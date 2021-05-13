@@ -54,7 +54,6 @@ class ReflectionClassDenormalizer extends AbstractObjectDenormalizer implements 
         } catch (\ReflectionException $e) {
             return null;
         }
-        $propertyType = null;
 
         // Detect the type of the property if it was not possible to determine the type
         // we will delegate this work to a method that can be overloaded by subclasses.

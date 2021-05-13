@@ -265,7 +265,17 @@ class ReflectionClassPropertyTypeResolver
             if ($method->getNumberOfParameters() === 0 &&
                 strpos($method->getName(), 'get') !== false &&
                 stripos($method->getName(), $property->getName()) !== false) {
-                return [(string) $method->getReturnType()];
+                $returnType = $method->getReturnType();
+                if (!$returnType) {
+                    return [];
+                }
+
+                $types = [$returnType->getName()];
+                if ($returnType->allowsNull()) {
+                    $types[] = 'null';
+                }
+
+                return $types;
             }
         }
 
@@ -284,7 +294,7 @@ class ReflectionClassPropertyTypeResolver
             /** @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection */
             $propertyType = $property->getType();
             if ($propertyType) {
-                $types = [(string) $propertyType];
+                $types = [$propertyType->getName()];
                 if ($propertyType->allowsNull()) {
                     $types[] = 'null';
                 }

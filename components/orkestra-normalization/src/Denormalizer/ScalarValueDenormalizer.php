@@ -31,10 +31,8 @@ class ScalarValueDenormalizer implements DenormalizerInterface
 
         // Strict mode.
         $typeName = $context->getTypeName();
-        if ($typeName !== 'scalar') {
-            if (get_debug_type($value) !== $typeName) {
-                throw new MalformedValueForTargetTypeException($typeName, $context, $this);
-            }
+        if (($typeName !== 'scalar') && get_debug_type($value) !== $typeName) {
+            throw new MalformedValueForTargetTypeException($typeName, $context, $this);
         }
 
         // TODO CONFIGURATION OPTION FOR THIS.
