@@ -9,6 +9,7 @@ use Morebec\Orkestra\Messaging\MessageHeaders;
 use Morebec\Orkestra\Messaging\MessageInterface;
 use Morebec\Orkestra\Messaging\MultiMessageHandlerResponse;
 use Morebec\Orkestra\Messaging\Normalization\MessageNormalizerInterface;
+use Morebec\Orkestra\Messaging\Routing\UnhandledMessageResponse;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
@@ -128,8 +129,10 @@ class LoggerMiddleware implements MessageBusMiddlewareInterface
             );
         }
 
-        $this->logger->warning('Message of type "{messageType}" was not handled.', [
-            'messageType' => $message::getTypeName(),
-        ]);
+        if ($response instanceof UnhandledMessageResponse) {
+            $this->logger->warning('Message of type "{messageType}" was not handled.', [
+                'messageType' => $message::getTypeName(),
+            ]);
+        }
     }
 }
