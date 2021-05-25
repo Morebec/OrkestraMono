@@ -72,7 +72,7 @@ class RetryStrategy implements RetryStrategyInterface
                 $throwable = $t;
                 ($this->onErrorFun)($context, $throwable);
                 if (!($this->retryConditionFun)($context, $throwable)) {
-                    return null;
+                    break;
                 }
                 $delayInMillis = ($this->retryAfterFun)($context, $throwable);
 
