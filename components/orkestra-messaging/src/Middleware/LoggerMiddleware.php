@@ -2,6 +2,7 @@
 
 namespace Morebec\Orkestra\Messaging\Middleware;
 
+use JsonException;
 use Morebec\Orkestra\Messaging\MessageBusResponseInterface;
 use Morebec\Orkestra\Messaging\MessageBusResponseStatusCode;
 use Morebec\Orkestra\Messaging\MessageHandlerResponse;
@@ -55,9 +56,9 @@ class LoggerMiddleware implements MessageBusMiddlewareInterface
     private function buildMessageContext(MessageInterface $message, MessageHeaders $headers): array
     {
         return [
-            'messageTypeName' => $headers->get(MessageHeaders::MESSAGE_TYPE_NAME),
+            'messageTypeName' => $headers->get(MessageHeaders::MESSAGE_TYPE_NAME, $message::getTypeName()),
             'messageType' => $headers->get(MessageHeaders::MESSAGE_TYPE),
-            'message' => $this->objectNormalizer->normalize($message),
+            'message' => $this->normalizeMessage($message),
             'messageHeaders' => $headers->toArray(),
             'messageId' => $headers->get(MessageHeaders::MESSAGE_ID),
             'causationId' => $headers->get(MessageHeaders::CAUSATION_ID),
@@ -134,5 +135,25 @@ class LoggerMiddleware implements MessageBusMiddlewareInterface
                 'messageType' => $message::getTypeName(),
             ]);
         }
+    }
+
+    private function normalizeMessage(MessageInterface $message): ?array
+    {
+        if (method_exists($message, '__toString')) {
+            /*
+             * Although {@link MessageInterface} does not implement the __toString method,
+             * the subclasses might so we check for it.
+             */
+            try {
+                // Also allows json encoded messages to be returned as arrays.
+                $messageAsString = (string) $message;
+
+                return json_decode($messageAsString, true, 512, \JSON_THROW_ON_ERROR);
+            } catch (JsonException $e) {
+                return [$messageAsString];
+            }
+        }
+
+        return $this->objectNormalizer->normalize($message);
     }
 }
