@@ -89,7 +89,10 @@ return static function (ContainerConfigurator $configurator) {
         service(MessageHandlerProviderInterface::class),
         tagged_iterator(SymfonyOrkestraModuleContainerConfigurator::MESSAGE_HANDLER_INTERCEPTORS),
     ]);
-    $services->set(LoggingMessageHandlerInterceptor::class)->tag('monolog.logger', ['channel' => 'message_bus']);
+    $services->set(LoggingMessageHandlerInterceptor::class)
+        ->tag('monolog.logger', ['channel' => 'message_bus'])
+        ->tag(SymfonyOrkestraModuleContainerConfigurator::MESSAGE_HANDLER_INTERCEPTORS)
+    ;
 
     // Setup message bus with middleware.
     // If one needs to have custom middleware
