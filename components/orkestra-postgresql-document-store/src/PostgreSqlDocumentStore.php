@@ -13,7 +13,7 @@ use Morebec\Orkestra\PostgreSqlDocumentStore\Filter\Filter;
 
 final class PostgreSqlDocumentStore
 {
-    public  const ID_INDEX_NAME = 'primary';
+    public const ID_INDEX_NAME = 'primary';
 
     /**
      * @var PostgreSqlDocumentStoreConfiguration
@@ -60,7 +60,7 @@ final class PostgreSqlDocumentStore
 
         $table = $schema->createTable($this->prefixCollection($collectionName));
         $table->addColumn(CollectionTableColumnKeys::ID, 'string');
-        $table->setPrimaryKey([CollectionTableColumnKeys::ID], $collectionName . '_' . self::ID_INDEX_NAME);
+        $table->setPrimaryKey([CollectionTableColumnKeys::ID], $collectionName.'_'.self::ID_INDEX_NAME);
 
         $table->addColumn(CollectionTableColumnKeys::DATA, 'json');
 
