@@ -13,6 +13,8 @@ use Morebec\Orkestra\PostgreSqlDocumentStore\Filter\Filter;
 
 final class PostgreSqlDocumentStore
 {
+    public  const ID_INDEX_NAME = 'primary';
+
     /**
      * @var PostgreSqlDocumentStoreConfiguration
      */
@@ -58,7 +60,7 @@ final class PostgreSqlDocumentStore
 
         $table = $schema->createTable($this->prefixCollection($collectionName));
         $table->addColumn(CollectionTableColumnKeys::ID, 'string');
-        $table->setPrimaryKey([CollectionTableColumnKeys::ID]);
+        $table->setPrimaryKey([CollectionTableColumnKeys::ID], $collectionName . '_' . self::ID_INDEX_NAME);
 
         $table->addColumn(CollectionTableColumnKeys::DATA, 'json');
 
@@ -85,6 +87,10 @@ final class PostgreSqlDocumentStore
 
         if ($schemaManager->tablesExist($tableName)) {
             $schemaManager->dropTable($tableName);
+            $indexes = $schemaManager->listTableIndexes($collectionName);
+            foreach ($indexes as $index) {
+                $this->connection->executeStatement("DROP INDEX {$index->getName()};");
+            }
         }
     }
 
@@ -243,10 +249,6 @@ final class PostgreSqlDocumentStore
         $collections = $this->listCollections();
         foreach ($collections as $collection) {
             $this->dropCollection($collection);
-            $indexes = $sm->listTableIndexes($this->prefixCollection($collection));
-            foreach ($indexes as $index) {
-                $this->connection->executeStatement("DROP INDEX {$index->getName()};");
-            }
         }
     }
 
@@ -272,7 +274,7 @@ final class PostgreSqlDocumentStore
      * @throws Exception
      * @throws SchemaException
      */
-    private function createCollectionIfNotExists(string $collectionName): void
+    public function createCollectionIfNotExists(string $collectionName): void
     {
         if (!$this->hasCollection($collectionName)) {
             $this->createCollection($collectionName);
