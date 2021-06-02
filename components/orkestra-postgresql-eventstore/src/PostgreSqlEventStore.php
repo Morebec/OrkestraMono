@@ -321,22 +321,20 @@ class PostgreSqlEventStore implements EventStoreInterface
 
         // Filter by event types
         if ($options->eventTypes) {
-            $eventTypesAsStrings = array_map(static function (EventType $t) {
+            $eventTypes = array_map(static function (EventType $t) {
                 return (string) $t;
             }, $options->eventTypes);
 
-            $eventTypes = implode(',', $eventTypesAsStrings);
-            $qb->andWhere(sprintf('%s IN (%s)', EventsTableKeys::TYPE, $qb->createPositionalParameter($eventTypes)));
+            $qb->andWhere(sprintf('%s IN (%s)', EventsTableKeys::TYPE, $qb->createPositionalParameter($eventTypes, Connection::PARAM_STR_ARRAY)));
         }
 
         // Ignore event types
         if ($options->ignoredEventTypes) {
-            $eventTypesAsStrings = array_map(static function (EventType $t) {
+            $eventTypes = array_map(static function (EventType $t) {
                 return (string) $t;
             }, $options->ignoredEventTypes);
 
-            $eventTypes = implode(',', $eventTypesAsStrings);
-            $qb->andWhere(sprintf('%s NOT IN (%s)', EventsTableKeys::TYPE, $qb->createPositionalParameter($eventTypes)));
+            $qb->andWhere(sprintf('%s IN (%s)', EventsTableKeys::TYPE, $qb->createPositionalParameter($eventTypes, Connection::PARAM_STR_ARRAY)));
         }
 
         // Run Query.

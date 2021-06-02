@@ -210,10 +210,11 @@ class PostgreSqlEventStoreTest extends TestCase
             $this->store->getGlobalStreamId(),
             ReadStreamOptions::read()
                 ->filterEventTypes([
+                    EventType::fromString('user_account_registered'),
                     EventType::fromString('user_account_updated'),
                 ])
         );
-        $this->assertCount(1, $events);
+        $this->assertCount(3, $events);
 
         $events = $this->store->readStream(
             $this->store->getGlobalStreamId(),
@@ -233,7 +234,7 @@ class PostgreSqlEventStoreTest extends TestCase
                     EventType::fromString('user_account_updated'),
                 ])
         );
-        $this->assertCount(2, $events);
+        $this->assertCount(1, $events);
 
         $events = $this->store->readStream(
             $this->store->getGlobalStreamId(),
@@ -242,7 +243,7 @@ class PostgreSqlEventStoreTest extends TestCase
                     EventType::fromString('user_account_registered'),
                 ])
         );
-        $this->assertCount(1, $events);
+        $this->assertCount(2, $events);
     }
 
     public function testSubscribeToStream(): void
