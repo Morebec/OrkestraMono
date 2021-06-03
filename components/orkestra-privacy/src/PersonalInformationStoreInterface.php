@@ -18,7 +18,7 @@ namespace Morebec\Orkestra\Privacy;
  */
 interface PersonalInformationStoreInterface
 {
-    public const UNDEFINED_REFERENCE_TOKEN = 'UNDEFINED';
+    public const UNDEFINED_REFERENCE_TOKEN = '__undefined__';
 
     /**
      * Allows to put Personal Data to this store and returns a reference token representing this data.

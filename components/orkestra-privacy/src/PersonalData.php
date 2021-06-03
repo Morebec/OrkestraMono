@@ -9,7 +9,6 @@ use Morebec\Orkestra\DateTime\DateTime;
  */
 class PersonalData implements PersonalDataInterface
 {
-    public const UNDEFINED_REFERENCE_TOKEN = 'UNDEFINED';
     /**
      * The person that is the owner of the record.
      *

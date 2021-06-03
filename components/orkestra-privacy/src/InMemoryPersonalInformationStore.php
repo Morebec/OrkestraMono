@@ -32,7 +32,16 @@ class InMemoryPersonalInformationStore implements PersonalInformationStoreInterf
             $this->personalTokens[$personalToken] = [];
         }
 
-        $referenceToken = uniqid("pii:$personalToken/");
+        $referenceToken = $data->getReferenceToken();
+
+        if ($referenceToken === self::UNDEFINED_REFERENCE_TOKEN) {
+            $referenceToken = uniqid("pii:$personalToken/", true);
+        }
+
+        if ($this->findOneByKeyName($personalToken, $data->getKeyName())) {
+            throw new PersonalDataFoundException('Personal data already in store, use replace instead of put.');
+        }
+
         $recorded = $this->convertPersonalTokenToRecordedToken($referenceToken, $data);
 
         $this->personalTokens[$personalToken][$referenceToken] = $recorded;

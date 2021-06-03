@@ -5,6 +5,7 @@ namespace Tests\Morebec\Orkestra\Privacy;
 use Morebec\Orkestra\DateTime\SystemClock;
 use Morebec\Orkestra\Privacy\InMemoryPersonalInformationStore;
 use Morebec\Orkestra\Privacy\PersonalData;
+use Morebec\Orkestra\Privacy\PersonalDataFoundException;
 use Morebec\Orkestra\Privacy\PersonalDataNotFoundException;
 use PHPUnit\Framework\TestCase;
 
@@ -27,7 +28,7 @@ class InMemoryPersonalInformationStoreTest extends TestCase
 
         $this->store->erase('test-user-token');
 
-        $this->assertEmpty($this->store->findByPersonalToken('test-user-token'));
+        self::assertEmpty($this->store->findByPersonalToken('test-user-token'));
     }
 
     public function testPut(): void
@@ -35,13 +36,11 @@ class InMemoryPersonalInformationStoreTest extends TestCase
         $record = new PersonalData('test-user-token', 'emailAddress', 'test@email.com', 'registration_form');
         $referenceToken = $this->store->put($record);
 
-        $this->assertNotNull($referenceToken);
+        self::assertNotNull($referenceToken);
 
-        // Test replace
         $record = new PersonalData('test-user-token', 'emailAddress', 'test@email.com', 'registration_form');
-        $newReferenceToken = $this->store->put($record);
-
-        $this->assertNotEquals($referenceToken, $newReferenceToken);
+        $this->expectException(PersonalDataFoundException::class);
+        $this->store->put($record);
     }
 
     public function testReplace(): void
@@ -51,10 +50,10 @@ class InMemoryPersonalInformationStoreTest extends TestCase
 
         $this->store->replace($referenceToken, new PersonalData('test-user-token', 'emailAddress', 'test@email.com', 'user_account_settings'));
 
-        $this->assertNotNull($referenceToken);
+        self::assertNotNull($referenceToken);
 
         $recorded = $this->store->findOneByReferenceToken($referenceToken);
-        $this->assertEquals('user_account_settings', $recorded->getSource());
+        self::assertEquals('user_account_settings', $recorded->getSource());
 
         $this->expectException(PersonalDataNotFoundException::class);
         $record = new PersonalData('test-user-token', 'emailAddress', 'test@email.com', 'registration_form');
@@ -74,7 +73,7 @@ class InMemoryPersonalInformationStoreTest extends TestCase
 
         $found = $this->store->findByPersonalToken('test-user-token');
 
-        $this->assertEquals(\count($records), \count($found));
+        self::assertEquals(\count($records), \count($found));
     }
 
     public function testRemoveByKeyName(): void
@@ -86,7 +85,7 @@ class InMemoryPersonalInformationStoreTest extends TestCase
 
         $found = $this->store->findOneByKeyName('test-user-token', 'emailAddress');
 
-        $this->assertNull($found);
+        self::assertNull($found);
     }
 
     public function testFindOneByKeyName(): void
@@ -96,9 +95,9 @@ class InMemoryPersonalInformationStoreTest extends TestCase
 
         $found = $this->store->findOneByKeyName('test-user-token', 'emailAddress');
 
-        $this->assertEquals($reference, $found->getReferenceToken());
+        self::assertEquals($reference, $found->getReferenceToken());
 
-        $this->assertNull($this->store->findOneByKeyName('test-user-token', 'not-found'));
+        self::assertNull($this->store->findOneByKeyName('test-user-token', 'not-found'));
     }
 
     public function testFindOneByReferenceToken(): void
@@ -108,9 +107,23 @@ class InMemoryPersonalInformationStoreTest extends TestCase
 
         $found = $this->store->findOneByReferenceToken($reference);
 
-        $this->assertNotNull($found);
+        self::assertNotNull($found);
 
-        $this->assertEquals('test@email.com', $found->getValue());
+        self::assertEquals('test@email.com', $found->getValue());
+
+        // CUSTOM REFERENCE TOKEN
+        $record = new PersonalData('test-user-token', 'secondaryEmailAddress', 'test@email.com', 'registration_form');
+        $customToken = 'zGh6YxO0p65Rtgkl';
+        $record->referenceToken($customToken);
+        $reference = $this->store->put($record);
+
+        self::assertEquals($customToken, $reference);
+
+        $found = $this->store->findOneByReferenceToken($reference);
+
+        self::assertNotNull($found);
+
+        self::assertEquals('test@email.com', $found->getValue());
     }
 
     public function testRemove(): void
@@ -121,6 +134,6 @@ class InMemoryPersonalInformationStoreTest extends TestCase
         $this->store->remove($reference);
 
         $found = $this->store->findOneByReferenceToken($reference);
-        $this->assertNull($found);
+        self::assertNull($found);
     }
 }
