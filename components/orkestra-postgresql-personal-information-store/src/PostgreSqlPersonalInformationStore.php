@@ -3,11 +3,13 @@
 namespace Morebec\Orkestra\PostgreSqlPersonalInformationStore;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Schema\Schema;
 use Morebec\Orkestra\DateTime\ClockInterface;
 use Morebec\Orkestra\DateTime\SystemClock;
 use Morebec\Orkestra\Normalization\ObjectNormalizer;
 use Morebec\Orkestra\Normalization\ObjectNormalizerInterface;
+use Morebec\Orkestra\Privacy\PersonalDataFoundException;
 use Morebec\Orkestra\Privacy\PersonalDataInterface;
 use Morebec\Orkestra\Privacy\PersonalDataNotFoundException;
 use Morebec\Orkestra\Privacy\PersonalInformationStoreInterface;
@@ -81,7 +83,12 @@ class PostgreSqlPersonalInformationStore implements PersonalInformationStoreInte
     public function put(PersonalDataInterface $data): string
     {
         $personalToken = $data->getPersonalToken();
-        $referenceToken = $this->generateReferenceToken($personalToken);
+
+        $referenceToken = $data->getReferenceToken();
+        if ($referenceToken === self::UNDEFINED_REFERENCE_TOKEN) {
+            $referenceToken = $this->generateReferenceToken($personalToken);
+        }
+
         $recorded = $this->convertPersonalDataToRecordedData($data, $referenceToken);
 
         $normalizedData = $this->normalizer->normalize($recorded);
@@ -99,23 +106,20 @@ class PostgreSqlPersonalInformationStore implements PersonalInformationStoreInte
             INSERT INTO {$this->configuration->personallyIdentifiableInformationTableName}
                 ({$keys['personalToken']}, {$keys['referenceToken']}, {$keys['keyName']}, {$keys['disposedAt']}, {$keys['data']})
                 VALUES (:personalToken, :referenceToken, :keyName, :disposedAt, :personalData)
-                ON CONFLICT ({$keys['personalToken']}, {$keys['keyName']})
-                DO UPDATE
-                SET
-                    {$keys['referenceToken']} = excluded.{$keys['referenceToken']},
-                    {$keys['keyName']} = excluded.{$keys['keyName']},
-                    {$keys['disposedAt']} = excluded.{$keys['disposedAt']},
-                    {$keys['data']} = excluded.{$keys['data']}
             ;
             SQL;
 
-        $this->connection->executeStatement($sql, [
-            'personalToken' => $data->getPersonalToken(),
-            'referenceToken' => $referenceToken,
-            'keyName' => $data->getKeyName(),
-            'disposedAt' => $data->getDisposedAt(),
-            'personalData' => $encryptedData,
-        ]);
+        try {
+            $this->connection->executeStatement($sql, [
+                'personalToken' => $data->getPersonalToken(),
+                'referenceToken' => $referenceToken,
+                'keyName' => $data->getKeyName(),
+                'disposedAt' => $data->getDisposedAt(),
+                'personalData' => $encryptedData,
+            ]);
+        } catch (Exception\UniqueConstraintViolationException $e) {
+            throw new PersonalDataFoundException($e->getMessage(), $e);
+        }
 
         return $referenceToken;
     }

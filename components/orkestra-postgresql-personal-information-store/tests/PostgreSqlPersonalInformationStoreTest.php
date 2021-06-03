@@ -8,6 +8,7 @@ use Morebec\Orkestra\Normalization\ObjectNormalizer;
 use Morebec\Orkestra\PostgreSqlPersonalInformationStore\PostgreSqlPersonalInformationStore;
 use Morebec\Orkestra\PostgreSqlPersonalInformationStore\PostgreSqlPersonalInformationStoreConfiguration;
 use Morebec\Orkestra\Privacy\PersonalData;
+use Morebec\Orkestra\Privacy\PersonalDataFoundException;
 use Morebec\Orkestra\Privacy\PersonalDataNotFoundException;
 use PHPUnit\Framework\TestCase;
 
@@ -71,6 +72,11 @@ class PostgreSqlPersonalInformationStoreTest extends TestCase
                 'secondary' => 'French',
             ],
         ], $record->getValue());
+
+        // Expect exception if already exists.
+        $record = new PersonalData('test-user-token', 'emailAddress', 'test@email.com', 'registration_form');
+        $this->expectException(PersonalDataFoundException::class);
+        $this->store->put($record);
     }
 
     public function testReplace(): void
