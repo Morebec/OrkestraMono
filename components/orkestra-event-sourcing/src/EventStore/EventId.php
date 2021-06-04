@@ -6,7 +6,7 @@ use InvalidArgumentException;
 use Ramsey\Uuid\Uuid;
 
 /**
- * Represents the unique Identifier of an Event.
+ * Represents the unique Identifier of an Event *within a stream*.
  */
 class EventId
 {

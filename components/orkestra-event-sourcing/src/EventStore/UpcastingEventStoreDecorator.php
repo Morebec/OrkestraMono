@@ -72,6 +72,11 @@ class UpcastingEventStoreDecorator implements EventStoreInterface
         $this->eventStore->subscribeToStream($streamId, $subscriber);
     }
 
+    public function truncateStream(EventStreamId $streamId, TruncateStreamOptions $options): void
+    {
+        $this->eventStore->truncateStream($streamId, $options);
+    }
+
     /**
      * Upcast an event and returns the result as an array as when upcasting an event might
      * have been split into many new ones.

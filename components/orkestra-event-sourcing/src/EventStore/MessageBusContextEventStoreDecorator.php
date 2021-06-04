@@ -83,6 +83,11 @@ class MessageBusContextEventStoreDecorator implements EventStoreInterface
         $this->eventStore->subscribeToStream($streamId, $subscriber);
     }
 
+    public function truncateStream(EventStreamId $streamId, TruncateStreamOptions $options): void
+    {
+        $this->eventStore->truncateStream($streamId, $options);
+    }
+
     protected function processMetadata(EventDescriptorInterface $eventDescriptor, MessageBusContext $context): MutableEventMetadata
     {
         $headers = $context->getMessageHeaders();

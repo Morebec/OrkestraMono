@@ -210,4 +210,11 @@ class InMemoryEventStore implements EventStoreInterface
         $this->events = [];
         $this->subscribers = [];
     }
+
+    public function truncateStream(EventStreamId $streamId, TruncateStreamOptions $options): void
+    {
+        $this->events = array_filter($this->events, function ($event) use ($streamId, $options) {
+            return !($event->getStreamId()->isEqualTo($streamId) && $event->getStreamVersion()->toInt() < $options->beforeVersionNumber->toInt());
+        });
+    }
 }

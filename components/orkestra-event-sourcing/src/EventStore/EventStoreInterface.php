@@ -39,6 +39,11 @@ interface EventStoreInterface
     public function readStream(EventStreamId $streamId, ReadStreamOptions $options): StreamedEventCollectionInterface;
 
     /**
+     * Truncates a stream, that is removes some events in a stream.
+     */
+    public function truncateStream(EventStreamId $streamId, TruncateStreamOptions $options): void;
+
+    /**
      * Returns an event stream's information or null if the stream does not exist.
      *
      * @return ?EventStreamInterface

@@ -12,6 +12,14 @@ class AppendStreamOptions
      */
     public $expectedStreamVersion = null;
 
+    /**
+     * Indicates if the append operation should be performed in a transaction if the underlying implementation
+     * of the event store supports it.
+     *
+     * @var bool
+     */
+    public $transactional = false;
+
     public static function append(): self
     {
         return (new self())
@@ -29,6 +37,13 @@ class AppendStreamOptions
     public function disableOptimisticConcurrencyCheck(): self
     {
         $this->expectedStreamVersion = null;
+
+        return $this;
+    }
+
+    public function transactional(bool $transactional = true): self
+    {
+        $this->transactional = $transactional;
 
         return $this;
     }
