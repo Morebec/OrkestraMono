@@ -7,6 +7,8 @@ use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaException;
 use InvalidArgumentException;
+use const JSON_THROW_ON_ERROR;
+use JsonException;
 use Morebec\Orkestra\DateTime\ClockInterface;
 use Morebec\Orkestra\DateTime\DateTime;
 use Morebec\Orkestra\DateTime\SystemClock;
@@ -33,8 +35,10 @@ use Morebec\Orkestra\EventSourcing\EventStore\RecordedEventDescriptor;
 use Morebec\Orkestra\EventSourcing\EventStore\StreamedEventCollection;
 use Morebec\Orkestra\EventSourcing\EventStore\StreamedEventCollectionInterface;
 use Morebec\Orkestra\EventSourcing\EventStore\SubscriptionOptions;
+use Morebec\Orkestra\EventSourcing\EventStore\TruncateStreamOptions;
 use PDO;
 use RuntimeException;
+use Throwable;
 
 /**
  * Event Store implemented using storage to PostgreSQL.
@@ -71,6 +75,10 @@ class PostgreSqlEventStore implements EventStoreInterface
      */
     private $subscribers;
 
+    /**
+     * @throws Exception
+     * @throws SchemaException
+     */
     public function __construct(Connection $connection, PostgreSqlEventStoreConfiguration $configuration, ?ClockInterface $clock = null)
     {
         if (!\extension_loaded('pdo_pgsql')) {
@@ -92,6 +100,9 @@ class PostgreSqlEventStore implements EventStoreInterface
         $this->subscribers = [];
     }
 
+    /**
+     * @throws Exception
+     */
     public function __destruct()
     {
         $this->connection->executeStatement("UNLISTEN {$this->configuration->eventsTableName}");
@@ -114,21 +125,22 @@ class PostgreSqlEventStore implements EventStoreInterface
      * @throws Exception
      * @throws SchemaException
      */
-    public function setupSchema(PostgreSqlEventStoreConfiguration $configuration)
+    public function setupSchema(PostgreSqlEventStoreConfiguration $configuration): void
     {
         $schema = new Schema();
 
         // Events Table
-        $sm = $this->connection->getSchemaManager();
+        $sm = $this->connection->createSchemaManager();
         if (!$sm->tablesExist($configuration->eventsTableName)) {
             $eventsTable = $schema->createTable($configuration->eventsTableName);
             $eventsTable->addColumn(EventsTableKeys::ID, 'string', ['notnull' => true]);
-            $eventsTable->setPrimaryKey([EventsTableKeys::ID]);
+            $eventsTable->addIndex([EventsTableKeys::ID]);
 
             $eventsTable->addColumn(EventsTableKeys::STREAM_ID, 'string', ['notnull' => true]);
             $eventsTable->addColumn(EventsTableKeys::STREAM_VERSION, 'integer', ['notnull' => true]);
-
             $eventsTable->addIndex([EventsTableKeys::STREAM_ID]);
+            $eventsTable->addUniqueIndex([EventsTableKeys::ID, EventsTableKeys::STREAM_ID]);
+
             $eventsTable->addIndex([EventsTableKeys::STREAM_VERSION]);
 
             $eventsTable->addColumn(EventsTableKeys::TYPE, 'string');
@@ -157,20 +169,20 @@ class PostgreSqlEventStore implements EventStoreInterface
         }
 
         $this->connection->executeStatement(<<<SQL
-            LOCK TABLE {$configuration->eventsTableName};
+            LOCK TABLE $configuration->eventsTableName;
             -- Create the trigger function
             CREATE OR REPLACE FUNCTION notify_{$configuration->eventsTableName}() RETURNS TRIGGER AS $$
             BEGIN
-                PERFORM pg_notify('{$configuration->eventsTableName}', row_to_json(NEW)::text);
+                PERFORM pg_notify('$configuration->eventsTableName', row_to_json(NEW)::text);
                 RETURN NEW;
             END
             $$ LANGUAGE plpgsql;
 
             -- Create the trigger
-            DROP TRIGGER IF EXISTS notify_{$configuration->eventsTableName}_trigger ON {$configuration->eventsTableName};
+            DROP TRIGGER IF EXISTS notify_{$configuration->eventsTableName}_trigger ON $configuration->eventsTableName;
             CREATE TRIGGER notify_{$configuration->eventsTableName}_trigger
             AFTER INSERT
-            ON {$configuration->eventsTableName}
+            ON $configuration->eventsTableName
             FOR EACH ROW EXECUTE PROCEDURE notify_{$configuration->eventsTableName}();
             SQL);
 
@@ -178,6 +190,11 @@ class PostgreSqlEventStore implements EventStoreInterface
         $this->connection->executeStatement("LISTEN {$this->configuration->eventsTableName}");
     }
 
+    /**
+     * @throws Exception
+     * @throws JsonException
+     * @throws Throwable
+     */
     public function appendToStream(EventStreamId $streamId, iterable $eventDescriptors, AppendStreamOptions $options): void
     {
         // Make sure it is not a virtual stream.
@@ -229,9 +246,9 @@ class PostgreSqlEventStore implements EventStoreInterface
                 EventsTableKeys::ID => (string) $descriptor->getEventId(),
                 EventsTableKeys::STREAM_ID => (string) $streamId,
                 EventsTableKeys::STREAM_VERSION => $versionAccumulator,
-                EventsTableKeys::METADATA => json_encode($metadata->toArray(), \JSON_THROW_ON_ERROR),
+                EventsTableKeys::METADATA => json_encode($metadata->toArray(), JSON_THROW_ON_ERROR),
                 EventsTableKeys::TYPE => (string) $descriptor->getEventType(),
-                EventsTableKeys::DATA => json_encode($eventData->toArray(), \JSON_THROW_ON_ERROR),
+                EventsTableKeys::DATA => json_encode($eventData->toArray(), JSON_THROW_ON_ERROR),
                 EventsTableKeys::RECORDED_AT => $recordedAt,
             ];
         }
@@ -240,10 +257,7 @@ class PostgreSqlEventStore implements EventStoreInterface
             return;
         }
 
-        $eventsTableName = $this->configuration->eventsTableName;
-        $store = $this;
-
-        $transactionFun = function (Connection $connection) use ($eventDocuments, $streamId, $streamVersion, $versionAccumulator) {
+        $appendOperationFunc = function (Connection $connection) use ($eventDocuments, $streamId, $streamVersion, $versionAccumulator) {
             if (!$this->streamExists($streamId)) {
                 $this->createStream(new EventStream($streamId, $streamVersion));
             }
@@ -255,17 +269,21 @@ class PostgreSqlEventStore implements EventStoreInterface
             // Update stream version index
             $this->updateStreamVersion($streamId, EventStreamVersion::fromInt($versionAccumulator));
         };
-        $transactionFun = $transactionFun->bindTo($this);
 
-        $this->connection->transactional($transactionFun);
+        if ($options->transactional) {
+            $this->connection->transactional($appendOperationFunc);
+        } else {
+            $appendOperationFunc($this->connection);
+        }
     }
 
     /**
      * @throws Exception
+     * @throws JsonException
      */
     public function readStream(EventstreamId $streamId, ReadStreamOptions $options): StreamedEventCollectionInterface
     {
-        $isGlobalStream = $streamId->isEqualTo(self::getGlobalStreamId());
+        $isGlobalStream = $streamId->isEqualTo($this->getGlobalStreamId());
 
         if (!$isGlobalStream && !$this->streamExists($streamId)) {
             throw new EventStreamNotFoundException($streamId);
@@ -340,8 +358,8 @@ class PostgreSqlEventStore implements EventStoreInterface
         $result = $qb->executeQuery();
         $events = [];
         while ($queryData = $result->fetchAssociative()) {
-            $queryData[EventsTableKeys::DATA] = json_decode($queryData[EventsTableKeys::DATA], true);
-            $queryData[EventsTableKeys::METADATA] = json_decode($queryData[EventsTableKeys::METADATA], true);
+            $queryData[EventsTableKeys::DATA] = json_decode($queryData[EventsTableKeys::DATA], true, 512, JSON_THROW_ON_ERROR);
+            $queryData[EventsTableKeys::METADATA] = json_decode($queryData[EventsTableKeys::METADATA], true, 512, JSON_THROW_ON_ERROR);
 
             $events[] = new RecordedEventDescriptor(
                 EventId::fromString($queryData[EventsTableKeys::ID]),
@@ -358,6 +376,9 @@ class PostgreSqlEventStore implements EventStoreInterface
         return new StreamedEventCollection($streamId, $events);
     }
 
+    /**
+     * @throws Exception
+     */
     public function getStream(EventStreamId $streamId): ?EventStreamInterface
     {
         $qb = $this->connection->createQueryBuilder();
@@ -373,6 +394,9 @@ class PostgreSqlEventStore implements EventStoreInterface
         return $streamData ? new EventStream($streamId, EventStreamVersion::fromInt($streamData[StreamsTableKeys::VERSION])) : null;
     }
 
+    /**
+     * @throws Exception
+     */
     public function streamExists(EventStreamId $streamId): bool
     {
         return $this->getStream($streamId) !== null;
@@ -402,6 +426,10 @@ class PostgreSqlEventStore implements EventStoreInterface
         $sm->dropTable($this->configuration->streamsTableName);
     }
 
+    /**
+     * @throws Exception
+     * @throws JsonException
+     */
     public function subscribeToStream(EventStreamId $streamId, EventStoreSubscriberInterface $subscriber): void
     {
         $this->subscribers[] = new PostgreSqlSubscriberWrapper($subscriber);
@@ -409,7 +437,7 @@ class PostgreSqlEventStore implements EventStoreInterface
         $subscriptionOptions = $subscriber->getOptions();
         if ($subscriptionOptions->position !== SubscriptionOptions::POSITION_END) {
             $lastPosition = $subscriptionOptions->position;
-            $isGlobalStream = $streamId->isEqualTo(self::getGlobalStreamId());
+            $isGlobalStream = $streamId->isEqualTo($this->getGlobalStreamId());
             while ($events = $this->readStream($streamId, ReadStreamOptions::read()->forward()->maxCount(1000)->from($lastPosition))) {
                 /** @var RecordedEventDescriptor $event */
                 foreach ($events as $event) {
@@ -435,8 +463,9 @@ class PostgreSqlEventStore implements EventStoreInterface
         /** @var PDO $pgSqlConnection */
         $pgSqlConnection = $pdoConnection->getWrappedConnection();
 
+        /* @noinspection PhpUndefinedMethodInspection */
         if ($data = $pgSqlConnection->pgsqlGetNotify(PDO::FETCH_ASSOC, $this->configuration->notifyTimeout)) {
-            $data = json_decode($data['payload'], true);
+            $data = json_decode($data['payload'], true, 512, JSON_THROW_ON_ERROR);
 
             $descriptor = new RecordedEventDescriptor(
                 EventId::fromString($data[EventsTableKeys::ID]),
@@ -463,6 +492,18 @@ class PostgreSqlEventStore implements EventStoreInterface
     public function getConfiguration(): PostgreSqlEventStoreConfiguration
     {
         return $this->configuration;
+    }
+
+    public function truncateStream(EventStreamId $streamId, TruncateStreamOptions $options): void
+    {
+        $qb = $this->connection->createQueryBuilder();
+
+        $qb->delete($this->configuration->eventsTableName)
+            ->where(sprintf('%s = %s', EventsTableKeys::STREAM_ID, $qb->createPositionalParameter((string) $streamId)))
+            ->andWhere(sprintf('%s < %s', EventsTableKeys::STREAM_VERSION, $qb->createPositionalParameter($options->beforeVersionNumber->toInt())))
+        ;
+
+        $qb->executeStatement();
     }
 
     /**

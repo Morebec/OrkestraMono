@@ -22,6 +22,7 @@ use Morebec\Orkestra\EventSourcing\EventStore\EventType;
 use Morebec\Orkestra\EventSourcing\EventStore\ReadStreamOptions;
 use Morebec\Orkestra\EventSourcing\EventStore\RecordedEventDescriptor;
 use Morebec\Orkestra\EventSourcing\EventStore\SubscriptionOptions;
+use Morebec\Orkestra\EventSourcing\EventStore\TruncateStreamOptions;
 use Morebec\Orkestra\PostgreSqlEventStore\PostgreSqlEventStore;
 use Morebec\Orkestra\PostgreSqlEventStore\PostgreSqlEventStoreConfiguration;
 use PHPUnit\Framework\TestCase;
@@ -360,5 +361,52 @@ class PostgreSqlEventStoreTest extends TestCase
 
         $this->store->notifySubscribers();
         $this->assertCount(1, $listenedEvents);
+    }
+
+    public function testTruncateStream(): void
+    {
+        $streamId = EventStreamId::fromString('stream-test');
+
+        // Adding a past event.
+        $this->store->appendToStream(
+            $streamId,
+            [
+                new EventDescriptor(
+                    EventId::fromString('event1'),
+                    EventType::fromString('user_account_registered'),
+                    new EventData([
+                        'username' => 'user_1',
+                        'emailAddress' => 'email1@address.com',
+                    ])
+                ),
+                new EventDescriptor(
+                    EventId::fromString('event2'),
+                    EventType::fromString('user_account_registered'),
+                    new EventData([
+                        'username' => 'user_1',
+                        'emailAddress' => 'email1@address.com',
+                    ])
+                ),
+                new EventDescriptor(
+                    EventId::fromString('event3'),
+                    EventType::fromString('user_account_registered'),
+                    new EventData([
+                        'username' => 'user_1',
+                        'emailAddress' => 'email1@address.com',
+                    ])
+                ),
+            ],
+            AppendStreamOptions::append()
+        );
+
+        // After truncating we should only have one event in the stream.
+        $this->store->truncateStream($streamId, TruncateStreamOptions::beforeVersionNumber(EventStreamVersion::fromInt(2))); // 0 indexed
+
+        $events = $this->store->readStream($streamId, ReadStreamOptions::read()->fromStart());
+
+        self::assertCount(1, $events);
+
+        $event = $events->getFirst();
+        self::assertEquals('event3', $event->getEventId());
     }
 }
