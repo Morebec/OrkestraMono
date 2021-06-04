@@ -5,12 +5,14 @@ namespace Tests\Morebec\Orkestra\PostgreSqlEventStore;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\DriverManager;
 use Morebec\Orkestra\DateTime\ClockInterface;
-use Morebec\Orkestra\DateTime\SystemClock;
+use Morebec\Orkestra\DateTime\DateTime;
+use Morebec\Orkestra\DateTime\FixedClock;
 use Morebec\Orkestra\EventSourcing\EventStore\AppendStreamOptions;
 use Morebec\Orkestra\EventSourcing\EventStore\ConcurrencyException;
 use Morebec\Orkestra\EventSourcing\EventStore\EventData;
 use Morebec\Orkestra\EventSourcing\EventStore\EventDescriptor;
 use Morebec\Orkestra\EventSourcing\EventStore\EventId;
+use Morebec\Orkestra\EventSourcing\EventStore\EventMetadata;
 use Morebec\Orkestra\EventSourcing\EventStore\EventStoreInterface;
 use Morebec\Orkestra\EventSourcing\EventStore\EventStoreSubscriberInterface;
 use Morebec\Orkestra\EventSourcing\EventStore\EventStreamId;
@@ -36,11 +38,17 @@ class PostgreSqlEventStoreTest extends TestCase
      */
     private $clock;
 
+    /**
+     * @var DateTime
+     */
+    private $currentFixedDate;
+
     protected function setUp(): void
     {
         $config = new PostgreSqlEventStoreConfiguration();
 
-        $this->clock = new SystemClock();
+        $this->currentFixedDate = new DateTime('2020-01-01T00:00:00.0123Z');
+        $this->clock = new FixedClock($this->currentFixedDate);
 
         $connection = DriverManager::getConnection([
             'url' => 'pgsql://postgres@localhost:5432/postgres?charset=UTF8',
@@ -97,7 +105,44 @@ class PostgreSqlEventStoreTest extends TestCase
         );
 
         $stream = $this->store->getStream($streamId);
-        $this->assertEquals(EventStreamVersion::fromInt(2), $stream->getVersion());
+        self::assertEquals(EventStreamVersion::fromInt(2), $stream->getVersion());
+
+        // Test event has all data appended to the store.
+        $this->store->appendToStream(
+            $streamId,
+            [
+                new EventDescriptor(
+                    EventId::fromString('eventMetaId'),
+                    EventType::fromString('event_with_metadata'),
+                    new EventData([
+                        'username' => 'user_1',
+                        'emailAddress' => 'email1@address.com',
+                    ]),
+                    new EventMetadata([
+                        'key' => 'value',
+                    ])
+                ),
+            ],
+            AppendStreamOptions::append()
+        );
+
+        $lastEventSlice = $this->store->readStream($streamId, ReadStreamOptions::lastEvent());
+        $event = $lastEventSlice->getFirst();
+
+        self::assertEquals('eventMetaId', (string) $event->getEventId());
+        self::assertEquals('event_with_metadata', (string) $event->getEventType());
+        self::assertEquals([
+            'username' => 'user_1',
+            'emailAddress' => 'email1@address.com',
+        ], $event->getEventData()->toArray());
+
+        self::assertEquals([
+            'key' => 'value',
+            'event_store' => [
+                'id' => PostgreSqlEventStore::EVENT_STORE_IDENTIFIER,
+                'version' => PostgreSqlEventStore::EVENT_STORE_VERSION,
+            ],
+        ], $event->getEventMetadata()->toArray());
 
         // Expect concurrency issue
         $this->expectException(ConcurrencyException::class);

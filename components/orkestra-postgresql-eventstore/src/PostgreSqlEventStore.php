@@ -218,7 +218,6 @@ class PostgreSqlEventStore implements EventStoreInterface
             $metadata = new MutableEventData($descriptor->getEventMetadata()->toArray());
 
             $recordedAt = $this->clock->now();
-            $metadata->putValue('recordedAt', $recordedAt);
 
             $metadata->putValue('event_store', [
                 'id' => self::EVENT_STORE_IDENTIFIER,
@@ -230,9 +229,9 @@ class PostgreSqlEventStore implements EventStoreInterface
                 EventsTableKeys::ID => (string) $descriptor->getEventId(),
                 EventsTableKeys::STREAM_ID => (string) $streamId,
                 EventsTableKeys::STREAM_VERSION => $versionAccumulator,
-                EventsTableKeys::METADATA => json_encode($metadata),
+                EventsTableKeys::METADATA => json_encode($metadata->toArray(), \JSON_THROW_ON_ERROR),
                 EventsTableKeys::TYPE => (string) $descriptor->getEventType(),
-                EventsTableKeys::DATA => json_encode($eventData->toArray()),
+                EventsTableKeys::DATA => json_encode($eventData->toArray(), \JSON_THROW_ON_ERROR),
                 EventsTableKeys::RECORDED_AT => $recordedAt,
             ];
         }
