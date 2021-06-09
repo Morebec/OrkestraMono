@@ -71,7 +71,7 @@
             "Tests\\Morebec\\Orkestra\\PostgreSqlDocumentStore\\": "components/orkestra-postgresql-document-store/tests",
             "Tests\\Morebec\\Orkestra\\PostgreSqlEventStore\\": "components/orkestra-postgresql-eventstore/tests",
             "Tests\\Morebec\\Orkestra\\PostgreSqlPersonalInformationStore\\": "components/orkestra-postgresql-personal-information-store/tests",
-            "Tests\\Morebec\\Orkestra\\PostgreSqlTimerStorage\\": "components/orkestra-postgresql-timeout-storage/tests",
+            "Tests\\Morebec\\Orkestra\\PostgreSqlTimeoutStorage\\": "components/orkestra-postgresql-timeout-storage/tests",
             "Tests\\Morebec\\Orkestra\\Privacy\\": "components/orkestra-privacy/tests",
             "Tests\\Morebec\\Orkestra\\Retry\\": "components/orkestra-retry/tests",
             "Tests\\Morebec\\Orkestra\\SymfonyBundle\\": "components/orkestra-symfony-bundle/Tests/"
@@ -103,7 +103,7 @@
             "Morebec\\Orkestra\\PostgreSqlDocumentStore\\": "components/orkestra-postgresql-document-store/src",
             "Morebec\\Orkestra\\PostgreSqlEventStore\\": "components/orkestra-postgresql-eventstore/src",
             "Morebec\\Orkestra\\PostgreSqlPersonalInformationStore\\": "components/orkestra-postgresql-personal-information-store/src",
-            "Morebec\\Orkestra\\PostgreSqlTimerStorage\\": "components/orkestra-postgresql-timeout-storage/src",
+            "Morebec\\Orkestra\\PostgreSqlTimeoutStorage\\": "components/orkestra-postgresql-timeout-storage/src",
             "Morebec\\Orkestra\\Privacy\\": "components/orkestra-privacy/src",
             "Morebec\\Orkestra\\Retry\\": "components/orkestra-retry/src",
             "Morebec\\Orkestra\\SymfonyBundle\\": "components/orkestra-symfony-bundle/."
@@ -123,7 +123,7 @@
         "morebec/orkestra-postgresql-document-store": "2.1.0",
         "morebec/orkestra-postgresql-eventstore": "2.1.0",
         "morebec/orkestra-postgresql-personal-information-store": "2.1.0",
-        "morebec/orkestra-postgresql-timer-storage": "2.1.0",
+        "morebec/orkestra-postgresql-timeout-storage": "2.1.0",
         "morebec/orkestra-privacy": "2.1.0",
         "morebec/orkestra-retry": "2.1.0",
         "morebec/orkestra-server": "2.1.0",
