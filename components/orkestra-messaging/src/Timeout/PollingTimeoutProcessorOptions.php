@@ -1,8 +1,8 @@
 <?php
 
-namespace Morebec\Orkestra\Messaging\Timer;
+namespace Morebec\Orkestra\Messaging\Timeout;
 
-class PollingTimerProcessorOptions
+class PollingTimeoutProcessorOptions
 {
     public const INFINITE = 0;
 
@@ -27,7 +27,7 @@ class PollingTimerProcessorOptions
     public function withName(string $name): self
     {
         if (!$name) {
-            throw new \InvalidArgumentException('A Polling Timer Processor must have a name');
+            throw new \InvalidArgumentException('A Polling Timeout Processor must have a name');
         }
 
         $this->name = $name;

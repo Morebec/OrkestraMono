@@ -1,18 +1,18 @@
 <?php
 
-namespace Morebec\Orkestra\Messaging\Timer;
+namespace Morebec\Orkestra\Messaging\Timeout;
 
 use Morebec\Orkestra\DateTime\ClockInterface;
 use Morebec\Orkestra\Messaging\MessageBusInterface;
 use Morebec\Orkestra\Messaging\MessageHeaders;
 
 /**
- * Default Implementation of a {@link TimerManagerInterface}.
+ * Default Implementation of a {@link TimeoutManagerInterface}.
  */
-class TimerManager implements TimerManagerInterface
+class TimeoutManager implements TimeoutManagerInterface
 {
     /**
-     * @var TimerStorageInterface
+     * @var TimeoutStorageInterface
      */
     private $storage;
 
@@ -28,7 +28,7 @@ class TimerManager implements TimerManagerInterface
 
     public function __construct(
         ClockInterface $clock,
-        TimerStorageInterface $storage,
+        TimeoutStorageInterface $storage,
         MessageBusInterface $messageBus
     ) {
         $this->storage = $storage;
@@ -36,17 +36,17 @@ class TimerManager implements TimerManagerInterface
         $this->messageBus = $messageBus;
     }
 
-    public function schedule(TimerInterface $timer, ?MessageHeaders $headers = null): void
+    public function schedule(TimeoutInterface $timeout, ?MessageHeaders $headers = null): void
     {
         if (!$headers) {
             $headers = new MessageHeaders();
         }
 
-        $this->storage->add(TimerWrapper::wrap($timer, $headers));
+        $this->storage->add(TimeoutWrapper::wrap($timeout, $headers));
     }
 
-    public function cancel(string $timerId): void
+    public function cancel(string $timeoutId): void
     {
-        $this->storage->remove($timerId);
+        $this->storage->remove($timeoutId);
     }
 }

@@ -3,11 +3,11 @@
 namespace Morebec\Orkestra\OrkestraServer\ServiceHealth\Domain\HealthCheck;
 
 use Morebec\Orkestra\DateTime\DateTime;
-use Morebec\Orkestra\Messaging\Timer\AbstractTimer;
+use Morebec\Orkestra\Messaging\Timeout\AbstractTimeout;
 use Morebec\Orkestra\OrkestraServer\ServiceHealth\Domain\ServiceCheck\ServiceCheckId;
 use Morebec\Orkestra\OrkestraServer\ServiceHealth\Domain\ServiceId;
 
-class CheckHealthTimer extends AbstractTimer
+class CheckHealthTimer extends AbstractTimeout
 {
     /**
      * @var string
@@ -28,6 +28,6 @@ class CheckHealthTimer extends AbstractTimer
 
     public static function getTypeName(): string
     {
-        return 'timer.check_health';
+        return 'timeout.check_health';
     }
 }

@@ -27,7 +27,7 @@
         "symfony/var-dumper": "5.*"
     },
     "suggest": {
-        "morebec/orkestra-postgresql-timer-storage": "PostgreSQL implementation of the Timer Storage"
+        "morebec/orkestra-postgresql-timeout-storage": "PostgreSQL implementation of the Timeout Storage"
     },
     "autoload": {
         "psr-4": {

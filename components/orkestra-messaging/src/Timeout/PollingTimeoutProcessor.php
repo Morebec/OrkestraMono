@@ -1,24 +1,24 @@
 <?php
 
-namespace Morebec\Orkestra\Messaging\Timer;
+namespace Morebec\Orkestra\Messaging\Timeout;
 
 use Morebec\Orkestra\DateTime\ClockInterface;
 use Morebec\Orkestra\DateTime\DateTime;
 
 /**
- * Implementation of a TimerProcessor that continuously polls the storage for timers to be processed.
- * This processor always ends up removing the timer from the storage once it is published.
+ * Implementation of a TimeoutProcessor that continuously polls the storage for timeouts to be processed.
+ * This processor always ends up removing the timeout from the storage once it is published.
  * It does not check whether the publishing effort was successful or not. This responsibility is delegated to the publisher.
  */
-class PollingTimerProcessor implements TimerProcessorInterface
+class PollingTimeoutProcessor implements TimeoutProcessorInterface
 {
     /**
-     * @var TimerPublisherInterface
+     * @var TimeoutPublisherInterface
      */
     private $publisher;
 
     /**
-     * @var PollingTimerProcessorOptions
+     * @var PollingTimeoutProcessorOptions
      */
     private $options;
 
@@ -30,7 +30,7 @@ class PollingTimerProcessor implements TimerProcessorInterface
     private $running;
 
     /**
-     * @var TimerStorageInterface
+     * @var TimeoutStorageInterface
      */
     private $storage;
 
@@ -46,9 +46,9 @@ class PollingTimerProcessor implements TimerProcessorInterface
 
     public function __construct(
         ClockInterface $clock,
-        TimerPublisherInterface $publisher,
-        TimerStorageInterface $storage,
-        PollingTimerProcessorOptions $options
+        TimeoutPublisherInterface $publisher,
+        TimeoutStorageInterface $storage,
+        PollingTimeoutProcessorOptions $options
     ) {
         $this->publisher = $publisher;
         $this->options = $options;
@@ -72,9 +72,9 @@ class PollingTimerProcessor implements TimerProcessorInterface
             $wrappers = $this->storage->findByEndsAtBefore($now);
 
             foreach ($wrappers as $wrapper) {
-                $timer = $wrapper->getTimer();
-                $this->publisher->publish($timer, $wrapper->getMessageHeaders());
-                $this->storage->remove($timer->getId());
+                $timeout = $wrapper->getTimeout();
+                $this->publisher->publish($timeout, $wrapper->getMessageHeaders());
+                $this->storage->remove($timeout->getId());
             }
 
             usleep($this->options->pollingDelay);

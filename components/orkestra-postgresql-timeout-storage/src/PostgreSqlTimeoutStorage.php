@@ -1,6 +1,6 @@
 <?php
 
-namespace Morebec\Orkestra\PostgreSqlTimerStorage;
+namespace Morebec\Orkestra\PostgreSqlTimeoutStorage;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
@@ -9,15 +9,15 @@ use Doctrine\DBAL\Schema\Schema;
 use Morebec\Orkestra\DateTime\DateTime;
 use Morebec\Orkestra\Messaging\MessageHeaders;
 use Morebec\Orkestra\Messaging\Normalization\MessageNormalizerInterface;
-use Morebec\Orkestra\Messaging\Timer\TimerInterface;
-use Morebec\Orkestra\Messaging\Timer\TimerStorageInterface;
-use Morebec\Orkestra\Messaging\Timer\TimerWrapper;
+use Morebec\Orkestra\Messaging\Timeout\TimeoutInterface;
+use Morebec\Orkestra\Messaging\Timeout\TimeoutStorageInterface;
+use Morebec\Orkestra\Messaging\Timeout\TimeoutWrapper;
 use Morebec\Orkestra\Normalization\ObjectNormalizerInterface;
 
 /**
- * Implementation of a {@link TimerStorageInterface} using PostgreSQL.
+ * Implementation of a {@link TimeoutStorageInterface} using PostgreSQL.
  */
-class PostgreSqlTimerStorage implements TimerStorageInterface
+class PostgreSqlTimeoutStorage implements TimeoutStorageInterface
 {
     public const ID_KEY = 'id';
     public const END_AT_KEY = 'end_at';
@@ -31,7 +31,7 @@ class PostgreSqlTimerStorage implements TimerStorageInterface
     private $connection;
 
     /**
-     * @var PostgreSqlTimerStorageConfiguration
+     * @var PostgreSqlTimeoutStorageConfiguration
      */
     private $configuration;
     /**
@@ -45,7 +45,7 @@ class PostgreSqlTimerStorage implements TimerStorageInterface
 
     public function __construct(
         Connection $connection,
-        PostgreSqlTimerStorageConfiguration $configuration,
+        PostgreSqlTimeoutStorageConfiguration $configuration,
         MessageNormalizerInterface $messageNormalizer,
         ObjectNormalizerInterface $objectNormalizer
     ) {
@@ -62,16 +62,16 @@ class PostgreSqlTimerStorage implements TimerStorageInterface
         $this->objectNormalizer = $objectNormalizer;
     }
 
-    public function add(TimerWrapper $wrapper): void
+    public function add(TimeoutWrapper $wrapper): void
     {
-        $timer = $wrapper->getTimer();
+        $timeout = $wrapper->getTimeout();
         $headers = $wrapper->getMessageHeaders();
 
-        $this->connection->insert($this->configuration->timerTableName, [
-            self::ID_KEY => $timer->getId(),
-            self::END_AT_KEY => $timer->getEndsAt(),
-            self::MESSAGE_TYPE_NAME_KEY => $timer::getTypeName(),
-            self::MESSAGE_PAYLOAD_KEY => json_encode($this->messageNormalizer->normalize($timer)),
+        $this->connection->insert($this->configuration->timeoutTableName, [
+            self::ID_KEY => $timeout->getId(),
+            self::END_AT_KEY => $timeout->getEndsAt(),
+            self::MESSAGE_TYPE_NAME_KEY => $timeout::getTypeName(),
+            self::MESSAGE_PAYLOAD_KEY => json_encode($this->messageNormalizer->normalize($timeout)),
             self::MESSAGE_HEADERS => json_encode($headers->toArray()),
         ]);
     }
@@ -80,31 +80,31 @@ class PostgreSqlTimerStorage implements TimerStorageInterface
     {
         $qb = $this->connection->createQueryBuilder();
         $qb->select('*')
-            ->from($this->configuration->timerTableName)
+            ->from($this->configuration->timeoutTableName)
             ->where(self::END_AT_KEY.' <= '.$qb->createPositionalParameter($dateTime))
         ;
         $result = $qb->executeQuery();
 
-        return $this->convertDbResultToTimerWrappers($result);
+        return $this->convertDbResultToTimeoutWrappers($result);
     }
 
     public function findByEndsAtBetween(DateTime $from, DateTime $to): array
     {
         $qb = $this->connection->createQueryBuilder();
         $qb->select('*')
-            ->from($this->configuration->timerTableName)
+            ->from($this->configuration->timeoutTableName)
             ->where(self::END_AT_KEY.' >= '.$qb->createPositionalParameter($from))
             ->andWhere(self::END_AT_KEY.' <= '.$qb->createPositionalParameter($to))
         ;
         $result = $qb->executeQuery();
 
-        return $this->convertDbResultToTimerWrappers($result);
+        return $this->convertDbResultToTimeoutWrappers($result);
     }
 
-    public function remove(string $timerId): void
+    public function remove(string $timeoutId): void
     {
-        $this->connection->delete($this->configuration->timerTableName, [
-            self::ID_KEY => $timerId,
+        $this->connection->delete($this->configuration->timeoutTableName, [
+            self::ID_KEY => $timeoutId,
         ]);
     }
 
@@ -114,35 +114,35 @@ class PostgreSqlTimerStorage implements TimerStorageInterface
     public function clear(): void
     {
         $platform = $this->connection->getDatabasePlatform();
-        $this->connection->executeQuery($platform->getTruncateTableSQL($this->configuration->timerTableName));
+        $this->connection->executeQuery($platform->getTruncateTableSQL($this->configuration->timeoutTableName));
     }
 
-    public function convertDbResultToTimerWrappers(Result $result): array
+    public function convertDbResultToTimeoutWrappers(Result $result): array
     {
-        $timers = [];
+        $timeouts = [];
         while ($data = $result->fetchAssociative()) {
             /** @var string $messageTypeName */
             $messageTypeName = $data[self::MESSAGE_TYPE_NAME_KEY];
             $payload = json_decode($data[self::MESSAGE_PAYLOAD_KEY], true);
             $headersData = json_decode($data[self::MESSAGE_HEADERS], true);
 
-            /** @var TimerInterface $timer */
-            $timer = $this->messageNormalizer->denormalize($payload, $messageTypeName);
+            /** @var TimeoutInterface $timeout */
+            $timeout = $this->messageNormalizer->denormalize($payload, $messageTypeName);
             $headers = new MessageHeaders($headersData);
 
-            $timers[] = TimerWrapper::wrap($timer, $headers);
+            $timeouts[] = TimeoutWrapper::wrap($timeout, $headers);
         }
 
-        return $timers;
+        return $timeouts;
     }
 
-    private function setupSchema(PostgreSqlTimerStorageConfiguration $configuration): void
+    private function setupSchema(PostgreSqlTimeoutStorageConfiguration $configuration): void
     {
         $schema = new Schema();
 
         $sm = $this->connection->createSchemaManager();
-        if (!$sm->tablesExist($configuration->timerTableName)) {
-            $eventsTable = $schema->createTable($configuration->timerTableName);
+        if (!$sm->tablesExist($configuration->timeoutTableName)) {
+            $eventsTable = $schema->createTable($configuration->timeoutTableName);
             $eventsTable->addColumn(self::ID_KEY, 'string', ['notnull' => true]);
             $eventsTable->setPrimaryKey([self::ID_KEY]);
             $eventsTable->addColumn(self::END_AT_KEY, 'datetime', ['notnull' => true]);

@@ -3,10 +3,10 @@
 namespace Morebec\Orkestra\OrkestraServer\Command;
 
 use Morebec\Orkestra\DateTime\ClockInterface;
-use Morebec\Orkestra\Messaging\Timer\MessageBusTimerPublisher;
-use Morebec\Orkestra\Messaging\Timer\PollingTimerProcessor;
-use Morebec\Orkestra\Messaging\Timer\PollingTimerProcessorOptions;
-use Morebec\Orkestra\Messaging\Timer\TimerStorageInterface;
+use Morebec\Orkestra\Messaging\Timeout\MessageBusTimeoutPublisher;
+use Morebec\Orkestra\Messaging\Timeout\PollingTimeoutProcessor;
+use Morebec\Orkestra\Messaging\Timeout\PollingTimeoutProcessorOptions;
+use Morebec\Orkestra\Messaging\Timeout\TimeoutStorageInterface;
 use Morebec\Orkestra\SymfonyBundle\Command\AbstractInterruptibleConsoleCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -14,53 +14,53 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class MainTimerProcessorConsoleCommand extends AbstractInterruptibleConsoleCommand
 {
-    protected static $defaultName = 'orkestra:timer-processor';
+    protected static $defaultName = 'orkestra:timeout-processor';
     /**
-     * @var MessageBusTimerPublisher
+     * @var MessageBusTimeoutPublisher
      */
-    private $timerPublisher;
+    private $timeoutPublisher;
 
     /**
      * @var ClockInterface
      */
     private $clock;
     /**
-     * @var TimerStorageInterface
+     * @var TimeoutStorageInterface
      */
-    private $timerStorage;
+    private $timeoutStorage;
 
     public function __construct(
-        MessageBusTimerPublisher $timerPublisher,
+        MessageBusTimeoutPublisher $timeoutPublisher,
         ClockInterface $clock,
-        TimerStorageInterface $timerStorage
+        TimeoutStorageInterface $timeoutStorage
     ) {
         parent::__construct();
-        $this->timerPublisher = $timerPublisher;
+        $this->timeoutPublisher = $timeoutPublisher;
         $this->clock = $clock;
-        $this->timerStorage = $timerStorage;
+        $this->timeoutStorage = $timeoutStorage;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output);
 
-        $io->title('Timer Processor');
+        $io->title('Timeout Processor');
 
-        $options = new PollingTimerProcessorOptions();
+        $options = new PollingTimeoutProcessorOptions();
         $options->withName('main');
-        $options->withMaximumProcessingTime(PollingTimerProcessorOptions::INFINITE);
-        $processor = new PollingTimerProcessor($this->clock, $this->timerPublisher, $this->timerStorage, $options);
+        $options->withMaximumProcessingTime(PollingTimeoutProcessorOptions::INFINITE);
+        $processor = new PollingTimeoutProcessor($this->clock, $this->timeoutPublisher, $this->timeoutStorage, $options);
 
-        $io->writeln('Timer Processor Started.');
+        $io->writeln('Timeout Processor Started.');
         $processor->start();
 
-        $io->writeln('Timer Processor Stopped.');
+        $io->writeln('Timeout Processor Stopped.');
 
         return self::SUCCESS;
     }
 
     protected function onInterruption($input, $output): void
     {
-        $output->writeln('Timer Processor Stopping ...');
+        $output->writeln('Timeout Processor Stopping ...');
     }
 }

@@ -1,10 +1,10 @@
 <?php
 
-namespace Morebec\Orkestra\Messaging\Timer;
+namespace Morebec\Orkestra\Messaging\Timeout;
 
 use Morebec\Orkestra\DateTime\DateTime;
 
-abstract class AbstractTimer implements TimerInterface
+abstract class AbstractTimeout implements TimeoutInterface
 {
     /** @var string */
     public $id;

@@ -1,13 +1,13 @@
 <?php
 
-namespace Morebec\Orkestra\Messaging\Timer;
+namespace Morebec\Orkestra\Messaging\Timeout;
 
 use Morebec\Orkestra\Messaging\MessageHeaders;
 
 /**
  * Service responsible for Managing Schedules.
  */
-interface TimerManagerInterface
+interface TimeoutManagerInterface
 {
     /**
      * Schedules a Message for later processing.
@@ -15,10 +15,10 @@ interface TimerManagerInterface
      * It is also possible to provide a schedulingToken that can be used to cancel the scheduling of message
      * if necessary.
      */
-    public function schedule(TimerInterface $timer, ?MessageHeaders $headers = null): void;
+    public function schedule(TimeoutInterface $timeout, ?MessageHeaders $headers = null): void;
 
     /**
-     * Cancels a timer with a given id.
+     * Cancels a timeout with a given id.
      */
-    public function cancel(string $timerId): void;
+    public function cancel(string $timeoutId): void;
 }

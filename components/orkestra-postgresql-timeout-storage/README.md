@@ -1,34 +1,34 @@
-# PostgreSQL Timer Storage
-This component is an implementation of a TimerStorage from the [Messaging Component]()
+# PostgreSQL Timeout Storage
+This component is an implementation of a TimeoutStorage from the [Messaging Component]()
 using PostgreSQL.
 
 ## Installation
 
 ```shell
-composer require orkestra-orkestra-postgresql-timer-storage
+composer require orkestra-orkestra-postgresql-timeout-storage
 ```
 
 ## Usage
 
 ```php
 
-use Morebec\Orkestra\PostgreSqlTimerStorage\PostgreSqlTimerStorage;
-use Morebec\Orkestra\PostgreSqlTimerStorage\PostgreSqlTimerStorageConfiguration;
+use Morebec\Orkestra\PostgreSqlTimeoutStorage\PostgreSqlTimeoutStorage;
+use Morebec\Orkestra\PostgreSqlTimeoutStorage\PostgreSqlTimeoutStorageConfiguration;
 
 $connection = new DriverManaer([
     'url' => '...'
 ], new Configuration());
 
-$configuration = new PostgreSqlTimerStorageConfiguration();
-$storage = new PostgreSqlTimerStorage($connection, $configuration);
+$configuration = new PostgreSqlTimeoutStorageConfiguration();
+$storage = new PostgreSqlTimeoutStorage($connection, $configuration);
 ```
 
 ### Configuration
-The `PostgreSqlTimerStorageConfiguration` class is used to configure the behavior of the timer storage.
+The `PostgreSqlTimeoutStorageConfiguration` class is used to configure the behavior of the timeout storage.
 You can for example change the polling interval according to the needs of the application developed.
 
 > Usually PostgreSQL is capable of handling polling efficiently, but of course, it always adds
-> a little more work on it. It is advised to set up the `pollingInterval` to the minimum frequency at which new Timers
+> a little more work on it. It is advised to set up the `pollingInterval` to the minimum frequency at which new Timeouts
 > are added in your application.
 
 ## Testing

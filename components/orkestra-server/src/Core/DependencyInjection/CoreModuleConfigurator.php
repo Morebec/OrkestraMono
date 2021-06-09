@@ -10,18 +10,18 @@ use Morebec\Orkestra\EventSourcing\EventProcessor\MessageBusEventPublisher;
 use Morebec\Orkestra\EventSourcing\EventStore\EventStoreInterface;
 use Morebec\Orkestra\EventSourcing\EventStore\MessageBusContextEventStoreDecorator;
 use Morebec\Orkestra\EventSourcing\EventStore\UpcastingEventStoreDecorator;
-use Morebec\Orkestra\Messaging\Timer\MessageBusTimerPublisher;
-use Morebec\Orkestra\Messaging\Timer\TimerManager;
-use Morebec\Orkestra\Messaging\Timer\TimerManagerInterface;
-use Morebec\Orkestra\Messaging\Timer\TimerStorageInterface;
+use Morebec\Orkestra\Messaging\Timeout\MessageBusTimeoutPublisher;
+use Morebec\Orkestra\Messaging\Timeout\TimeoutManager;
+use Morebec\Orkestra\Messaging\Timeout\TimeoutManagerInterface;
+use Morebec\Orkestra\Messaging\Timeout\TimeoutStorageInterface;
 use Morebec\Orkestra\OrkestraServer\Command\MainEventProcessorConsoleCommand;
 use Morebec\Orkestra\OrkestraServer\Command\MainProjectionEventProcessorConsoleCommand;
-use Morebec\Orkestra\OrkestraServer\Command\MainTimerProcessorConsoleCommand;
+use Morebec\Orkestra\OrkestraServer\Command\MainTimeoutProcessorConsoleCommand;
 use Morebec\Orkestra\PostgreSqlDocumentStore\PostgreSqlDocumentStore;
 use Morebec\Orkestra\PostgreSqlEventStore\PostgreSqlEventStore;
 use Morebec\Orkestra\PostgreSqlEventStore\PostgreSqlEventStoreConfiguration;
 use Morebec\Orkestra\PostgreSqlEventStore\PostgreSqlEventStorePositionStorage;
-use Morebec\Orkestra\PostgreSqlTimerStorage\PostgreSqlTimerStorage;
+use Morebec\Orkestra\PostgreSqlTimeoutStorage\PostgreSqlTimeoutStorage;
 use Morebec\Orkestra\SymfonyBundle\Module\SymfonyOrkestraModuleConfiguratorInterface;
 use Morebec\Orkestra\SymfonyBundle\Module\SymfonyOrkestraModuleContainerConfigurator;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
@@ -68,11 +68,11 @@ class CoreModuleConfigurator implements SymfonyOrkestraModuleConfiguratorInterfa
         $config->service(MessageBusEventPublisher::class);
         $config->consoleCommand(MainEventProcessorConsoleCommand::class);
 
-        // Timers and Timer Processing
-        $config->service(TimerManagerInterface::class, TimerManager::class);
-        $config->service(PostgreSqlTimerStorageFactory::class);
-        $config->service(TimerStorageInterface::class, PostgreSqlTimerStorage::class)
-                ->factory([service(PostgreSqlTimerStorageFactory::class), 'create']);
+        // Timeouts and Timeout Processing
+        $config->service(TimeoutManagerInterface::class, TimeoutManager::class);
+        $config->service(PostgreSqlTimeoutStorageFactory::class);
+        $config->service(TimeoutStorageInterface::class, PostgreSqlTimeoutStorage::class)
+                ->factory([service(PostgreSqlTimeoutStorageFactory::class), 'create']);
 
         // General Storage
         $config->service(PostgreSqlDocumentStoreFactory::class);
@@ -81,8 +81,8 @@ class CoreModuleConfigurator implements SymfonyOrkestraModuleConfiguratorInterfa
         )
         ;
 
-        $config->service(MessageBusTimerPublisher::class);
-        $config->consoleCommand(MainTimerProcessorConsoleCommand::class);
+        $config->service(MessageBusTimeoutPublisher::class);
+        $config->consoleCommand(MainTimeoutProcessorConsoleCommand::class);
         $config->consoleCommand(MainProjectionEventProcessorConsoleCommand::class);
     }
 

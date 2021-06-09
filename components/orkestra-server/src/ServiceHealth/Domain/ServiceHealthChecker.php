@@ -6,9 +6,9 @@ use Morebec\Orkestra\DateTime\ClockInterface;
 use Morebec\Orkestra\DateTime\DateTime;
 use Morebec\Orkestra\Messaging\Domain\Event\DomainEventHandlerInterface;
 use Morebec\Orkestra\Messaging\MessageBusInterface;
-use Morebec\Orkestra\Messaging\Timer\TimerHandlerInterface;
-use Morebec\Orkestra\Messaging\Timer\TimerManagerInterface;
-use Morebec\Orkestra\OrkestraServer\ServiceHealth\Domain\HealthCheck\CheckHealthTimer;
+use Morebec\Orkestra\Messaging\Timeout\TimeoutHandlerInterface;
+use Morebec\Orkestra\Messaging\Timeout\TimeoutManagerInterface;
+use Morebec\Orkestra\OrkestraServer\ServiceHealth\Domain\HealthCheck\CheckHealthTimeout;
 use Morebec\Orkestra\OrkestraServer\ServiceHealth\Domain\HealthCheck\RunHealthCheck\HealthCheckEndedEvent;
 use Morebec\Orkestra\OrkestraServer\ServiceHealth\Domain\HealthCheck\RunHealthCheck\RunHealthCheckCommand;
 use Morebec\Orkestra\OrkestraServer\ServiceHealth\Domain\ServiceCheck\ServiceCheckAddedEvent;
@@ -16,7 +16,7 @@ use Morebec\Orkestra\OrkestraServer\ServiceHealth\Domain\ServiceCheck\ServiceChe
 use Morebec\Orkestra\OrkestraServer\ServiceHealth\Domain\ServiceCheck\ServiceCheckNotFoundException;
 use Morebec\Orkestra\OrkestraServer\ServiceHealth\Domain\ServiceCheck\ServiceCheckRemovedEvent;
 
-class ServiceHealthChecker implements DomainEventHandlerInterface, TimerHandlerInterface
+class ServiceHealthChecker implements DomainEventHandlerInterface, TimeoutHandlerInterface
 {
     /**
      * @var ServiceRepositoryInterface
@@ -24,9 +24,9 @@ class ServiceHealthChecker implements DomainEventHandlerInterface, TimerHandlerI
     private $serviceRepository;
 
     /**
-     * @var TimerManagerInterface
+     * @var TimeoutManagerInterface
      */
-    private $timerManager;
+    private $timeoutManager;
 
     /**
      * @var ClockInterface
@@ -45,29 +45,29 @@ class ServiceHealthChecker implements DomainEventHandlerInterface, TimerHandlerI
 
     public function __construct(
         ServiceRepositoryInterface $serviceRepository,
-        TimerManagerInterface $timerManager,
+        TimeoutManagerInterface $timeoutManager,
         ClockInterface $clock,
         MessageBusInterface $messageBus,
         ServiceCheckThresholdCounterRepositoryInterface $serviceCheckThresholdCounter
     ) {
         $this->serviceRepository = $serviceRepository;
-        $this->timerManager = $timerManager;
+        $this->timeoutManager = $timeoutManager;
         $this->clock = $clock;
         $this->messageBus = $messageBus;
         $this->serviceCheckThresholdCounterRepository = $serviceCheckThresholdCounter;
     }
 
-    public function runHealthCheckOnCheckHealthTimer(CheckHealthTimer $timer): void
+    public function runHealthCheckOnCheckHealthTimeout(CheckHealthTimeout $timeout): void
     {
         // Ensure health checking is enabled
-        $serviceId = ServiceId::fromString($timer->serviceId);
+        $serviceId = ServiceId::fromString($timeout->serviceId);
         $service = $this->serviceRepository->findById($serviceId);
         if (!$service->isEnabled()) {
             return;
         }
 
         // Ensure health check is enabled.
-        $healthCheckId = ServiceCheckId::fromString($timer->serviceCheckId);
+        $healthCheckId = ServiceCheckId::fromString($timeout->serviceCheckId);
         try {
             $healthCheck = $service->getServiceCheckById($healthCheckId);
             if (!$healthCheck->isEnabled()) {
@@ -162,11 +162,11 @@ class ServiceHealthChecker implements DomainEventHandlerInterface, TimerHandlerI
      */
     private function scheduleHealthCheck(ServiceId $serviceId, ServiceCheckId $serviceCheckId, DateTime $date): void
     {
-        $timer = new CheckHealthTimer(
+        $timeout = new CheckHealthTimeout(
             $serviceId,
             $serviceCheckId,
             $date
         );
-        $this->timerManager->schedule($timer);
+        $this->timeoutManager->schedule($timeout);
     }
 }

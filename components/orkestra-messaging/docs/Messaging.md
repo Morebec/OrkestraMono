@@ -59,7 +59,7 @@ Out of the box, the Messaging component defines four types of specific messages:
 - `DomainCommandInterface` represents a Command in a CQRS sense and extends `DomainMessageInterface`. 
 - `DomainEventInterface` represents an Event in an Event-Driven Programming/Event Sourcing sense and extends `DomainMessageInterface`
 - `DomainQueryInterface` represents a Query in a CQRS sense and extends `DomainMessageInterface`.
-- `TimerInterface` represents time based messages, i.e. messages that should be sent in the future (more on this in later sections).
+- `TimeoutInterface` represents time based messages, i.e. messages that should be sent in the future (more on this in later sections).
 
 These messages have very specific intents and meaning and cannot be used interchangeably.
 From a conceptual point of view, a message is immutable and cannot be changed once created.
@@ -362,27 +362,27 @@ class RegisterUserCommandHandler implements DomainCommandHandlerInterface
 }
 ```
 
-## Timers
+## Timeouts
 In some occasions you might have business rules that need to be executed in the future after a certain time has elapsed.
 For example, one could have a rule that says 5 days before an invoice is due, email the person that must pay it.
 
-For these specific use cases the Messaging Component provides the concept of Timers. Timers represented by the `TimerInterface` are a specific type of message that represent 
+For these specific use cases the Messaging Component provides the concept of Timeouts. Timeouts represented by the `TimeoutInterface` are a specific type of message that represent 
 actions or processes that should be triggered in the future at a specific date and time.
 Such processes can be scheduled and handled by MessageHandlers or ProcessManagers.
 
-In their structure timers must have a unique `Identifier` as well as an `endsAt` field that indicates when the timer ends:
+In their structure timeouts must have a unique `Identifier` as well as an `endsAt` field that indicates when the timeout ends:
 
 ```php
-class InvoiceDueReminderTimer extends AbstractTimer 
+class InvoiceDueReminderTimeout extends AbstractTimeout 
 {
     /** @var string */
     public $invoiceId;
     
     public function __construct(string $invoiceId, DateTime $invoiceDueDate) 
     {
-        // Invoice ID is used as the id of the timer, as well as being saved as part
+        // Invoice ID is used as the id of the timeout, as well as being saved as part
         // of the message payload.
-        // The second parameter of the `AbstractTimer::__construct` is the endsAt of the timer which is the moment
+        // The second parameter of the `AbstractTimeout::__construct` is the endsAt of the timeout which is the moment
         // at which it will be triggered, in this example 5 days before the due date of the invoice.
         parent::__construct($invoiceId, $invoiceDueDate->subDays(5));
         $this->invoiceId = $invoiceId;
@@ -390,7 +390,7 @@ class InvoiceDueReminderTimer extends AbstractTimer
     
     public static function getTypeName()
     {
-        return 'timer.invoice.over_due_reminder';    
+        return 'timeout.invoice.over_due_reminder';    
     }
 }
 ```
@@ -398,9 +398,9 @@ class InvoiceDueReminderTimer extends AbstractTimer
 Then using the same logic as any other type of message you implement, can be notified through the message bus of these messages:
 
 ```php
-class InvoiceDueReminderProcessor implements TimerHandlerInterface
+class InvoiceDueReminderProcessor implements TimeoutHandlerInterface
 {
-    public function onInvoiceDueTimer(InvoiceDueReminderTimer $timer)
+    public function onInvoiceDueTimeout(InvoiceDueReminderTimeout $timeout)
     {
         // Here you could
         // - send a command,
@@ -410,19 +410,19 @@ class InvoiceDueReminderProcessor implements TimerHandlerInterface
 }
 ```
 
-### Scheduling a Timer
-To schedule a timer, one can use the `TimerManagerInterface`:
+### Scheduling a Timeout
+To schedule a timeout, one can use the `TimeoutManagerInterface`:
 
 ```php
 public function handleCommand(Command $command): void
 {
     // ...  
-    $this->timerManager->schedule(new InvoiceDueReminderTimer($invoice->getId(), $invoice->getDueDate()));
+    $this->timeoutManager->schedule(new InvoiceDueReminderTimeout($invoice->getId(), $invoice->getDueDate()));
 }
 ```
 
-### Canceling a Timer
-There are cases where you might want to cancel a timer, for example if the person paid our invoice before the reminder,
+### Canceling a Timeout
+There are cases where you might want to cancel a timeout, for example if the person paid our invoice before the reminder,
 we shouldn't email them:
 
 ```php
@@ -430,25 +430,25 @@ public function onInvoicePaid(InvoicePaidEvent $event): void
 {
     // ...  
     if ($this->clock->now()->isBefore($invoice->getDueDate()->subDays(5))) {
-        // The timer we had setup had the invoice id as its Timer id.
-        $this->timerManager->cancel($invoice->getId()); 
+        // The timeout we had setup had the invoice id as its Timeout id.
+        $this->timeoutManager->cancel($invoice->getId()); 
     }
 }
 ```
 
 ### Asynchronous processing
-From an infrastructural point of view, in order for a Timer to be dispatched on the bus at the right time, you need to set up a process that asynchronously
-checks the `TimerStorageInterface` which is responsible for persisting timers until they are triggered. 
+From an infrastructural point of view, in order for a Timeout to be dispatched on the bus at the right time, you need to set up a process that asynchronously
+checks the `TimeoutStorageInterface` which is responsible for persisting timeouts until they are triggered. 
 This is done through two services:
-- `TimerProcessInterface` which is responsible for finding the timers that are ready to be triggered at the current time and delegating the work of actually publishing
-  the timers to a `TimerPublisherInterface`
-- `TimerPublisherInterface` which is responsible for sending the timers to the interested subscribed handlers.
+- `TimeoutProcessInterface` which is responsible for finding the timeouts that are ready to be triggered at the current time and delegating the work of actually publishing
+  the timeouts to a `TimeoutPublisherInterface`
+- `TimeoutPublisherInterface` which is responsible for sending the timeouts to the interested subscribed handlers.
 
 > If you are familiar with the `EventSourcing` component this **processor + publisher** API works exactly 
 > like the `EventProcessorInterface` and `EventPublisherInterface`.
 
-To allow this, the messaging component provides a `PollingTimerProcessor` that allows to continuously poll the
-`TimerStorageInterface` at a configurable interval as well as a `MessageBusTimerPublisher` that allows sending these timers
+To allow this, the messaging component provides a `PollingTimeoutProcessor` that allows to continuously poll the
+`TimeoutStorageInterface` at a configurable interval as well as a `MessageBusTimeoutPublisher` that allows sending these timeouts
 to the message bus as well as a configurable retry strategy in cases of errors.
 
 All you need to do if using this component outside the Orkestra framework is to do the following:
@@ -456,26 +456,26 @@ All you need to do if using this component outside the Orkestra framework is to 
 ```php
 // Publisher (Retry Strategy is available in the morebec/orkestra-retry component.)
 
-// This strategy attempts sending the timer on the bus at most 5 times with a delay of 1 second between each attempt.
+// This strategy attempts sending the timeout on the bus at most 5 times with a delay of 1 second between each attempt.
 $retryStrategy = RetryStrategy::create()
                     ->maximumAttempts(5)
                     ->retryAfterDelay(1000)
 ;
-$publisher = new MessageBusTimerPublisher($messageBus, $retryStrategy);
+$publisher = new MessageBusTimeoutPublisher($messageBus, $retryStrategy);
 
 // Processor
-$options = (new PollingTimerProcessor())
+$options = (new PollingTimeoutProcessor())
     ->withName('default_processor')
     ->withDelay(60 * 1000) // Will poll the storage every minute
 ;
-$processor = new PollingTimerProcessor(new SystemClock(), $publisher, $storage, $options);
+$processor = new PollingTimeoutProcessor(new SystemClock(), $publisher, $storage, $options);
 
 // Will continuously check poll the storage for new messages.
 $processor->start();
 ```
 
-> The messaging component does not provide any implementation of a Timer Storage, as this is dependent on the technology
-> used by your application. Fir a PostgreSQL implementation, see the `morebec/orkestra-postgresql-timer-storage` composer package.
+> The messaging component does not provide any implementation of a Timeout Storage, as this is dependent on the technology
+> used by your application. Fir a PostgreSQL implementation, see the `morebec/orkestra-postgresql-timeout-storage` composer package.
 
 #### Handling Exceptions
 By design the `Message Bus` is **expected not to throw exceptions related to the handling of a message**.

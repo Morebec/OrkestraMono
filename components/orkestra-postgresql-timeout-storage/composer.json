@@ -1,6 +1,6 @@
 {
-    "name": "morebec/orkestra-postgresql-timer-storage",
-    "description": "PostgreSQL Timer Storage for Orkestra",
+    "name": "morebec/orkestra-postgresql-timeout-storage",
+    "description": "PostgreSQL Timeout Storage for Orkestra",
     "type": "library",
     "license": "Apache-2.0",
     "authors": [
@@ -28,12 +28,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Morebec\\Orkestra\\PostgreSqlTimerStorage\\": "src"
+            "Morebec\\Orkestra\\PostgreSqlTimeoutStorage\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Tests\\Morebec\\Orkestra\\PostgreSqlTimerStorage\\": "tests"
+            "Tests\\Morebec\\Orkestra\\PostgreSqlTimeoutStorage\\": "tests"
         }
     }
 }

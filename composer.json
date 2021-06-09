@@ -71,7 +71,7 @@
             "Tests\\Morebec\\Orkestra\\PostgreSqlDocumentStore\\": "components/orkestra-postgresql-document-store/tests",
             "Tests\\Morebec\\Orkestra\\PostgreSqlEventStore\\": "components/orkestra-postgresql-eventstore/tests",
             "Tests\\Morebec\\Orkestra\\PostgreSqlPersonalInformationStore\\": "components/orkestra-postgresql-personal-information-store/tests",
-            "Tests\\Morebec\\Orkestra\\PostgreSqlTimerStorage\\": "components/orkestra-postgresql-timer-storage/tests",
+            "Tests\\Morebec\\Orkestra\\PostgreSqlTimerStorage\\": "components/orkestra-postgresql-timeout-storage/tests",
             "Tests\\Morebec\\Orkestra\\Privacy\\": "components/orkestra-privacy/tests",
             "Tests\\Morebec\\Orkestra\\Retry\\": "components/orkestra-retry/tests",
             "Tests\\Morebec\\Orkestra\\SymfonyBundle\\": "components/orkestra-symfony-bundle/Tests/"
@@ -103,7 +103,7 @@
             "Morebec\\Orkestra\\PostgreSqlDocumentStore\\": "components/orkestra-postgresql-document-store/src",
             "Morebec\\Orkestra\\PostgreSqlEventStore\\": "components/orkestra-postgresql-eventstore/src",
             "Morebec\\Orkestra\\PostgreSqlPersonalInformationStore\\": "components/orkestra-postgresql-personal-information-store/src",
-            "Morebec\\Orkestra\\PostgreSqlTimerStorage\\": "components/orkestra-postgresql-timer-storage/src",
+            "Morebec\\Orkestra\\PostgreSqlTimerStorage\\": "components/orkestra-postgresql-timeout-storage/src",
             "Morebec\\Orkestra\\Privacy\\": "components/orkestra-privacy/src",
             "Morebec\\Orkestra\\Retry\\": "components/orkestra-retry/src",
             "Morebec\\Orkestra\\SymfonyBundle\\": "components/orkestra-symfony-bundle/."

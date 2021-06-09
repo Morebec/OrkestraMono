@@ -65,10 +65,10 @@ class SymfonyOrkestraModuleContainerConfigurator
     }
 
     /**
-     * Adds a timer handler definition.
+     * Adds a timeout handler definition.
      * Configured as autowired, autoconfigured, public and lazy.
      */
-    public function timerHandler(string $serviceId, ?string $serviceClass = null): MessageHandlerServiceConfigurator
+    public function timeoutHandler(string $serviceId, ?string $serviceClass = null): MessageHandlerServiceConfigurator
     {
         return $this->messageHandler($serviceId, $serviceClass);
     }

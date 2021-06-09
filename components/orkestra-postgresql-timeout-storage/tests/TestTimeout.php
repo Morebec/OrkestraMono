@@ -1,11 +1,11 @@
 <?php
 
-namespace Tests\Morebec\Orkestra\PostgreSqlTimerStorage;
+namespace Tests\Morebec\Orkestra\PostgreSqlTimeoutStorage;
 
 use Morebec\Orkestra\DateTime\DateTime;
-use Morebec\Orkestra\Messaging\Timer\AbstractTimer;
+use Morebec\Orkestra\Messaging\Timeout\AbstractTimeout;
 
-class TestTimer extends AbstractTimer
+class TestTimeout extends AbstractTimeout
 {
     /** @var string */
     public $testData;
@@ -18,6 +18,6 @@ class TestTimer extends AbstractTimer
 
     public static function getTypeName(): string
     {
-        return 'test_timer';
+        return 'test_timeout';
     }
 }
