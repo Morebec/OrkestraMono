@@ -16,8 +16,8 @@
         "ext-pgsql": "*",
         "ext-pdo_pgsql": "*",
         "doctrine/dbal": "^3.0",
-        "morebec/orkestra-datetime": "^2.3",
-        "morebec/orkestra-event-sourcing": "^2.3"
+        "morebec/orkestra-datetime": "^2.4",
+        "morebec/orkestra-event-sourcing": "^2.4"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.5",
