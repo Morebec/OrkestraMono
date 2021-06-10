@@ -7,7 +7,7 @@ use Morebec\Orkestra\Messaging\Timeout\AbstractTimeout;
 use Morebec\Orkestra\OrkestraServer\ServiceHealth\Domain\ServiceCheck\ServiceCheckId;
 use Morebec\Orkestra\OrkestraServer\ServiceHealth\Domain\ServiceId;
 
-class CheckHealthTimer extends AbstractTimeout
+class CheckHealthTimeout extends AbstractTimeout
 {
     /**
      * @var string

@@ -11,7 +11,7 @@ use Morebec\Orkestra\Messaging\Timeout\TimeoutInterface;
 use Morebec\Orkestra\Retry\RetryStrategy;
 use PHPUnit\Framework\TestCase;
 
-class MessageBusTimerPublisherTest extends TestCase
+class MessageBusTimeoutPublisherTest extends TestCase
 {
     public function testPublish(): void
     {

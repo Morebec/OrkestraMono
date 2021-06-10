@@ -9,7 +9,7 @@ use Morebec\Orkestra\Messaging\Timeout\TimeoutPublisherInterface;
 use Morebec\Orkestra\Messaging\Timeout\TimeoutStorageInterface;
 use PHPUnit\Framework\TestCase;
 
-class PollingTimerProcessorTest extends TestCase
+class PollingTimeoutProcessorTest extends TestCase
 {
     public function testStart(): void
     {

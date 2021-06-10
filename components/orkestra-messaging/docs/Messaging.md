@@ -1,7 +1,7 @@
 # Messaging
 *This document explains the core concepts that make up the Messaging Component and how it should be used.*
 
-The Messaging component provides functionality to route Messages to Handlers in a uniform way. 
+The Messaging component provides functionality to route Messages to Handlers uniformly. 
 It is responsible for routing these messages from one component to others. It serves as a way to implement Pub/Sub
 in an application. See the [Mediator pattern](https://en.wikipedia.org/wiki/Mediator_pattern) for more information.
 
@@ -12,7 +12,7 @@ a Marketing email list or subscribed to the company's CRM, statistics can be com
 These use cases can be numerous. In a traditional non-message based system, these operations would likely happen in a single 
 Web Controller. However, this has a lot of drawbacks and shortcomings:
 - This can very quickly make the controller handle too many responsibilities,
-- One of these operation could fail, leaving the system in an inconsistent state, e.g. user was registered, but not added to CRM, or Welcome Email not send.
+- One of these operation could fail, leaving the system in an inconsistent state, e.g., user was registered, but not added to CRM, or Welcome Email not send.
 - If we ever allow a different client such as a CLI application, Android App, or a completely different system, to use the feature, the logic would need to be duplicated
 in different locations.
 - Unit testing all these operations would become harder and one would be forced to test the whole work of the controller as a single unit, instead of on a per-operation basis.
@@ -59,7 +59,7 @@ Out of the box, the Messaging component defines four types of specific messages:
 - `DomainCommandInterface` represents a Command in a CQRS sense and extends `DomainMessageInterface`. 
 - `DomainEventInterface` represents an Event in an Event-Driven Programming/Event Sourcing sense and extends `DomainMessageInterface`
 - `DomainQueryInterface` represents a Query in a CQRS sense and extends `DomainMessageInterface`.
-- `TimeoutInterface` represents time based messages, i.e. messages that should be sent in the future (more on this in later sections).
+- `TimeoutInterface` represents time based messages, i.e., messages that should be sent in the future (more on this in later sections).
 
 These messages have very specific intents and meaning and cannot be used interchangeably.
 From a conceptual point of view, a message is immutable and cannot be changed once created.
@@ -69,7 +69,7 @@ Indeed, this is because they represent specific intents or facts.
 > such as [Middleware](#Middleware) and [Interceptors](#Message Interceptors) for various uses cases.
 
 ### Domain Commands
-Domain Commands represent a desire or intent to do something in the system. (e.g. Registering a user account, activating/deactivating it etc).
+Domain Commands represent a desire or intent to do something in the system. (e.g., Registering a user account, activating/deactivating it etc).
 They can be implemented using the `DomainCommandInterface` that inherits the `DomainMessageInterface`.
 For example, we might have `RegisterUserAccount`, `OrderProduct`, `CancelOrder` etc.
 
@@ -321,7 +321,7 @@ class CustomerXYZMessageHandlerInterceptor implements MessageHandlerInterceptorI
 > Both interceptors and middleware are capable of altering the execution flow of the message bus.
 > For example there is the `AuthorizeMessageMiddleware` for authorization or the `ValidateMessageMiddleware`.
 > Which one to choose highly depends on your goals, but as a rule of thumb:
-> - If you want to alter the behaviour of a specific handler or group of handlers -> `MessageHandlerInterceptor`. (E.g. tenant specific handlers.)
+> - If you want to alter the behaviour of a specific handler or group of handlers -> `MessageHandlerInterceptor`. (E.g., tenant specific handlers.)
 > - If you want to alter the behaviour based on the message itself with disregard to the resolved message handlers -> `MessageBusMiddleware`. (E.g. Validation.)
 > 
 > One other thing to take into account is the fact that middleware is further from the execution flow of the message handlers
@@ -334,7 +334,7 @@ Messages are handled by Handlers. Since we define by default three types of doma
 - Event Handlers -> Handle Event messages to trigger side effects and implement the `DomainEventHandlerInterface`
 - Query Handlers -> Handle Query messages to return information and implement the `DomainQueryHandlerInterface`
 
-From an implementation point of view, creating a message handlkers only requries to implement the  MessageHandlerInterface`
+From an implementation point of view, creating a message handlers only requires to implement the  MessageHandlerInterface`
 and having a public method with a single argument being the typed message:
 
 ```php
