@@ -15,6 +15,7 @@ use Morebec\Orkestra\DateTime\SystemClock;
 use Morebec\Orkestra\EventSourcing\EventStore\AppendStreamOptions;
 use Morebec\Orkestra\EventSourcing\EventStore\CannotAppendToVirtualStreamException;
 use Morebec\Orkestra\EventSourcing\EventStore\ConcurrencyException;
+use Morebec\Orkestra\EventSourcing\EventStore\DuplicateEventIdException;
 use Morebec\Orkestra\EventSourcing\EventStore\EventData;
 use Morebec\Orkestra\EventSourcing\EventStore\EventDescriptorInterface;
 use Morebec\Orkestra\EventSourcing\EventStore\EventId;
@@ -270,10 +271,15 @@ class PostgreSqlEventStore implements EventStoreInterface
             $this->updateStreamVersion($streamId, EventStreamVersion::fromInt($versionAccumulator));
         };
 
-        if ($options->transactional) {
-            $this->connection->transactional($appendOperationFunc);
-        } else {
-            $appendOperationFunc($this->connection);
+        try {
+            if ($options->transactional) {
+                $this->connection->transactional($appendOperationFunc);
+            } else {
+                $appendOperationFunc($this->connection);
+            }
+        } catch (Exception\UniqueConstraintViolationException $exception) {
+            $eventId = $exception->getQuery()->getParams()[0];
+            throw new DuplicateEventIdException($streamId, EventId::fromString($eventId), $exception);
         }
     }
 

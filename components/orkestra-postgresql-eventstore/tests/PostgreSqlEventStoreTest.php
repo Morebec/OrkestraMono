@@ -9,6 +9,7 @@ use Morebec\Orkestra\DateTime\DateTime;
 use Morebec\Orkestra\DateTime\FixedClock;
 use Morebec\Orkestra\EventSourcing\EventStore\AppendStreamOptions;
 use Morebec\Orkestra\EventSourcing\EventStore\ConcurrencyException;
+use Morebec\Orkestra\EventSourcing\EventStore\DuplicateEventIdException;
 use Morebec\Orkestra\EventSourcing\EventStore\EventData;
 use Morebec\Orkestra\EventSourcing\EventStore\EventDescriptor;
 use Morebec\Orkestra\EventSourcing\EventStore\EventId;
@@ -177,6 +178,48 @@ class PostgreSqlEventStoreTest extends TestCase
             ],
             AppendStreamOptions::append()->expectVersion(EventStreamVersion::initial())
         );
+    }
+
+    public function testAppendSameEventTwice(): void
+    {
+        $streamId = EventStreamId::fromString('stream-test');
+
+        $this->store->appendToStream(
+            $streamId,
+            [
+                new EventDescriptor(
+                    EventId::fromString('event1'),
+                    EventType::fromString('user_account_registered'),
+                    new EventData([
+                        'username' => 'user_1',
+                        'emailAddress' => 'email1@address.com',
+                    ])
+                ),
+            ],
+            AppendStreamOptions::append()
+        );
+
+        try {
+            $this->expectException(DuplicateEventIdException::class);
+            $this->store->appendToStream(
+                $streamId,
+                [
+                    new EventDescriptor(
+                        EventId::fromString('event1'),
+                        EventType::fromString('user_account_registered'),
+                        new EventData([
+                            'username' => 'user_1',
+                            'emailAddress' => 'email1@address.com',
+                        ])
+                    ),
+                ],
+                AppendStreamOptions::append()
+            );
+        } catch (DuplicateEventIdException $e) {
+            self::assertEquals('event1', $e->getEventId());
+            self::assertEquals($streamId, $e->getEventStreamId());
+            throw $e;
+        }
     }
 
     public function testReadStream(): void
