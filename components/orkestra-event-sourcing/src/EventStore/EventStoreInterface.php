@@ -21,13 +21,13 @@ interface EventStoreInterface
     /**
      * Appends events to a given stream.
      * If the stream does not exist, it will get implicitly created.
-     * It takes a stream version parameter to detect if there has been any concurrent appends to
-     * this stream, to enforce consistency boundaries when required.
-     * This parameter can be null in cases where a consistency check is deemed unnecessary.
+     * To enforce consistency boundaries when required, the AppendStreamOptions has the concept
+     * of expected version, where if the current version of the stream is not the same will throw a {@link ConcurrencyException}.
      *
      * @param EventDescriptorInterface[] $eventDescriptors
      *
      * @throws ConcurrencyException
+     * @throws DuplicateEventIdException
      */
     public function appendToStream(EventStreamId $streamId, iterable $eventDescriptors, AppendStreamOptions $options): void;
 

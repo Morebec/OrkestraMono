@@ -71,8 +71,17 @@ class InMemoryEventStore implements EventStoreInterface
 
         $appendedEvents = [];
 
+        /** @var string[] $eventIdsAsStr */
+        $eventIds = array_map(static function (RecordedEventDescriptor $e) {
+            return (string) $e->getEventId();
+        }, $this->readStream($streamId, ReadStreamOptions::read()->fromStart()->forward())->toArray());
+
         /** @var EventDescriptorInterface $descriptor */
         foreach ($eventDescriptors as $descriptor) {
+            if (\in_array((string) $descriptor->getEventId(), $eventIds)) {
+                throw new DuplicateEventIdException($streamId, $descriptor->getEventId());
+            }
+
             $versionAccumulator++;
 
             // Add recorded at metadata.
