@@ -70,7 +70,12 @@ class MessageHandlerRouteBuilder
             }
 
             $eventClass = $params[0];
-            $eventClassName = $eventClass->getClass()->getName();
+            $eventClassOb = $eventClass->getClass();
+            if (!$eventClassOb) {
+                continue;
+            }
+
+            $eventClassName = $eventClassOb->getName();
             if (!is_subclass_of($eventClassName, MessageInterface::class, true)) {
                 continue;
             }
