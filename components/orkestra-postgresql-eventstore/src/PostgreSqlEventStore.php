@@ -438,7 +438,7 @@ class PostgreSqlEventStore implements EventStoreInterface
      */
     public function subscribeToStream(EventStreamId $streamId, EventStoreSubscriberInterface $subscriber): void
     {
-        $this->subscribers[] = new PostgreSqlSubscriberWrapper($subscriber);
+        $this->subscribers[] = new PostgreSqlSubscriberWrapper($streamId, $subscriber);
         // Catchup if required
         $subscriptionOptions = $subscriber->getOptions();
         if ($subscriptionOptions->position !== SubscriptionOptions::POSITION_END) {
@@ -484,8 +484,12 @@ class PostgreSqlEventStore implements EventStoreInterface
                 new DateTime($data[EventsTableKeys::RECORDED_AT])
             );
 
+
+            /** @var PostgreSqlSubscriberWrapper $subscriber */
             foreach ($this->subscribers as $subscriber) {
-                $subscriber->onEvent($this, $descriptor);
+                if ($subscriber->getStreamId()->isEqualTo($descriptor->getStreamId()) || $subscriber->getStreamId()->isEqualTo($this->getGlobalStreamId())) {
+                    $subscriber->onEvent($this, $descriptor);
+                }
             }
         }
     }
