@@ -46,7 +46,7 @@ class InMemoryEventStore implements EventStoreInterface
     public function appendToStream(EventStreamId $streamId, iterable $eventDescriptors, AppendStreamOptions $options): void
     {
         // Make sure it is not a virtual stream.
-        if ($streamId === $this->getGlobalStreamId()) {
+        if ($streamId->isEqualTo($this->getGlobalStreamId())) {
             throw new CannotAppendToVirtualStreamException($streamId);
         }
 
@@ -71,14 +71,18 @@ class InMemoryEventStore implements EventStoreInterface
 
         $appendedEvents = [];
 
-        /** @var string[] $eventIdsAsStr */
-        $eventIds = array_map(static function (RecordedEventDescriptor $e) {
-            return (string) $e->getEventId();
-        }, $this->readStream($streamId, ReadStreamOptions::read()->fromStart()->forward())->toArray());
+        /* @var string[] $eventIdsAsStr */
+        if ($this->streamExists($streamId)) {
+            $eventIds = array_map(static function (RecordedEventDescriptor $e) {
+                return (string) $e->getEventId();
+            }, $this->readStream($streamId, ReadStreamOptions::read()->fromStart()->forward())->toArray());
+        } else {
+            $eventIds = [];
+        }
 
         /** @var EventDescriptorInterface $descriptor */
         foreach ($eventDescriptors as $descriptor) {
-            if (\in_array((string) $descriptor->getEventId(), $eventIds)) {
+            if (\in_array((string) $descriptor->getEventId(), $eventIds, true)) {
                 throw new DuplicateEventIdException($streamId, $descriptor->getEventId());
             }
 
@@ -108,13 +112,15 @@ class InMemoryEventStore implements EventStoreInterface
 
         // Call Subscribers
         foreach ($appendedEvents as $event) {
-            $streamIdStr = (string) $streamId;
-            if (!\array_key_exists($streamIdStr, $this->subscribers)) {
-                continue;
-            }
-
-            foreach ($this->subscribers[$streamIdStr] as $subscriber) {
-                $subscriber->onEvent($this, $event);
+            $eventStreamIdStr = (string) $streamId;
+            $globalStreamIdStr = (string) $this->getGlobalStreamId();
+            foreach ([$eventStreamIdStr, $globalStreamIdStr] as $streamIdStr) {
+                if (!\array_key_exists($streamIdStr, $this->subscribers)) {
+                    continue;
+                }
+                foreach ($this->subscribers[$streamIdStr] as $subscriber) {
+                    $subscriber->onEvent($this, $event);
+                }
             }
         }
     }

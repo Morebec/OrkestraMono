@@ -8,6 +8,7 @@ use Morebec\Orkestra\EventSourcing\EventProcessor\InMemoryEventStorePositionStor
 use Morebec\Orkestra\EventSourcing\EventProcessor\SubscribedTrackingEventProcessor;
 use Morebec\Orkestra\EventSourcing\EventProcessor\SubscribedTrackingEventProcessorOptions;
 use Morebec\Orkestra\EventSourcing\EventStore\AppendStreamOptions;
+use Morebec\Orkestra\EventSourcing\EventStore\EventId;
 use Morebec\Orkestra\EventSourcing\EventStore\EventStreamId;
 use Morebec\Orkestra\EventSourcing\EventStore\InMemoryEventStore;
 use Morebec\Orkestra\EventSourcing\EventStore\RecordedEventDescriptor;
@@ -21,13 +22,15 @@ class SubscribedTrackingEventProcessorTest extends TestCase
 
         // Prepare event store with an event in it.
         $eventStore = new InMemoryEventStore(new SystemClock());
+
+        $event1 = $this->getMockBuilder(RecordedEventDescriptor::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $event1->method('getEventId')->willReturn(EventId::generate());
+
         $eventStore->appendToStream(
             $streamId,
-            [
-                 $this->getMockBuilder(RecordedEventDescriptor::class)
-                ->disableOriginalConstructor()
-                ->getMock(),
-            ],
+            [$event1],
             AppendStreamOptions::append()
         );
 
@@ -44,16 +47,17 @@ class SubscribedTrackingEventProcessorTest extends TestCase
 
         // We expect a first time, because there is one event in the stream.
         // And we expect a second time because we will add a new event in the stream.
-        $eventPublisher->expects($this->exactly(2))->method('publishEvent');
+        $eventPublisher->expects(self::exactly(2))->method('publishEvent');
+
+        $event2 = $this->getMockBuilder(RecordedEventDescriptor::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $event2->method('getEventId')->willReturn(EventId::generate());
 
         $processor->start();
         $eventStore->appendToStream(
             $streamId,
-            [
-                $this->getMockBuilder(RecordedEventDescriptor::class)
-                    ->disableOriginalConstructor()
-                    ->getMock(),
-            ],
+            [$event2],
             AppendStreamOptions::append()
         );
     }
