@@ -19,6 +19,14 @@ class FixedClock implements ClockInterface
         $this->dateTime = $dateTime;
     }
 
+    /**
+     * Changes the date of this clock.
+     */
+    public function changeDate(DateTime $dateTime): void
+    {
+        $this->dateTime = $dateTime;
+    }
+
     public function today(): Date
     {
         return new Date($this->now());
