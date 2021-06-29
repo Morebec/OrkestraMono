@@ -40,9 +40,6 @@ class PostgreSqlSubscriberWrapper implements EventStoreSubscriberInterface
         return $this->subscriber->getOptions();
     }
 
-    /**
-     * @return EventStreamId
-     */
     public function getStreamId(): EventStreamId
     {
         return $this->streamId;

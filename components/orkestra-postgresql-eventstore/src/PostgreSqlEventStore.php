@@ -484,7 +484,6 @@ class PostgreSqlEventStore implements EventStoreInterface
                 new DateTime($data[EventsTableKeys::RECORDED_AT])
             );
 
-
             /** @var PostgreSqlSubscriberWrapper $subscriber */
             foreach ($this->subscribers as $subscriber) {
                 if ($subscriber->getStreamId()->isEqualTo($descriptor->getStreamId()) || $subscriber->getStreamId()->isEqualTo($this->getGlobalStreamId())) {
