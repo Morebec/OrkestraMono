@@ -77,7 +77,7 @@ class PollingTimeoutProcessor implements TimeoutProcessorInterface
                 $this->storage->remove($timeout->getId());
             }
 
-            usleep($this->options->pollingDelay);
+            usleep($this->options->pollingDelay * 1000);
         } while ($this->mustContinue());
 
         $this->stop();
