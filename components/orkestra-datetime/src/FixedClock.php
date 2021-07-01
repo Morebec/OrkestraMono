@@ -13,10 +13,13 @@ class FixedClock implements ClockInterface
      */
     private $dateTime;
 
-    public function __construct(DateTime $dateTime, string $timeZone = DateTime::DEFAULT_SYSTEM_TIME_ZONE)
+    /**
+     * @param DateTime|null $dateTime if null will default to the current date time of the system
+     */
+    public function __construct(?DateTime $dateTime = null, string $timeZone = DateTime::DEFAULT_SYSTEM_TIME_ZONE)
     {
         date_default_timezone_set($timeZone);
-        $this->dateTime = $dateTime;
+        $this->dateTime = $dateTime ?? new DateTime();
     }
 
     /**
