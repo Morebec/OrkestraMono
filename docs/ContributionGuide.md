@@ -1,6 +1,6 @@
 # Repository  
 *This document explains the general the setup of the repository to develop, release and maintain Orkestra and its components.
-If you intend on contributing to orchestra, this document is the place to start*
+If you intend on contributing to Orkestra, this document is the place to start*
 
 ## Coding Convention
 In order to have a common way of programming and committing to the repository, there is an adopted [Coding Convention](./CodingConvention.md).

@@ -3,7 +3,7 @@ This document describes the coding standards and conventions for developing Orke
 its code consistent.
 
 ## Committing
-Commits messages should have the following form:
+Commit messages should have the following form:
 ```
 [ComponentName] Your commit message
 ```
@@ -34,11 +34,17 @@ The coding standard is enforced using the `firendsofsymfony/php-cs-fixer` compos
 provides a binary to fix the files according to the standard defined in the `php_cs.dist` file located 
 at the root of the repository.
 
-Before every commit you should run the following command:
+Before every commit, you should run the following command:
 ```shell
 vendor/bin/php-cs-fixer fix components/
 ```
 This will ensure all the files you have modified adhere to the coding standard.
+
+Alternatively you can use the `bin/dev` binary with the following command:
+```bash
+bin/dev fix-cs name-of-component # E.g. bin/dev fix-cs eventsourcing
+```
+This command will only apply the coding style fix to the components you have worked on.
 
 ## Changelog
 Every meaningful change should be documented in the `CHANGELOG.md` file located at the root of the directory
