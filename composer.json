@@ -38,7 +38,7 @@
         "ext-posix": "*",
         "ext-sodium": "*",
         "monolog/monolog": "^2.0",
-        "php": ">=7.3",
+        "php": ">=7.4",
         "php-di/phpdoc-reader": "2.*",
         "ramsey/uuid": "^4.1",
         "symfony/config": "5.*",
@@ -84,7 +84,7 @@
         "phpunit/phpunit": "^9.5",
         "symfony/var-dumper": "5.*",
         "symplify/composer-json-manipulator": "^9.2",
-        "symplify/monorepo-builder": "^9.2"
+        "symplify/monorepo-builder": "9.3.*"
     },
     "autoload": {
         "psr-4": {
