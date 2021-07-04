@@ -53,8 +53,8 @@ The following sections need to be modified in the appropriate component's config
 The rest can be changed without any problem.
 
 #### Docker
-The `docker/` directory contains development specific docker-compose configurations in order to quickly get a development
-environment setup. When, developing Orkestra components one should use these configurations instead of the ones
+The `docker/` directory contains development specific docker-compose configurations in order to quickly set up a development
+environment. When, developing Orkestra components one should use these configurations instead of the ones
 that might be present in the components' directories, as these are meant for distributions for the users
 using the components in their projects.
 
