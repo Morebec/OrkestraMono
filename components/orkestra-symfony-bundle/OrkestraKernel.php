@@ -2,7 +2,13 @@
 
 namespace Morebec\Orkestra\SymfonyBundle;
 
-use Morebec\Orkestra\SymfonyBundle\Module\SymfonyOrkestraModuleConfiguratorInterface;
+use JsonException;
+use LogicException;
+use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\OrkestraConfiguration;
+use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\OrkestraConfigurationProcessor;
+use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\OrkestraModuleConfiguratorInterface;
+use ReflectionException;
+use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
@@ -19,7 +25,7 @@ class OrkestraKernel extends BaseKernel
     /**
      * List of the Module Configurators.
      *
-     * @var SymfonyOrkestraModuleConfiguratorInterface[]
+     * @var OrkestraModuleConfiguratorInterface[]
      */
     private $moduleConfigurators;
 
@@ -40,7 +46,7 @@ class OrkestraKernel extends BaseKernel
     /**
      * Returns the list of module configurators.
      *
-     * @return SymfonyOrkestraModuleConfiguratorInterface[]
+     * @return OrkestraModuleConfiguratorInterface[]
      */
     public function getModuleConfigurators(): array
     {
@@ -61,6 +67,7 @@ class OrkestraKernel extends BaseKernel
             $container->import($projectDir.'/config/services.yaml');
             $container->import($projectDir.'/config/{services}_'.$this->environment.'.yaml');
         } elseif (is_file($path = \dirname(__DIR__).'/config/services.php')) {
+            /** @noinspection PhpIncludeInspection */
             (require $path)($container->withPath($path), $this);
         }
 
@@ -76,30 +83,11 @@ class OrkestraKernel extends BaseKernel
         if (is_file(\dirname(__DIR__).'/config/routes.yaml')) {
             $routes->import($projectDir.'/config/routes.yaml');
         } elseif (is_file($path = \dirname(__DIR__).'/config/routes.php')) {
+            /** @noinspection PhpIncludeInspection */
             (require $path)($routes->withPath($path), $this);
         }
 
         $this->configureModuleRoutes($routes);
-    }
-
-    /**
-     * Configures the container using the Orkestra Module Configurators.
-     */
-    protected function configureModuleContainer(ContainerConfigurator $container): void
-    {
-        foreach ($this->getModuleConfigurators() as $moduleConfigurator) {
-            $moduleConfigurator->configureContainer($container);
-        }
-    }
-
-    /**
-     * Configures the routes using the Orkestra Module Configurators.
-     */
-    protected function configureModuleRoutes(RoutingConfigurator $routes)
-    {
-        foreach ($this->getModuleConfigurators() as $moduleConfigurator) {
-            $moduleConfigurator->configureRoutes($routes);
-        }
     }
 
     /**
@@ -110,28 +98,56 @@ class OrkestraKernel extends BaseKernel
         $modulesFile = $this->getProjectDir().'/config/modules.php';
 
         if (!file_exists($modulesFile)) {
-            throw new \LogicException(sprintf('The modules configuration file was not found at "%s"', $modulesFile));
+            throw new LogicException(sprintf('The modules configuration file was not found at "%s"', $modulesFile));
         }
 
+        /** @noinspection PhpIncludeInspection */
         $contents = require $modulesFile;
-        foreach ($contents as $class => $envs) {
+        foreach ($contents as $configuratorClassName => $envs) {
             if ($envs[$this->environment] ?? $envs['all'] ?? false) {
-                $configuratorClassName = "{$class}";
-
                 if (!class_exists($configuratorClassName)) {
-                    throw new \RuntimeException(sprintf('Configurator "%s" could not be loaded. Did you correctly registered it with the autoloader?', $class));
+                    throw new RuntimeException(sprintf('Configurator "%s" could not be loaded. Did you correctly registered it with the autoloader?', $configuratorClassName));
                 }
 
                 if (isset($this->moduleConfigurators[$configuratorClassName])) {
-                    throw new \LogicException(sprintf('Trying to load two module configurators with the same name: "%s"', $configuratorClassName));
+                    throw new LogicException(sprintf('Trying to load two module configurators with the same name: "%s"', $configuratorClassName));
                 }
 
-                /** @var SymfonyOrkestraModuleConfiguratorInterface $configurator */
+                /** @var OrkestraModuleConfiguratorInterface $configurator */
                 $configurator = new $configuratorClassName();
                 $this->moduleConfigurators[$configuratorClassName] = $configurator;
             }
         }
 
         $this->moduleConfiguratorsLoaded = true;
+    }
+
+    /**
+     * Configures the routes using the Orkestra Module Configurators.
+     */
+    protected function configureModuleRoutes(RoutingConfigurator $routes): void
+    {
+        foreach ($this->getModuleConfigurators() as $moduleConfigurator) {
+            $moduleConfigurator->configureRoutes($routes);
+        }
+    }
+
+    /**
+     * Configures the container using the Orkestra Module Configurators.
+     *
+     * @throws JsonException
+     * @throws ReflectionException
+     */
+    protected function configureModuleContainer(ContainerConfigurator $container): void
+    {
+        $orkestraConfiguration = new OrkestraConfiguration($container);
+        foreach ($this->getModuleConfigurators() as $moduleConfigurator) {
+            $moduleConfigurator->configureContainer($orkestraConfiguration);
+        }
+
+        // Using the configuration register services.
+        // Apply configuration here since multiple module can redefine the configuration at any point.
+        $processor = new OrkestraConfigurationProcessor($this);
+        $processor->processConfiguration($orkestraConfiguration);
     }
 }

@@ -1,19 +1,18 @@
 <?php
 
-namespace Morebec\Orkestra\SymfonyBundle\Module;
+namespace Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration;
 
-use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 
 /**
- * Represents a Symfony based Orkestra Module.
+ * Represents the configuration of a module's dependencies.
  */
-interface SymfonyOrkestraModuleConfiguratorInterface
+interface OrkestraModuleConfiguratorInterface
 {
     /**
      * Configures the Symfony service container.
      */
-    public function configureContainer(ContainerConfigurator $container): void;
+    public function configureContainer(OrkestraConfiguration $configuration): void;
 
     /**
      * Configures the Symfony route to be used by symfony for this module.

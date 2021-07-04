@@ -5,9 +5,9 @@ namespace Morebec\Orkestra\SymfonyBundle\DependencyInjection;
 use Morebec\Orkestra\Messaging\Routing\MessageHandlerRouteBuilder;
 use Morebec\Orkestra\Messaging\Routing\MessageRouteCollection;
 use Morebec\Orkestra\Messaging\Routing\MessageRouterInterface;
+use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\AutoRoutedMessageHandlerServiceConfigurator;
+use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\MessageHandlerServiceConfigurator;
 use Morebec\Orkestra\SymfonyBundle\Messaging\MessageRouterCache;
-use Morebec\Orkestra\SymfonyBundle\Module\AutoRoutedMessageHandlerServiceConfigurator;
-use Morebec\Orkestra\SymfonyBundle\Module\MessageHandlerServiceConfigurator;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 

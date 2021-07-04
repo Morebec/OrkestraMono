@@ -57,7 +57,7 @@ class MessageRouterCache
     public function dumpRoutes(MessageRouteCollection $routes): void
     {
         // Normalize routes
-        $data = json_encode($this->normalizer->normalize($routes->toArray())/*, JSON_PRETTY_PRINT*/);
+        $data = json_encode($this->normalizer->normalize($routes->toArray()), \JSON_THROW_ON_ERROR);
         file_put_contents($this->getCacheFile(), $data);
     }
 
@@ -66,7 +66,7 @@ class MessageRouterCache
      */
     public function loadRoutes(): MessageRouteCollection
     {
-        $data = json_decode(file_get_contents($this->getCacheFile()), true);
+        $data = json_decode(file_get_contents($this->getCacheFile()), true, 512, \JSON_THROW_ON_ERROR);
         $routes = [];
         foreach ($data as $datum) {
             $routes[] = $this->normalizer->denormalize($datum, MessageRouteInterface::class);

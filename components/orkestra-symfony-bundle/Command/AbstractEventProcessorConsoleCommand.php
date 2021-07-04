@@ -2,10 +2,9 @@
 
 namespace Morebec\Orkestra\SymfonyBundle\Command;
 
-use Doctrine\DBAL\Exception;
+use Morebec\Orkestra\EventSourcing\EventProcessor\EventProcessorInterface;
 use Morebec\Orkestra\EventSourcing\EventProcessor\EventProcessorListenerInterface;
 use Morebec\Orkestra\EventSourcing\EventProcessor\ListenableEventProcessorInterface;
-use Morebec\Orkestra\EventSourcing\EventProcessor\ReplayableEventProcessorInterface;
 use Morebec\Orkestra\EventSourcing\EventProcessor\TrackingEventProcessor;
 use Morebec\Orkestra\EventSourcing\EventProcessor\TrackingEventProcessorInspector;
 use Morebec\Orkestra\EventSourcing\EventStore\RecordedEventDescriptor;
@@ -19,32 +18,24 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-class AbstractEventProcessorConsoleCommand extends Command implements EventProcessorListenerInterface
+abstract class AbstractEventProcessorConsoleCommand extends Command implements EventProcessorListenerInterface
 {
     /** @var SymfonyStyle */
     protected $io;
 
-    /** @var ProgressBar */
+    /** @var ProgressBar|null */
     protected $replayProgressBar;
-
-    /** @var string|null */
-    protected $displayName;
-
-    /** @var ReplayableEventProcessorInterface */
-    private $processor;
 
     /** @var string */
     private $progressBarStyle;
 
-    public function __construct(ReplayableEventProcessorInterface $processor, string $commandName = null, string $displayName = null, string $progressBarStyle = 'modern')
-    {
+    public function __construct(
+        string $commandName = null,
+        string $progressBarStyle = 'modern'
+    ) {
         parent::__construct($commandName);
-        $this->displayName = $displayName ?: 'Event Processor';
 
         $this->progressBarStyle = $progressBarStyle;
-
-        $this->processor = $processor;
-        $this->processor->addListener($this);
     }
 
     public function onStart(ListenableEventProcessorInterface $processor): void
@@ -68,7 +59,7 @@ class AbstractEventProcessorConsoleCommand extends Command implements EventProce
         }
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->addArgument(
             'processor-command',
@@ -81,44 +72,45 @@ class AbstractEventProcessorConsoleCommand extends Command implements EventProce
     {
         $this->io = new SymfonyStyle($input, $output);
 
-        $this->io->title($this->displayName);
-
         $command = $input->getArgument('processor-command');
 
-        return $this->executeCommand($command);
+        $processor = $this->getProcessor($input, $output);
+
+        return $this->executeCommand($processor, $command);
     }
 
     /**
-     * @param $command
+     * Executes the command passed to this console command (e.g. replay, start, reset etc.)
+     * for a given processor.
      *
-     * @throws Exception
+     * @return int status code
      */
-    protected function executeCommand($command): int
+    protected function executeCommand(EventProcessorInterface $processor, string $command): int
     {
         switch ($command) {
             case 'replay':
-                $this->replayProcessor();
+                $this->replayProcessor($processor);
                 break;
 
             case 'reset':
-                $this->resetProcessor();
+                $this->resetProcessor($processor);
                 break;
 
             case 'start':
-                $this->startProcessor();
+                $this->startProcessor($processor);
                 break;
 
             case 'progress':
-                $this->displayProgress();
+                $this->displayProgress($processor);
                 break;
 
             case 'list-commands':
-                $this->displayHelp();
+                $this->displayHelp($processor);
                 break;
 
             default:
                 $this->io->error(sprintf('Command "%s" is not defined.', $command));
-                $this->displayHelp();
+                $this->displayHelp($processor);
 
                 return self::FAILURE;
         }
@@ -126,7 +118,15 @@ class AbstractEventProcessorConsoleCommand extends Command implements EventProce
         return self::SUCCESS;
     }
 
-    protected function displayHelp(): void
+    /**
+     * Builds and instantiate the Processor.
+     */
+    abstract protected function getProcessor(InputInterface $input, OutputInterface $output): EventProcessorInterface;
+
+    /**
+     * Displays the help message.
+     */
+    protected function displayHelp(EventProcessorInterface $processor): void
     {
         $help = new HelpCommand();
         $help->setCommand($this);
@@ -142,11 +142,8 @@ class AbstractEventProcessorConsoleCommand extends Command implements EventProce
             ['list-commands', 'Displays the current help message.'],
         ];
 
-        if ($this->processor instanceof ReplayableEventProcessorInterface) {
+        if ($processor instanceof TrackingEventProcessor) {
             $rows[] = ['replay', 'Replays the processor form the beginning of the stream.'];
-        }
-
-        if ($this->processor instanceof TrackingEventProcessor) {
             $rows[] = ['reset', 'Resets the position storage of the processor.'];
             $rows[] = ['progress', 'Displays the current progress of the processor.'];
         }
@@ -164,23 +161,27 @@ class AbstractEventProcessorConsoleCommand extends Command implements EventProce
         $table->render();
     }
 
-    protected function startProcessor(): void
+    /**
+     * Starts the processor.
+     */
+    protected function startProcessor(EventProcessorInterface $processor): void
     {
-        $this->processor->start();
+        $processor->start();
     }
 
-    protected function replayProcessor(): void
+    /**
+     * Replays the processor.
+     */
+    protected function replayProcessor(EventProcessorInterface $processor): void
     {
-        if (!($this->processor instanceof ReplayableEventProcessorInterface)) {
+        if (!($processor instanceof TrackingEventProcessor)) {
             throw new \LogicException('This processor cannot be replayed.');
         }
 
-        if ($this->processor instanceof TrackingEventProcessor) {
-            $this->io->writeln('Resetting processor ...');
-            $this->processor->reset();
-        }
+        $this->io->writeln('Resetting processor ...');
+        $processor->reset();
 
-        $events = $this->processor->getNextEvents();
+        $events = $processor->getNextEvents();
         $this->io->writeln(sprintf('Events to replay <info>%s</info> events ...', \count($events)));
 
         if ($events->isEmpty()) {
@@ -203,39 +204,42 @@ class AbstractEventProcessorConsoleCommand extends Command implements EventProce
             $this->replayProgressBar = new ProgressBar($this->io, $nbEvents);
         }
 
-        $this->processor->replay();
+        $processor->replay();
         $this->replayProgressBar->finish();
         $this->io->success('Replay completed.');
 
-        $this->processor->stop();
+        $processor->stop();
     }
 
-    protected function resetProcessor(): void
+    /**
+     * Resets the processor.
+     */
+    protected function resetProcessor(EventProcessorInterface $processor): void
     {
-        if (!($this->processor instanceof TrackingEventProcessor)) {
+        if (!($processor instanceof TrackingEventProcessor)) {
             $this->io->warning('This processor cannot be reset.');
 
             return;
         }
 
         $this->io->writeln('Resetting processor ...');
-        $this->processor->reset();
+        $processor->reset();
         $this->io->success('Reset completed.');
     }
 
     /**
-     * @throws Exception
+     * Display the progress status of the processor.
      */
-    protected function displayProgress(): void
+    protected function displayProgress(EventProcessorInterface $processor): void
     {
-        if (!$this->processor instanceof TrackingEventProcessor) {
+        if (!$processor instanceof TrackingEventProcessor) {
             $this->io->warning('No progress to be displayed.');
 
             return;
         }
 
         $inspector = new TrackingEventProcessorInspector();
-        $progress = $inspector->inspect($this->processor);
+        $progress = $inspector->inspect($processor);
 
         $totalNumberEvents = $progress->getTotalNumberEvents();
         $numberEventProcessed = $progress->getNumberEventProcessed();
