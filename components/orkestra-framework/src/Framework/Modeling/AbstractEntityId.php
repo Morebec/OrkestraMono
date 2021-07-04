@@ -25,7 +25,6 @@ abstract class AbstractEntityId
     }
 
     /**
-     * @param string $id
      * @return static
      */
     public static function fromString(string $id): self
@@ -35,6 +34,7 @@ abstract class AbstractEntityId
 
     /**
      * Generate a new ID.
+     *
      * @return static
      */
     public static function generate(): self
@@ -44,8 +44,8 @@ abstract class AbstractEntityId
 
     /**
      * Indicates if this ID is equal to another one or not.
+     *
      * @param AbstractEntityId $id
-     * @return bool
      */
     public function isEqualTo(self $id): bool
     {

@@ -6,10 +6,8 @@ use Doctrine\DBAL\Connection;
 use Morebec\Orkestra\EventSourcing\EventProcessor\EventStorePositionStorageInterface;
 use Morebec\Orkestra\EventSourcing\EventProcessor\MessageBusEventPublisher;
 use Morebec\Orkestra\EventSourcing\EventStore\EventStoreInterface;
-use Morebec\Orkestra\EventSourcing\EventStore\InMemoryEventStore;
 use Morebec\Orkestra\EventSourcing\EventStore\MessageBusContextEventStoreDecorator;
 use Morebec\Orkestra\EventSourcing\EventStore\UpcastingEventStoreDecorator;
-use Morebec\Orkestra\EventSourcing\Projection\ProjectorGroup;
 use Morebec\Orkestra\Messaging\Timeout\InMemoryTimeoutStorage;
 use Morebec\Orkestra\Messaging\Timeout\MessageBusTimeoutPublisher;
 use Morebec\Orkestra\Messaging\Timeout\TimeoutManager;
@@ -37,8 +35,8 @@ use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\OrkestraMod
 use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\ProjectionProcessingConfiguration;
 use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\ProjectorGroupConfiguration;
 use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\TimeoutProcessingConfiguration;
-use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
+use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 
 class FrameworkModuleConfigurator implements OrkestraModuleConfiguratorInterface
 {
@@ -70,7 +68,6 @@ class FrameworkModuleConfigurator implements OrkestraModuleConfiguratorInterface
         $config->configureEventProcessing(
             (new EventProcessingConfiguration())
                 ->usingInMemoryEventStorePositionStorage()
-
 
                 // Projection Processing
                 ->configureProjectionProcessing((new ProjectionProcessingConfiguration())

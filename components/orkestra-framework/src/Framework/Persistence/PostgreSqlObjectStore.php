@@ -44,9 +44,8 @@ class PostgreSqlObjectStore
     }
 
     /**
-     * Adds an object to this store
-     * @param string $id
-     * @param object $o
+     * Adds an object to this store.
+     *
      * @throws Exception
      */
     public function addObject(string $id, object $o): void
@@ -56,8 +55,7 @@ class PostgreSqlObjectStore
 
     /**
      * Updates an object in this store.
-     * @param string $id
-     * @param object $o
+     *
      * @throws Exception
      */
     public function updateObject(string $id, object $o): void
@@ -67,7 +65,6 @@ class PostgreSqlObjectStore
 
     /**
      * Removes an object from this store.
-     * @param string $id
      */
     public function removeObject(string $id): void
     {
@@ -76,8 +73,9 @@ class PostgreSqlObjectStore
 
     /**
      * Finds an Object by its ID or returns null if not found.
-     * @param string $id
+     *
      * @return null
+     *
      * @throws Exception
      */
     public function findById(string $id): ?object
@@ -87,11 +85,12 @@ class PostgreSqlObjectStore
 
     /**
      * Finds an Object by a given filter or returns null if not found.
+     *
      * @param string|Filter $filter
-     * @return object|null
+     *
      * @throws Exception
      */
-    public function findOneBy($filter):  ?object
+    public function findOneBy($filter): ?object
     {
         $doc = $this->store->findOneDocument($this->collectionName, $filter);
         if (!$doc) {
@@ -103,8 +102,9 @@ class PostgreSqlObjectStore
 
     /**
      * Finds many objects by a given filter.
+     *
      * @param string|Filter $filter
-     * @return array
+     *
      * @throws Exception
      */
     public function findManyBy($filter): array
@@ -116,6 +116,7 @@ class PostgreSqlObjectStore
 
     /**
      * Empties the collection containing the objects.
+     *
      * @throws Exception
      */
     public function clear(): void
@@ -125,7 +126,6 @@ class PostgreSqlObjectStore
 
     /**
      * Returns the Doctrine DBAL connection.
-     * @return Connection
      */
     public function getConnection(): Connection
     {
@@ -134,8 +134,6 @@ class PostgreSqlObjectStore
 
     /**
      * Normalizes an object before adding or updating it in the store.
-     * @param object $object
-     * @return array
      */
     protected function normalizeObject(object $object): array
     {
@@ -144,8 +142,8 @@ class PostgreSqlObjectStore
 
     /**
      * Denormalizes an object upon reads.
+     *
      * @param mixed $objectData
-     * @return object|null
      */
     protected function denormalizeObject($objectData): ?object
     {

@@ -55,10 +55,10 @@ class ProjectionGroupEventProcessorConsoleCommand extends AbstractProjectionGrou
             new ProjectorEventPublisher($projectorGroup),
             $this->eventStore,
             $this->eventStorePositionStorage,
-            (new TrackingEventProcessorOptions)
+            (new TrackingEventProcessorOptions())
                 ->withName($projectorGroup->getName())
                 ->storePositionAfterProcessing()
-                ->withBatchSize((int)$input->getOption('batchSize'))
+                ->withBatchSize((int) $input->getOption('batchSize'))
                 ->storePositionPerEvent(true)
                 ->withStreamId($this->eventStore->getGlobalStreamId())
         );
