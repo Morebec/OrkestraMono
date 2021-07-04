@@ -10,10 +10,6 @@ use Morebec\Orkestra\EventSourcing\EventStore\ReadStreamOptions;
  */
 class TrackingEventProcessorInspector
 {
-    public function __construct()
-    {
-    }
-
     /**
      * Inspects a Tracking Event processor's progress.
      */

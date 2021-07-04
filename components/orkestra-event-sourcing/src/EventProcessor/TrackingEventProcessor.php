@@ -34,7 +34,7 @@ use RuntimeException;
  * This processor also supports {@link TrackingEventProcessorListenerInterface} that can be used to hook into
  * the work of this processor.
  */
-class TrackingEventProcessor implements ListenableEventProcessorInterface, ReplayableEventProcessorInterface
+class TrackingEventProcessor implements ListenableEventProcessorInterface
 {
     /** @var bool */
     protected $running;
@@ -145,7 +145,7 @@ class TrackingEventProcessor implements ListenableEventProcessorInterface, Repla
     {
         $position = $this->positionStorage->get($this->options->name);
 
-        return $position !== null ? $position : ReadStreamOptions::POSITION_START;
+        return $position ?? ReadStreamOptions::POSITION_START;
     }
 
     /**
@@ -175,7 +175,8 @@ class TrackingEventProcessor implements ListenableEventProcessorInterface, Repla
     }
 
     /**
-     * {@inheritDoc}
+     * Allows to replay this event processor, from a given position.
+     * If position is null it will be replayed from the start.
      */
     public function replay(int $position = null): void
     {
@@ -196,6 +197,11 @@ class TrackingEventProcessor implements ListenableEventProcessorInterface, Repla
     public function getEventStore(): EventStoreInterface
     {
         return $this->eventStore;
+    }
+
+    public function getPublisher(): EventPublisherInterface
+    {
+        return $this->publisher;
     }
 
     protected function processEvents(StreamedEventCollectionInterface $events): void

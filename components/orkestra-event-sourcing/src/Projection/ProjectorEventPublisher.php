@@ -24,4 +24,9 @@ class ProjectorEventPublisher implements EventPublisherInterface
     {
         $this->projector->project($eventDescriptor);
     }
+
+    public function getProjector(): ProjectorInterface
+    {
+        return $this->projector;
+    }
 }

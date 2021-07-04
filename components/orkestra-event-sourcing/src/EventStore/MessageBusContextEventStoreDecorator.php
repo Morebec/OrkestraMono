@@ -3,7 +3,7 @@
 namespace Morebec\Orkestra\EventSourcing\EventStore;
 
 use Morebec\Orkestra\Messaging\Context\MessageBusContext;
-use Morebec\Orkestra\Messaging\Context\MessageBusContextProvider;
+use Morebec\Orkestra\Messaging\Context\MessageBusContextProviderInterface;
 use Morebec\Orkestra\Messaging\MessageHeaders;
 
 /**
@@ -24,13 +24,13 @@ class MessageBusContextEventStoreDecorator implements EventStoreInterface
      */
     private $eventStore;
     /**
-     * @var MessageBusContextProvider
+     * @var MessageBusContextProviderInterface
      */
     private $contextProvider;
 
     public function __construct(
         EventStoreInterface $eventStore,
-        MessageBusContextProvider $contextProvider
+        MessageBusContextProviderInterface $contextProvider
     ) {
         $this->eventStore = $eventStore;
         $this->contextProvider = $contextProvider;

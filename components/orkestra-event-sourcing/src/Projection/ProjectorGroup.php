@@ -15,7 +15,7 @@ use Morebec\Orkestra\EventSourcing\EventStore\RecordedEventDescriptor;
  */
 class ProjectorGroup implements ProjectorInterface
 {
-    public const TYPE_NAME = 'projection_group';
+    public const TYPE_NAME = 'projector_group';
     /**
      * @var string
      */
