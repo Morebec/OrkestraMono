@@ -8,6 +8,9 @@ use Morebec\Orkestra\EventSourcing\EventStore\EventStreamVersion;
 use Morebec\Orkestra\EventSourcing\Modeling\AbstractEventSourcedAggregateRoot;
 use Morebec\Orkestra\Normalization\ObjectNormalizerInterface;
 
+/**
+ * Service responsible for taking a snapshot of an {@link AbstractEventSourcedAggregateRoot}.
+ */
 class Snapshotter
 {
     private ObjectNormalizerInterface $objectNormalizer;

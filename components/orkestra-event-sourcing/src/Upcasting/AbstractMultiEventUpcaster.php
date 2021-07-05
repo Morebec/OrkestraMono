@@ -7,7 +7,7 @@ namespace Morebec\Orkestra\EventSourcing\Upcasting;
  * It follows an API similar to the {@link AbstractSingleEventUpcaster} by allowing the implementor
  * to implement a `doUpcast` method.
  */
-abstract class AbstractMultiEventUpcaster extends AbstractEventSpecificUpcaster
+abstract class AbstractMultiEventUpcaster extends AbstractEventTypeSpecificUpcaster
 {
     public function upcast(UpcastableEventDescriptor $eventDescriptor): array
     {

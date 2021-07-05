@@ -116,7 +116,7 @@ abstract class Enum
         return array_values(self::getConstants());
     }
 
-    protected static function validateValue($value)
+    protected static function validateValue($value): void
     {
         if (!static::isValidValue($value)) {
             $values = implode("', '", static::getConstants());

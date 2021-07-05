@@ -11,8 +11,6 @@ use Morebec\Orkestra\EventSourcing\EventStore\EventStoreInterface;
  */
 class PollingTrackingEventProcessor extends TrackingEventProcessor
 {
-    protected PollingTrackingEventProcessorOptions $options;
-
     public function __construct(
         EventPublisherInterface $publisher,
         EventStoreInterface $eventStore,
@@ -24,9 +22,11 @@ class PollingTrackingEventProcessor extends TrackingEventProcessor
 
     public function start(): void
     {
+        /** @var PollingTrackingEventProcessorOptions $options */
+        $options = $this->options;
         do {
             parent::start();
-            usleep($this->options->pollingDelay * 1000);
+            usleep($options->pollingDelay * 1000);
         } while ($this->isRunning());
     }
 }

@@ -8,10 +8,7 @@ use Tests\Morebec\Orkestra\EventSourcing\TestEvent;
 
 class TestAggregate extends AbstractEventSourcedAggregateRoot
 {
-    /**
-     * @var bool
-     */
-    public $testEventReceived = false;
+    public bool $testEventReceived = false;
 
     protected function onDomainEvent(DomainEventInterface $event): void
     {

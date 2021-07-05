@@ -6,7 +6,7 @@ namespace Morebec\Orkestra\EventSourcing\Upcasting;
  * Abstract implementation of an Event Specific Upcaster that also checks for the version of the event
  * in its `supports` method. by checking for a field `schemaVersion` in the metadata of the event.
  */
-abstract class AbstractEventVersionSpecificUpcaster extends AbstractEventSpecificUpcaster
+abstract class AbstractEventVersionSpecificUpcaster extends AbstractEventTypeSpecificUpcaster
 {
     protected int $schemaVersion;
 

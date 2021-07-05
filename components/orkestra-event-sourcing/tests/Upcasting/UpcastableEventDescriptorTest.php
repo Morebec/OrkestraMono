@@ -13,7 +13,7 @@ use Morebec\Orkestra\EventSourcing\EventStore\EventType;
 use Morebec\Orkestra\EventSourcing\Upcasting\UpcastableEventDescriptor;
 use PHPUnit\Framework\TestCase;
 
-class UpcastableEventTest extends TestCase
+class UpcastableEventDescriptorTest extends TestCase
 {
     public function testWithFieldRenamed(): void
     {

@@ -9,7 +9,7 @@ use Morebec\Orkestra\EventSourcing\EventStore\EventType;
  * Abstract Implementation of an Upcaster for a specific Event type.
  * It defined the supports method to check that an event is of a specific type.
  */
-abstract class AbstractEventSpecificUpcaster implements UpcasterInterface
+abstract class AbstractEventTypeSpecificUpcaster implements UpcasterInterface
 {
     protected EventType $eventType;
 
@@ -23,6 +23,6 @@ abstract class AbstractEventSpecificUpcaster implements UpcasterInterface
 
     public function supports(UpcastableEventDescriptor $eventDescriptor): bool
     {
-        return $this->eventType === $eventDescriptor->getEventType();
+        return $this->eventType->isEqualTo($eventDescriptor->getEventType());
     }
 }

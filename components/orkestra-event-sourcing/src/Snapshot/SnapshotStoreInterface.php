@@ -10,12 +10,12 @@ use Morebec\Orkestra\EventSourcing\EventStore\EventStreamId;
 interface SnapshotStoreInterface
 {
     /**
-     * Upserts a snapshot.
+     * Upserts a snapshot for a given stream.
      */
     public function upsert(Snapshot $snapshot): void;
 
     /**
-     * Returns a snapshot by its ID.
+     * Returns a snapshot by its stream ID.
      */
     public function findByStreamId(EventStreamId $eventStreamId): ?Snapshot;
 }

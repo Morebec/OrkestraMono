@@ -7,6 +7,7 @@ use Morebec\Orkestra\EventSourcing\EventStore\AppendStreamOptions;
 use Morebec\Orkestra\EventSourcing\EventStore\EventData;
 use Morebec\Orkestra\EventSourcing\EventStore\EventDescriptor;
 use Morebec\Orkestra\EventSourcing\EventStore\EventId;
+use Morebec\Orkestra\EventSourcing\EventStore\EventMetadata;
 use Morebec\Orkestra\EventSourcing\EventStore\EventSequenceNumber;
 use Morebec\Orkestra\EventSourcing\EventStore\EventStoreInterface;
 use Morebec\Orkestra\EventSourcing\EventStore\EventStreamId;
@@ -19,6 +20,7 @@ use Morebec\Orkestra\EventSourcing\Snapshot\Snapshot;
 use Morebec\Orkestra\EventSourcing\Snapshot\SnapshotStoreInterface;
 use Morebec\Orkestra\Messaging\Domain\Event\DomainEventInterface;
 use Morebec\Orkestra\Messaging\Normalization\MessageNormalizerInterface;
+use Morebec\Orkestra\Messaging\VersionedMessageInterface;
 use Morebec\Orkestra\Modeling\DomainEventCollection;
 use Morebec\Orkestra\Modeling\DomainEventCollectionInterface;
 use Morebec\Orkestra\Normalization\ObjectNormalizerInterface;
@@ -125,18 +127,20 @@ class EventStoreRepository
 
     protected function convertEventsToEventDescriptors(DomainEventCollectionInterface $collection): array
     {
-        $convertFunction = function (DomainEventInterface $event) {
-            return new EventDescriptor(
-                EventId::generate(),
-                EventType::fromString($event::getTypeName()),
-                new EventData($this->normalizer->normalize($event))
-            );
-        };
-        $convertFunction->bindTo($this);
-
-        return array_map($convertFunction, $collection->toArray());
+        return array_map(fn (DomainEventInterface $event) => new EventDescriptor(
+            EventId::generate(),
+            EventType::fromString($event::getTypeName()),
+            new EventData($this->normalizer->normalize($event)),
+            new EventMetadata([
+                'schemaVersion' => $event instanceof VersionedMessageInterface ? $event::getMessageVersion() : null,
+            ])
+        ), $collection->toArray());
     }
 
+    /**
+     * Gets a snapshot for a stream with a given ID.
+     * If no snapshot was taken yet, a snapshot with an empty state is returned.
+     */
     protected function getSnapshot(EventStreamId $id): Snapshot
     {
         $snapshot = $this->snapshotStore->findByStreamId($id);

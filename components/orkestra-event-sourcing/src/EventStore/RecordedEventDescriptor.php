@@ -30,7 +30,7 @@ class RecordedEventDescriptor implements EventDescriptorInterface
         EventId $eventId,
         EventType $eventType,
         EventMetadata $eventMetadata,
-        EventData $event,
+        EventData $eventData,
         EventStreamId $streamId,
         EventStreamVersion $streamVersion,
         EventSequenceNumber $sequenceNumber,
@@ -41,7 +41,7 @@ class RecordedEventDescriptor implements EventDescriptorInterface
         $this->eventMetadata = $eventMetadata;
         $this->streamId = $streamId;
         $this->streamVersion = $streamVersion;
-        $this->eventData = $event;
+        $this->eventData = $eventData;
         $this->recordedAt = $recordedAt;
         $this->sequenceNumber = $sequenceNumber;
     }

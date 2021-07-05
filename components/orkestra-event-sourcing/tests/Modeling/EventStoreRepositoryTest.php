@@ -16,11 +16,9 @@ use Tests\Morebec\Orkestra\EventSourcing\TestEvent;
 
 class EventStoreRepositoryTest extends TestCase
 {
-    /**
-     * @var EventStoreRepository
-     */
-    private $repository;
-    private $eventStore;
+    private EventStoreRepository $repository;
+
+    private InMemoryEventStore $eventStore;
 
     protected function setUp(): void
     {
@@ -33,9 +31,16 @@ class EventStoreRepositoryTest extends TestCase
             $objectNormalizer
         );
 
-        $snapshotRepository = new InMemorySnapshotStore();
+        $snapshotStore = new InMemorySnapshotStore();
         $this->eventStore = new InMemoryEventStore(new SystemClock());
-        $this->repository = new EventStoreRepository($this->eventStore, $normalizer, $snapshotRepository, $objectNormalizer, TestAggregate::class, 'prefix_');
+        $this->repository = new EventStoreRepository(
+            $this->eventStore,
+            $normalizer,
+            $snapshotStore,
+            $objectNormalizer,
+            TestAggregate::class,
+            'prefix_'
+        );
     }
 
     public function testSave(): void
@@ -62,7 +67,7 @@ class EventStoreRepositoryTest extends TestCase
 
         $loadedAggregate = $this->repository->load('test');
 
-        $this->assertEquals($aggregate->testEventReceived, $loadedAggregate->testEventReceived);
-        $this->assertTrue($loadedAggregate->getVersion()->isEqualTo(EventSourcedAggregateRootVersion::fromInt(0)));
+        self::assertEquals($aggregate->testEventReceived, $loadedAggregate->testEventReceived);
+        self::assertTrue($loadedAggregate->getVersion()->isEqualTo(EventSourcedAggregateRootVersion::fromInt(0)));
     }
 }

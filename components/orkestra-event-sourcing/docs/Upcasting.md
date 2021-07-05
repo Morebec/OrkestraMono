@@ -169,6 +169,6 @@ Basically it can wrap the event store to give it the ability to upcast events, r
 
 ```php
 $postgresSqlEventStore = new PostgesSqlEventStore(/*...*/);
-$upcasterChain = UpcasterChain(/***/);
+$upcasterChain = new UpcasterChain(/*...*/);
 $eventStore = new UpcastingEventStoreDecorator($postgresSqlEventStore, $upcasterChain);
 ```
