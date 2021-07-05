@@ -12,15 +12,9 @@ use Morebec\Orkestra\Messaging\Normalization\MessageNormalizerInterface;
  */
 class MessageBusEventPublisher implements EventPublisherInterface
 {
-    /**
-     * @var MessageBusInterface
-     */
-    private $messageBus;
+    private MessageBusInterface $messageBus;
 
-    /**
-     * @var MessageNormalizerInterface
-     */
-    private $messageNormalizer;
+    private MessageNormalizerInterface $messageNormalizer;
 
     public function __construct(MessageBusInterface $messageBus, MessageNormalizerInterface $messageNormalizer)
     {

@@ -4,6 +4,9 @@ namespace Morebec\Orkestra\Normalization\Denormalizer;
 
 class NullValueDenormalizer implements DenormalizerInterface
 {
+    /**
+     * @return null
+     */
     public function denormalize(DenormalizationContextInterface $context)
     {
         if (!$this->supports($context)) {

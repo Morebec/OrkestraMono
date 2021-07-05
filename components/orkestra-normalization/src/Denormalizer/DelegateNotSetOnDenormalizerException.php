@@ -9,10 +9,7 @@ use Throwable;
  */
 class DelegateNotSetOnDenormalizerException extends \RuntimeException implements DenormalizationExceptionInterface
 {
-    /**
-     * @var DenormalizerInterface
-     */
-    private $denormalizer;
+    private DenormalizerInterface $denormalizer;
 
     public function __construct(DenormalizerInterface $denormalizer, $code = 0, Throwable $previous = null)
     {

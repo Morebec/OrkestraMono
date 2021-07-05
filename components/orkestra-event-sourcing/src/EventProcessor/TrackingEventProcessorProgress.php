@@ -10,30 +10,15 @@ use Morebec\Orkestra\EventSourcing\EventStore\EventStreamVersion;
  */
 class TrackingEventProcessorProgress
 {
-    /**
-     * @var string
-     */
-    private $eventProcessorName;
+    private string $eventProcessorName;
 
-    /**
-     * @var EventStreamId
-     */
-    private $streamId;
+    private EventStreamId $streamId;
 
-    /**
-     * @var int
-     */
-    private $firstPosition;
+    private int $firstPosition;
 
-    /**
-     * @var int
-     */
-    private $lastPosition;
+    private int $lastPosition;
 
-    /**
-     * @var int
-     */
-    private $currentPosition;
+    private int $currentPosition;
 
     /**
      * TrackingEventProcessorStatus constructor.

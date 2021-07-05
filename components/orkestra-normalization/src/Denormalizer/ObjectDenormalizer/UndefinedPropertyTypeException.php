@@ -11,14 +11,9 @@ use Throwable;
  */
 class UndefinedPropertyTypeException extends RuntimeException implements DenormalizationExceptionInterface
 {
-    /**
-     * @var string
-     */
-    private $propertyName;
-    /**
-     * @var string
-     */
-    private $className;
+    private string $propertyName;
+
+    private string $className;
 
     public function __construct(string $propertyName, string $className, $code = 0, Throwable $previous = null)
     {

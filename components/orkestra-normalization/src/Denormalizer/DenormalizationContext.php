@@ -7,15 +7,9 @@ class DenormalizationContext implements DenormalizationContextInterface
     /** @var mixed */
     private $value;
 
-    /**
-     * @var DenormalizationContextInterface|null
-     */
-    private $parentContext;
+    private ?DenormalizationContextInterface $parentContext;
 
-    /**
-     * @var string
-     */
-    private $typeName;
+    private string $typeName;
 
     /**
      * DenormalizationContext constructor.

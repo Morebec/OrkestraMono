@@ -8,22 +8,17 @@ namespace Morebec\Orkestra\EventSourcing\EventStore;
  */
 class EventDescriptorBuilder
 {
-    /** @var EventId|null */
-    private $eventId;
+    private ?EventId $eventId = null;
 
-    /** @var EventType|null */
-    private $eventType;
+    private ?EventType $eventType = null;
 
-    /**
-     * @var EventData
-     */
-    private $eventData;
+    private EventData $eventData;
+
+    private EventMetadata $eventMetadata;
 
     /**
-     * @var EventMetadata
+     * Creates an new EventDescriptor builder.
      */
-    private $eventMetadata;
-
     public static function create(): self
     {
         $b = new self();

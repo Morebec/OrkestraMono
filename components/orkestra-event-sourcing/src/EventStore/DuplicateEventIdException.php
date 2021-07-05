@@ -9,14 +9,9 @@ use Throwable;
  */
 class DuplicateEventIdException extends \RuntimeException implements EventStoreExceptionInterface
 {
-    /**
-     * @var EventStreamId
-     */
-    private $eventStreamId;
-    /**
-     * @var EventId
-     */
-    private $eventId;
+    private EventStreamId $eventStreamId;
+
+    private EventId $eventId;
 
     public function __construct(EventStreamId $eventStreamId, EventId $eventId, Throwable $previous = null)
     {

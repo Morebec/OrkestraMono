@@ -7,14 +7,10 @@ namespace Morebec\Orkestra\Messaging\Validation;
  */
 class MessageValidationError implements MessageValidationErrorInterface
 {
-    /**
-     * @var string
-     */
-    private $message;
-    /**
-     * @var string
-     */
-    private $property;
+    private string $message;
+
+    private string $property;
+
     private $value;
 
     public function __construct(string $message, string $property, $value)

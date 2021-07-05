@@ -7,18 +7,14 @@ class AppendStreamOptions
     /**
      * Represents the version at which stream is expected to be at, in order to perform an optimistic concurrency check.
      * Set to null to disable concurrency check.
-     *
-     * @var ?EventStreamVersion
      */
-    public $expectedStreamVersion = null;
+    public ?EventStreamVersion $expectedStreamVersion = null;
 
     /**
      * Indicates if the append operation should be performed in a transaction if the underlying implementation
      * of the event store supports it.
-     *
-     * @var bool
      */
-    public $transactional = false;
+    public bool $transactional = false;
 
     public static function append(): self
     {

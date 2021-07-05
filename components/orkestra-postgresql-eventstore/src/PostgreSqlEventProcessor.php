@@ -21,10 +21,7 @@ use Morebec\Orkestra\EventSourcing\EventStore\StreamedEventCollectionInterface;
  */
 class PostgreSqlEventProcessor extends SubscribedTrackingEventProcessor
 {
-    /**
-     * @var PostgreSqlEventStore
-     */
-    private $postgreSqlEventStore;
+    private PostgreSqlEventStore $postgreSqlEventStore;
 
     public function __construct(
         EventPublisherInterface $publisher,

@@ -6,7 +6,7 @@ use Throwable;
 
 class ThrowableNormalizer implements NormalizerInterface
 {
-    public function normalize(NormalizationContextInterface $context)
+    public function normalize(NormalizationContextInterface $context): array
     {
         if (!$this->supports($context)) {
             throw new UnsupportedNormalizerValueException($context, $this);

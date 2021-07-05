@@ -10,10 +10,7 @@ use Morebec\Orkestra\EventSourcing\EventStore\RecordedEventDescriptor;
  */
 class ProjectorEventPublisher implements EventPublisherInterface
 {
-    /**
-     * @var ProjectorInterface
-     */
-    private $projector;
+    private ProjectorInterface $projector;
 
     public function __construct(ProjectorInterface $projector)
     {

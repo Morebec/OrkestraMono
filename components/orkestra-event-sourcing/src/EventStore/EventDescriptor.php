@@ -7,22 +7,13 @@ namespace Morebec\Orkestra\EventSourcing\EventStore;
  */
 class EventDescriptor implements EventDescriptorInterface
 {
-    /**
-     * @var EventId
-     */
-    private $id;
-    /**
-     * @var EventType
-     */
-    private $type;
-    /**
-     * @var EventMetadata
-     */
-    private $metadata;
-    /**
-     * @var EventData
-     */
-    private $data;
+    private EventId $id;
+
+    private EventType $type;
+
+    private EventMetadata $metadata;
+
+    private EventData $data;
 
     public function __construct(EventId $id, EventType $type, EventData $data, ?EventMetadata $metadata = null)
     {

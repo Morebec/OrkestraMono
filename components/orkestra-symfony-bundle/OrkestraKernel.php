@@ -27,14 +27,12 @@ class OrkestraKernel extends BaseKernel
      *
      * @var OrkestraModuleConfiguratorInterface[]
      */
-    private $moduleConfigurators;
+    private array $moduleConfigurators;
 
     /**
      * Indicates if the module configurators were loaded or not.
-     *
-     * @var bool
      */
-    private $moduleConfiguratorsLoaded;
+    private bool $moduleConfiguratorsLoaded;
 
     public function __construct(string $environment, bool $debug)
     {

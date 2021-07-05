@@ -8,10 +8,7 @@ use Morebec\Orkestra\Modeling\DomainEventCollectionInterface;
 
 class EventSourcedAggregateRootTestScenario
 {
-    /**
-     * @var AbstractEventSourcedAggregateRoot
-     */
-    private $aggregateRoot;
+    private AbstractEventSourcedAggregateRoot $aggregateRoot;
 
     /**
      * @var callable
@@ -21,7 +18,7 @@ class EventSourcedAggregateRootTestScenario
     /**
      * @var DomainEventInterface[]
      */
-    private $givenEvents;
+    private array $givenEvents;
 
     private function __construct(AbstractEventSourcedAggregateRoot $aggregateRoot)
     {

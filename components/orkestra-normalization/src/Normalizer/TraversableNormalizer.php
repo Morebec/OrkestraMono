@@ -10,14 +10,14 @@ class TraversableNormalizer implements DelegatingNormalizerInterface
     /**
      * @var NormalizerInterface
      */
-    private $delegate;
+    private ?NormalizerInterface $delegate;
 
     public function __construct(NormalizerInterface $delegate = null)
     {
         $this->delegate = $delegate;
     }
 
-    public function normalize(NormalizationContextInterface $context)
+    public function normalize(NormalizationContextInterface $context): array
     {
         if (!$this->supports($context)) {
             throw new UnsupportedNormalizerValueException($context, $this);

@@ -12,7 +12,7 @@ class MessageBusContextStack
     /**
      * @var MessageBusContext[]
      */
-    private $data;
+    private array $data;
 
     public function __construct()
     {
@@ -47,10 +47,6 @@ class MessageBusContextStack
     {
         $nbContexts = \count($this->data);
 
-        if ($nbContexts === 0) {
-            return null;
-        }
-
-        return $this->data[$nbContexts - 1];
+        return $this->data[$nbContexts - 1] ?? null;
     }
 }

@@ -18,21 +18,14 @@ use Morebec\Orkestra\EventSourcing\EventStore\SubscriptionOptions;
  */
 class SubscribedEventProcessor implements EventProcessorInterface, EventStoreSubscriberInterface, ListenableEventProcessorInterface
 {
-    /**
-     * @var EventPublisherInterface
-     */
-    private $eventPublisher;
+    private EventPublisherInterface $eventPublisher;
 
-    /**
-     * @var string
-     */
-    private $name;
+    private string $name;
 
-    /** @var bool */
-    private $running;
+    private bool $running;
 
     /** @var EventProcessorListenerInterface[] */
-    private $listeners;
+    private array $listeners;
 
     public function __construct(string $name, EventPublisherInterface $eventPublisher, iterable $listeners = [])
     {
@@ -85,8 +78,6 @@ class SubscribedEventProcessor implements EventProcessorInterface, EventStoreSub
 
     public function removeListener(EventProcessorListenerInterface $listener): void
     {
-        $this->listeners = array_filter($this->listeners, static function (EventProcessorListenerInterface $l) use ($listener) {
-            return $listener !== $l;
-        });
+        $this->listeners = array_filter($this->listeners, static fn (EventProcessorListenerInterface $l) => $listener !== $l);
     }
 }

@@ -8,15 +8,9 @@ use Throwable;
 
 class UnsupportedDenormalizerValueException extends InvalidArgumentException implements DenormalizationExceptionInterface
 {
-    /**
-     * @var DenormalizerInterface
-     */
-    private $denormalizer;
+    private DenormalizerInterface $denormalizer;
 
-    /**
-     * @var DenormalizationContextInterface
-     */
-    private $context;
+    private DenormalizationContextInterface $context;
 
     public function __construct(DenormalizationContextInterface $context, DenormalizerInterface $denormalizer, Throwable $previous = null)
     {

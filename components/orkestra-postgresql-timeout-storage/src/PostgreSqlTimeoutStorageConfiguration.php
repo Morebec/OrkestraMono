@@ -4,9 +4,8 @@ namespace Morebec\Orkestra\PostgreSqlTimeoutStorage;
 
 class PostgreSqlTimeoutStorageConfiguration
 {
-    /** @var string */
-    public $timeoutTableName = 'timeouts';
+    public string $timeoutTableName = 'timeouts';
 
     /** @var int in milliseconds */
-    public $pollingInterval = 10;
+    public int $pollingInterval = 10;
 }

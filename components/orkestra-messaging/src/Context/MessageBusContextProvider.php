@@ -8,10 +8,7 @@ namespace Morebec\Orkestra\Messaging\Context;
  */
 class MessageBusContextProvider implements MessageBusContextProviderInterface
 {
-    /**
-     * @var MessageBusContextManagerInterface
-     */
-    private $contextManager;
+    private MessageBusContextManagerInterface $contextManager;
 
     public function __construct(MessageBusContextManagerInterface $contextManager)
     {

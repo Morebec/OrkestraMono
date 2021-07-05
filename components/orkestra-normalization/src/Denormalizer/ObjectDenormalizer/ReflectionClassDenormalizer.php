@@ -13,15 +13,9 @@ use Morebec\Orkestra\Normalization\Denormalizer\UnsupportedDenormalizerValueExce
  */
 class ReflectionClassDenormalizer extends AbstractObjectDenormalizer implements DelegatingDenormalizerInterface
 {
-    /**
-     * @var ReflectionClassPropertyTypeResolver
-     */
-    private $propertyTypeResolver;
+    private ReflectionClassPropertyTypeResolver $propertyTypeResolver;
 
-    /**
-     * @var DenormalizerInterface|null
-     */
-    private $delegate;
+    private ?DenormalizerInterface $delegate;
 
     public function __construct(?DenormalizerInterface $delegate = null)
     {

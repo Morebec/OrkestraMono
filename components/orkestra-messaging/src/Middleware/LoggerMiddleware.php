@@ -20,15 +20,9 @@ use Throwable;
  */
 class LoggerMiddleware implements MessageBusMiddlewareInterface
 {
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private LoggerInterface $logger;
 
-    /**
-     * @var MessageNormalizerInterface
-     */
-    private $objectNormalizer;
+    private MessageNormalizerInterface $objectNormalizer;
 
     public function __construct(LoggerInterface $logger, MessageNormalizerInterface $objectNormalizer)
     {

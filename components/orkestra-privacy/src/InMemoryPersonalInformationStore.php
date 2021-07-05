@@ -9,12 +9,9 @@ class InMemoryPersonalInformationStore implements PersonalInformationStoreInterf
     /**
      * @var RecordedPersonalDataInterface[][]
      */
-    private $personalTokens;
+    private array $personalTokens;
 
-    /**
-     * @var ClockInterface
-     */
-    private $clock;
+    private ClockInterface $clock;
 
     public function __construct(ClockInterface $clock)
     {

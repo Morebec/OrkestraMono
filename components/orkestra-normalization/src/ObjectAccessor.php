@@ -14,20 +14,11 @@ use TypeError;
  */
 class ObjectAccessor implements ObjectAccessorInterface
 {
-    /**
-     * @var object
-     */
-    private $object;
+    private object $object;
 
-    /**
-     * @var Closure
-     */
-    private $reader;
+    private Closure $reader;
 
-    /**
-     * @var Closure
-     */
-    private $writer;
+    private Closure $writer;
 
     public function __construct(object $object)
     {

@@ -4,11 +4,11 @@ namespace Morebec\Orkestra\PostgreSqlDocumentStore\Filter;
 
 class Filter
 {
-    /** @var array list of criteria */
-    private $ands;
+    /** @var Criterion[] list of criteria */
+    private array $ands;
 
-    /** @var array list of criteria */
-    private $ors;
+    /** @var Criterion[] list of criteria */
+    private array $ors;
 
     /**
      * Constructs the filter instance
@@ -16,8 +16,8 @@ class Filter
      * - ands: list of all criteria a document must match to be part of the result
      * - ors:  list of criteria a document can match to override the ands criteria.
      *
-     * @param array $ands mandatory queries
-     * @param array $ors  optional queries
+     * @param Criterion[] $ands mandatory queries
+     * @param Criterion[] $ors  optional queries
      */
     public function __construct(array $ands, array $ors = [])
     {
@@ -131,6 +131,6 @@ class Filter
 
     public function isEqualTo(self $f): bool
     {
-        return (string) $this == (string) $f;
+        return (string) $this === (string) $f;
     }
 }

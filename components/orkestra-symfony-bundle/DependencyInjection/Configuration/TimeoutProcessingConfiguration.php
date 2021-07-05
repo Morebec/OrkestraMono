@@ -6,11 +6,9 @@ use Morebec\Orkestra\Messaging\Timeout\TimeoutManager;
 
 class TimeoutProcessingConfiguration
 {
-    /** @var string */
-    public $managerImplementationClassName;
+    public string $managerImplementationClassName;
 
-    /** @var string */
-    public $storageImplementationClassName;
+    public string $storageImplementationClassName;
 
     public function usingManagerImplementation(string $className): self
     {

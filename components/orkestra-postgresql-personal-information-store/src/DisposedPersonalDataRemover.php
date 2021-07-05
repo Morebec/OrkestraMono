@@ -12,23 +12,14 @@ use Morebec\Orkestra\Privacy\DisposedPersonalDataRemoverInterface;
  */
 class DisposedPersonalDataRemover implements DisposedPersonalDataRemoverInterface
 {
-    /**
-     * @var PostgreSqlPersonalInformationStore
-     */
-    private $store;
-    /**
-     * @var ClockInterface
-     */
-    private $clock;
+    private PostgreSqlPersonalInformationStore $store;
+
+    private ClockInterface $clock;
 
     public function __construct(PostgreSqlPersonalInformationStore $store, ?ClockInterface $clock = null)
     {
-        if (!$clock) {
-            $clock = new SystemClock();
-        }
-
         $this->store = $store;
-        $this->clock = $clock;
+        $this->clock = $clock ?: new SystemClock();
     }
 
     public function run(): void
@@ -40,6 +31,6 @@ class DisposedPersonalDataRemover implements DisposedPersonalDataRemoverInterfac
         $qb->delete($conf->personallyIdentifiableInformationTableName)
             ->where(sprintf('%s <= %s', PostgreSqlPersonalInformationStore::DISPOSED_AT_KEY, $qb->createPositionalParameter($this->clock->now())));
 
-        $qb->execute();
+        $qb->executeStatement();
     }
 }

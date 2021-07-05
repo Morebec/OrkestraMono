@@ -12,37 +12,20 @@ use Morebec\Orkestra\DateTime\DateTime;
  */
 class PollingTimeoutProcessor implements TimeoutProcessorInterface
 {
-    /**
-     * @var TimeoutPublisherInterface
-     */
-    private $publisher;
+    private TimeoutPublisherInterface $publisher;
 
-    /**
-     * @var PollingTimeoutProcessorOptions
-     */
-    private $options;
+    private PollingTimeoutProcessorOptions $options;
 
     /**
      * Indicates if this processor is currently running or not.
-     *
-     * @var bool
      */
-    private $running;
+    private bool $running;
 
-    /**
-     * @var TimeoutStorageInterface
-     */
-    private $storage;
+    private TimeoutStorageInterface $storage;
 
-    /**
-     * @var ClockInterface
-     */
-    private $clock;
+    private ClockInterface $clock;
 
-    /**
-     * @var DateTime|null
-     */
-    private $startedAt;
+    private ?DateTime $startedAt;
 
     public function __construct(
         ClockInterface $clock,
@@ -55,6 +38,7 @@ class PollingTimeoutProcessor implements TimeoutProcessorInterface
         $this->storage = $storage;
         $this->clock = $clock;
         $this->running = false;
+        $this->startedAt = null;
     }
 
     public function getName(): string

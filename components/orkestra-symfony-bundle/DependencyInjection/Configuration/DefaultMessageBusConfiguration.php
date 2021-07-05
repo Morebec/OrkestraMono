@@ -13,16 +13,16 @@ class DefaultMessageBusConfiguration extends MessageBusConfiguration
     public const DEFAULT_IMPLEMENTATION_CLASS_NAME = MessageBus::class;
 
     /** @var MessageBusHandlerConfiguration[] */
-    public $messageHandlers = [];
+    public array $messageHandlers = [];
 
     /** @var string[] */
-    public $authorizers = [];
+    public array $authorizers = [];
 
     /** @var string[] */
-    public $validators = [];
+    public array $validators = [];
 
     /** @var string[] */
-    public $messageHandlerInterceptors = [];
+    public array $messageHandlerInterceptors = [];
 
     public function __construct()
     {

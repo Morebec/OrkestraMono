@@ -26,15 +26,10 @@ class SymfonyMessageClassMapFactory
 
     /**
      * Project's source directory.
-     *
-     * @var string
      */
-    private $sourceDir;
+    private string $sourceDir;
 
-    /**
-     * @var CacheInterface
-     */
-    private $cache;
+    private CacheInterface $cache;
 
     public function __construct(ParameterBagInterface $parameterBag, CacheInterface $cache)
     {

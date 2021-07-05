@@ -18,23 +18,19 @@ class InMemoryEventStore implements EventStoreInterface
     /**
      * @var RecordedEventDescriptor[]
      */
-    private $events;
+    private array $events;
 
-    /**
-     * @var ClockInterface
-     */
-    private $clock;
+    private ClockInterface $clock;
 
     /**
      * @var EventStoreSubscriberInterface[][]
      */
-    private $subscribers = [];
+    private array $subscribers;
 
     public function __construct(ClockInterface $clock)
     {
         $this->events = [];
         $this->subscribers = [];
-
         $this->clock = $clock;
     }
 
@@ -73,9 +69,10 @@ class InMemoryEventStore implements EventStoreInterface
 
         /* @var string[] $eventIdsAsStr */
         if ($this->streamExists($streamId)) {
-            $eventIds = array_map(static function (RecordedEventDescriptor $e) {
-                return (string) $e->getEventId();
-            }, $this->readStream($streamId, ReadStreamOptions::read()->fromStart()->forward())->toArray());
+            $eventIds = array_map(
+                static fn (RecordedEventDescriptor $e) => (string) $e->getEventId(),
+                $this->readStream($streamId, ReadStreamOptions::read()->fromStart()->forward())->toArray()
+            );
         } else {
             $eventIds = [];
         }
@@ -127,7 +124,7 @@ class InMemoryEventStore implements EventStoreInterface
 
     public function readStream(EventStreamId $streamId, ReadStreamOptions $options): StreamedEventCollectionInterface
     {
-        $isGlobalStream = $streamId->isEqualTo(self::getGlobalStreamId());
+        $isGlobalStream = $streamId->isEqualTo($this->getGlobalStreamId());
 
         if (!$isGlobalStream && !$this->streamExists($streamId)) {
             throw new EventStreamNotFoundException($streamId);
@@ -149,6 +146,7 @@ class InMemoryEventStore implements EventStoreInterface
             $readPosition = $options->position;
             if ($readPosition === ReadStreamOptions::POSITION_END) {
                 $stream = $self->getStream($streamId);
+                /** @noinspection NullPointerExceptionInspection */
                 $readPosition = $isGlobalStream ? \count($self->events) : $stream->getVersion()->toInt() + 1;
             }
 
@@ -174,17 +172,12 @@ class InMemoryEventStore implements EventStoreInterface
 
     public function getStream(EventStreamId $streamId): ?EventStreamInterface
     {
-        $versions = array_map(static function (RecordedEventDescriptor $e) use ($streamId) {
-            if ($e->getStreamId()->isEqualTo($streamId)) {
-                return $e->getStreamVersion()->toInt();
-            }
+        $versions = array_map(static fn (RecordedEventDescriptor $e) => $e->getStreamId()->isEqualTo($streamId) ?
+            $e->getStreamVersion()->toInt() :
+            null, $this->events
+        );
 
-            return null;
-        }, $this->events);
-
-        $versions = array_filter($versions, static function ($v) {
-            return $v !== null;
-        });
+        $versions = array_filter($versions, static fn ($v) => $v !== null);
 
         if (!$versions) {
             return null;
@@ -209,7 +202,7 @@ class InMemoryEventStore implements EventStoreInterface
         $subscriptionOptions = $subscriber->getOptions();
         if ($subscriptionOptions->position !== SubscriptionOptions::POSITION_END) {
             $lastPosition = $subscriptionOptions->position;
-            $isGlobalStream = $streamId->isEqualTo(self::getGlobalStreamId());
+            $isGlobalStream = $streamId->isEqualTo($this->getGlobalStreamId());
             while ($events = $this->readStream($streamId, ReadStreamOptions::read()->forward()->maxCount(1000)->from($lastPosition))) {
                 /** @var RecordedEventDescriptor $event */
                 foreach ($events as $event) {
@@ -220,7 +213,7 @@ class InMemoryEventStore implements EventStoreInterface
         }
     }
 
-    public function clear()
+    public function clear(): void
     {
         $this->events = [];
         $this->subscribers = [];
@@ -228,7 +221,7 @@ class InMemoryEventStore implements EventStoreInterface
 
     public function truncateStream(EventStreamId $streamId, TruncateStreamOptions $options): void
     {
-        $this->events = array_filter($this->events, function ($event) use ($streamId, $options) {
+        $this->events = array_filter($this->events, static function ($event) use ($streamId, $options) {
             return !($event->getStreamId()->isEqualTo($streamId) && $event->getStreamVersion()->toInt() < $options->beforeVersionNumber->toInt());
         });
     }

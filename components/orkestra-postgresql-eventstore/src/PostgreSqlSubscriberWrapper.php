@@ -15,14 +15,9 @@ use Morebec\Orkestra\EventSourcing\EventStore\SubscriptionOptions;
  */
 class PostgreSqlSubscriberWrapper implements EventStoreSubscriberInterface
 {
-    /**
-     * @var EventStoreSubscriberInterface
-     */
-    private $subscriber;
-    /**
-     * @var EventStreamId
-     */
-    private $streamId;
+    private EventStoreSubscriberInterface $subscriber;
+
+    private EventStreamId $streamId;
 
     public function __construct(EventStreamId $streamId, EventStoreSubscriberInterface $subscriber)
     {

@@ -7,10 +7,7 @@ namespace Morebec\Orkestra\Collections;
  */
 class TypedCollection extends Collection
 {
-    /**
-     * @var string
-     */
-    protected $className;
+    protected string $className;
 
     public function __construct(string $className, iterable $elements = [], bool $preserveKeys = false)
     {

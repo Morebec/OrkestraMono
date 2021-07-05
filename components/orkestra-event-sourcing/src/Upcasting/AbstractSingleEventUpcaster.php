@@ -5,7 +5,7 @@ namespace Morebec\Orkestra\EventSourcing\Upcasting;
 /**
  * Implementation of an upcaster that does a one-to-one mapping between a specific event at version x and version x+1.
  */
-abstract class AbstractSingleEventUpcaster extends AbstractEventSpecificUpcaster implements UpcasterInterface
+abstract class AbstractSingleEventUpcaster extends AbstractEventSpecificUpcaster
 {
     public function upcast(UpcastableEventDescriptor $eventDescriptor): array
     {

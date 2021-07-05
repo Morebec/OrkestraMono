@@ -9,20 +9,11 @@ use Throwable;
  */
 class ConcurrencyException extends \RuntimeException implements EventStoreExceptionInterface
 {
-    /**
-     * @var EventStreamId
-     */
-    private $streamId;
+    private EventStreamId $streamId;
 
-    /**
-     * @var EventStreamVersion
-     */
-    private $expectedStreamVersion;
+    private EventStreamVersion $expectedStreamVersion;
 
-    /**
-     * @var EventStreamVersion
-     */
-    private $actualStreamVersion;
+    private EventStreamVersion $actualStreamVersion;
 
     public function __construct(
         EventStreamId $streamId,

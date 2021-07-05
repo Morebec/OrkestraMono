@@ -12,7 +12,6 @@ use Morebec\Orkestra\Messaging\Normalization\MessageNormalizerInterface;
 use Morebec\Orkestra\Messaging\Timeout\TimeoutInterface;
 use Morebec\Orkestra\Messaging\Timeout\TimeoutStorageInterface;
 use Morebec\Orkestra\Messaging\Timeout\TimeoutWrapper;
-use Morebec\Orkestra\Normalization\ObjectNormalizerInterface;
 
 /**
  * Implementation of a {@link TimeoutStorageInterface} using PostgreSQL.
@@ -25,29 +24,16 @@ class PostgreSqlTimeoutStorage implements TimeoutStorageInterface
     public const MESSAGE_PAYLOAD_KEY = 'message_payload';
     public const MESSAGE_HEADERS = 'message_headers';
 
-    /**
-     * @var Connection
-     */
-    private $connection;
+    private Connection $connection;
 
-    /**
-     * @var PostgreSqlTimeoutStorageConfiguration
-     */
-    private $configuration;
-    /**
-     * @var MessageNormalizerInterface
-     */
-    private $messageNormalizer;
-    /**
-     * @var ObjectNormalizerInterface
-     */
-    private $objectNormalizer;
+    private PostgreSqlTimeoutStorageConfiguration $configuration;
+
+    private MessageNormalizerInterface $messageNormalizer;
 
     public function __construct(
         Connection $connection,
         PostgreSqlTimeoutStorageConfiguration $configuration,
-        MessageNormalizerInterface $messageNormalizer,
-        ObjectNormalizerInterface $objectNormalizer
+        MessageNormalizerInterface $messageNormalizer
     ) {
         if (!\extension_loaded('pdo_pgsql')) {
             throw new \RuntimeException('Extension not loaded: "pdo_pgsql"');
@@ -59,7 +45,6 @@ class PostgreSqlTimeoutStorage implements TimeoutStorageInterface
 
         $this->setupSchema($configuration);
         $this->messageNormalizer = $messageNormalizer;
-        $this->objectNormalizer = $objectNormalizer;
     }
 
     public function add(TimeoutWrapper $wrapper): void
@@ -71,8 +56,8 @@ class PostgreSqlTimeoutStorage implements TimeoutStorageInterface
             self::ID_KEY => $timeout->getId(),
             self::END_AT_KEY => $timeout->getEndsAt(),
             self::MESSAGE_TYPE_NAME_KEY => $timeout::getTypeName(),
-            self::MESSAGE_PAYLOAD_KEY => json_encode($this->messageNormalizer->normalize($timeout)),
-            self::MESSAGE_HEADERS => json_encode($headers->toArray()),
+            self::MESSAGE_PAYLOAD_KEY => json_encode($this->messageNormalizer->normalize($timeout), \JSON_THROW_ON_ERROR),
+            self::MESSAGE_HEADERS => json_encode($headers->toArray(), \JSON_THROW_ON_ERROR),
         ]);
     }
 
@@ -123,8 +108,8 @@ class PostgreSqlTimeoutStorage implements TimeoutStorageInterface
         while ($data = $result->fetchAssociative()) {
             /** @var string $messageTypeName */
             $messageTypeName = $data[self::MESSAGE_TYPE_NAME_KEY];
-            $payload = json_decode($data[self::MESSAGE_PAYLOAD_KEY], true);
-            $headersData = json_decode($data[self::MESSAGE_HEADERS], true);
+            $payload = json_decode($data[self::MESSAGE_PAYLOAD_KEY], true, 512, \JSON_THROW_ON_ERROR);
+            $headersData = json_decode($data[self::MESSAGE_HEADERS], true, 512, \JSON_THROW_ON_ERROR);
 
             /** @var TimeoutInterface $timeout */
             $timeout = $this->messageNormalizer->denormalize($payload, $messageTypeName);

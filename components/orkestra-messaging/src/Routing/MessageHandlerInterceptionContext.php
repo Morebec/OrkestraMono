@@ -13,24 +13,15 @@ use Morebec\Orkestra\Messaging\MessageInterface;
  */
 class MessageHandlerInterceptionContext
 {
-    /** @var MessageInterface */
-    private $message;
+    private MessageInterface $message;
 
-    /** @var MessageHeaders */
-    private $messageHeaders;
+    private MessageHeaders $messageHeaders;
 
-    /** @var MessageBusResponseInterface|null */
-    private $response;
+    private ?MessageBusResponseInterface $response;
 
-    /**
-     * @var MessageHandlerInterface|null
-     */
-    private $messageHandler;
+    private ?MessageHandlerInterface $messageHandler;
 
-    /**
-     * @var string|null
-     */
-    private $messageHandlerMethodName;
+    private ?string $messageHandlerMethodName;
 
     public function __construct(
         MessageInterface $message,
@@ -68,7 +59,7 @@ class MessageHandlerInterceptionContext
     public function addMessageHeaders(array $headers, bool $replace = true): void
     {
         foreach ($headers as $key => $value) {
-            if ($this->messageHeaders->has($key) && !$replace) {
+            if (!$replace && $this->messageHeaders->has($key)) {
                 continue;
             }
 

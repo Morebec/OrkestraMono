@@ -11,10 +11,7 @@ use Morebec\Orkestra\Normalization\Normalizer\UnsupportedNormalizerValueExceptio
  */
 class FluentNormalizer implements NormalizerInterface
 {
-    /**
-     * @var string
-     */
-    private $className;
+    private string $className;
 
     /**
      * @var callable
@@ -41,9 +38,7 @@ class FluentNormalizer implements NormalizerInterface
 
     public function asString(): self
     {
-        return $this->as(static function (NormalizationContextInterface $context) {
-            return (string) $context->getValue();
-        });
+        return $this->as(static fn (NormalizationContextInterface $context) => (string) $context->getValue());
     }
 
     public function asNull(): self
@@ -53,9 +48,7 @@ class FluentNormalizer implements NormalizerInterface
 
     public function asValue($value): self
     {
-        return $this->as(static function (NormalizationContextInterface $context) use ($value) {
-            return $value;
-        });
+        return $this->as(static fn (NormalizationContextInterface $context) => $value);
     }
 
     public function normalize(NormalizationContextInterface $context)

@@ -19,9 +19,9 @@ abstract class Enum
     /**
      * Cache for reflection.
      *
-     * @var array
+     * @var string[]|null
      */
-    private static $constCacheArray = null;
+    private static ?array $constCacheArray = null;
 
     final public function __construct($value)
     {

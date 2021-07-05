@@ -13,7 +13,7 @@ class ValidateMessageMiddleware implements MessageBusMiddlewareInterface
     /**
      * @var MessageValidatorInterface[]
      */
-    private $validators;
+    private array $validators;
 
     public function __construct(iterable $validators = [])
     {

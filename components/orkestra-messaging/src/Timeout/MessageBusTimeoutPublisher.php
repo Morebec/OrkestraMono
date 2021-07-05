@@ -14,14 +14,9 @@ use Morebec\Orkestra\Retry\RetryStrategyInterface;
  */
 class MessageBusTimeoutPublisher implements TimeoutPublisherInterface
 {
-    /**
-     * @var MessageBusInterface
-     */
-    protected $messageBus;
-    /**
-     * @var RetryStrategyInterface|null
-     */
-    private $retryStrategy;
+    protected MessageBusInterface $messageBus;
+
+    private ?RetryStrategyInterface $retryStrategy;
 
     public function __construct(MessageBusInterface $messageBus, ?RetryStrategyInterface $retryStrategy = null)
     {
@@ -36,10 +31,9 @@ class MessageBusTimeoutPublisher implements TimeoutPublisherInterface
 
     public function publish(TimeoutInterface $timeout, MessageHeaders $headers): void
     {
-        $messageBus = $this->messageBus;
         try {
-            $this->retryStrategy->execute(static function () use ($messageBus, $timeout, $headers) {
-                $response = $messageBus->sendMessage($timeout, $headers);
+            $this->retryStrategy->execute(function () use ($timeout, $headers) {
+                $response = $this->messageBus->sendMessage($timeout, $headers);
                 if ($response->isFailure()) {
                     throw $response->getPayload();
                 }

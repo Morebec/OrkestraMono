@@ -15,19 +15,11 @@ final class PostgreSqlDocumentStore
 {
     public const ID_INDEX_NAME = 'primary';
 
-    /**
-     * @var PostgreSqlDocumentStoreConfiguration
-     */
-    private $config;
+    private PostgreSqlDocumentStoreConfiguration $config;
 
-    /**
-     * @var Connection
-     */
-    private $connection;
-    /**
-     * @var ClockInterface
-     */
-    private $clock;
+    private Connection $connection;
+
+    private ClockInterface $clock;
 
     /**
      * orkestra-postgresql-document-store constructor.
@@ -99,7 +91,7 @@ final class PostgreSqlDocumentStore
      *
      * @throws Exception
      */
-    public function renameCollection(string $collectionName, string $newCollectionName)
+    public function renameCollection(string $collectionName, string $newCollectionName): void
     {
         $schemaManager = $this->connection->createSchemaManager();
         $schemaManager->renameTable($this->prefixCollection($collectionName), $this->prefixCollection($newCollectionName));
@@ -149,7 +141,7 @@ final class PostgreSqlDocumentStore
 
         $this->connection->insert($this->prefixCollection($collectionName), [
                 CollectionTableColumnKeys::ID => $id,
-                CollectionTableColumnKeys::DATA => json_encode($data),
+                CollectionTableColumnKeys::DATA => json_encode($data, \JSON_THROW_ON_ERROR),
                 CollectionTableColumnKeys::CREATED_AT => $this->clock->now(),
                 CollectionTableColumnKeys::UPDATED_AT => $this->clock->now(),
         ]);
@@ -163,7 +155,7 @@ final class PostgreSqlDocumentStore
     public function updateDocument(string $collectionName, string $documentId, array $data): void
     {
         $this->connection->update($this->prefixCollection($collectionName), [
-                CollectionTableColumnKeys::DATA => json_encode($data),
+                CollectionTableColumnKeys::DATA => json_encode($data, \JSON_THROW_ON_ERROR),
                 CollectionTableColumnKeys::UPDATED_AT => $this->clock->now(),
         ], [CollectionTableColumnKeys::ID => $documentId]);
     }
@@ -195,7 +187,7 @@ final class PostgreSqlDocumentStore
             return null;
         }
 
-        return json_decode($doc[CollectionTableColumnKeys::DATA], true);
+        return json_decode($doc[CollectionTableColumnKeys::DATA], true, 512, \JSON_THROW_ON_ERROR);
     }
 
     /**
@@ -222,13 +214,13 @@ final class PostgreSqlDocumentStore
         $documents = [];
 
         while ($doc = $result->fetchAssociative()) {
-            $documents[] = json_decode($doc[CollectionTableColumnKeys::DATA], true);
+            $documents[] = json_decode($doc[CollectionTableColumnKeys::DATA], true, 512, \JSON_THROW_ON_ERROR);
         }
 
         return $documents;
     }
 
-    public function removeDocument(string $collectionName, string $id)
+    public function removeDocument(string $collectionName, string $id): void
     {
         $this->connection->delete($this->prefixCollection($collectionName), [CollectionTableColumnKeys::ID => $id]);
     }

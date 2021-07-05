@@ -16,10 +16,7 @@ class DebugMessageClassMapConsoleCommand extends Command
 {
     protected static $defaultName = 'orkestra:messaging:debug-classmap';
 
-    /**
-     * @var MessageClassMapInterface
-     */
-    private $classMap;
+    private MessageClassMapInterface $classMap;
 
     public function __construct(MessageClassMapInterface $classMap)
     {
@@ -32,7 +29,7 @@ class DebugMessageClassMapConsoleCommand extends Command
         $this->addArgument('messageTypeName', InputArgument::OPTIONAL, '(Optional) filter the results by a certain messageTypeName');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
 

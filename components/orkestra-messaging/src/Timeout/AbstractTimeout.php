@@ -6,11 +6,9 @@ use Morebec\Orkestra\DateTime\DateTime;
 
 abstract class AbstractTimeout implements TimeoutInterface
 {
-    /** @var string */
-    public $id;
+    public string $id;
 
-    /** @var DateTime */
-    public $endsAt;
+    public DateTime $endsAt;
 
     public function __construct(string $id, DateTime $endsAt)
     {

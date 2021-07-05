@@ -15,10 +15,7 @@ use Morebec\Orkestra\Messaging\Middleware\MessageBusMiddlewareInterface;
  */
 class RouteMessageMiddleware implements MessageBusMiddlewareInterface
 {
-    /**
-     * @var MessageRouterInterface
-     */
-    private $router;
+    private MessageRouterInterface $router;
 
     public function __construct(MessageRouterInterface $router)
     {

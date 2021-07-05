@@ -22,6 +22,9 @@ class CallbackDenormalizer implements DenormalizerInterface
         $this->denormalizeCallback = $normalizeCallback;
     }
 
+    /**
+     * @return mixed
+     */
     public function denormalize(DenormalizationContextInterface $context)
     {
         if (!$this->supports($context)) {

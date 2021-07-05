@@ -9,7 +9,6 @@ use Throwable;
 /**
  * Exception thrown by the Message Bus when no middleware returned a response for a given message.
  * This indicates misconfiguration in the middleware pipeline.
- * TODO: Move to Middleware namespace.
  */
 final class NoResponseFromMiddlewareException extends \RuntimeException implements MessageBusExceptionInterface
 {

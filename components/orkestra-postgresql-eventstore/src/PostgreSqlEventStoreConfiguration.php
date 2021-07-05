@@ -7,12 +7,10 @@ namespace Morebec\Orkestra\PostgreSqlEventStore;
  */
 class PostgreSqlEventStoreConfiguration
 {
-    /** @var string */
-    public $eventsTableName = 'events';
+    public string $eventsTableName = 'events';
 
-    /** @var string */
-    public $streamsTableName = 'streams';
+    public string $streamsTableName = 'streams';
 
     /** @var int length of time in milliseconds to wait for a response from the database for new event. */
-    public $notifyTimeout = 10;
+    public int $notifyTimeout = 10;
 }

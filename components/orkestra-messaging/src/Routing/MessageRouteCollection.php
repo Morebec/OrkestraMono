@@ -17,14 +17,14 @@ class MessageRouteCollection implements Iterator, Countable
      *
      * @var int[]
      */
-    private $routeIdIndexMap;
+    private array $routeIdIndexMap;
 
     /**
      * Ordered list of routes.
      *
      * @var MessageRouteInterface[]
      */
-    private $routes;
+    private array $routes;
 
     public function __construct(iterable $routes = [])
     {
@@ -79,8 +79,8 @@ class MessageRouteCollection implements Iterator, Countable
 
         $this->routes = [];
         $this->routeIdIndexMap = [];
-        foreach ($routes as $route) {
-            $this->add($route);
+        foreach ($routes as $r) {
+            $this->add($r);
         }
     }
 

@@ -136,11 +136,7 @@ class MessageHeaders
      */
     public function get(string $key, $defaultValue = null)
     {
-        if (!$this->has($key)) {
-            return $defaultValue;
-        }
-
-        return $this->values[$key];
+        return $this->values[$key] ?? $defaultValue;
     }
 
     /**

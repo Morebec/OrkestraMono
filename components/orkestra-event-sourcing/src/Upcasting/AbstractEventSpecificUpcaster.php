@@ -11,10 +11,7 @@ use Morebec\Orkestra\EventSourcing\EventStore\EventType;
  */
 abstract class AbstractEventSpecificUpcaster implements UpcasterInterface
 {
-    /**
-     * @var EventType
-     */
-    protected $eventType;
+    protected EventType $eventType;
 
     /**
      * @param EventType|string $eventType

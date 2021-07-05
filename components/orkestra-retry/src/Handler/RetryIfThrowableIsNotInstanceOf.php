@@ -10,10 +10,7 @@ use Morebec\Orkestra\Retry\RetryContext;
  */
 class RetryIfThrowableIsNotInstanceOf
 {
-    /**
-     * @var string
-     */
-    private $throwableClassName;
+    private string $throwableClassName;
 
     public function __construct(string $throwableClassName)
     {

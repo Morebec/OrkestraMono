@@ -7,22 +7,18 @@ use Morebec\Orkestra\EventSourcing\EventStore\EventStreamId;
 class TrackingEventProcessorOptions
 {
     /** @var string Name of this processor. */
-    public $name;
+    public string $name;
 
     /**
      * Represents the stream that the processor should track.
-     *
-     * @var EventStreamId
      */
-    public $streamId;
+    public EventStreamId $streamId;
 
     /**
      * Maximum number of events to process whenever it is started.
      * A batch size of 0 means that no batching should be performed.
-     *
-     * @var int
      */
-    public $batchSize = 0;
+    public int $batchSize = 0;
 
     /**
      * Indicates if the position of the tracking event processor
@@ -40,10 +36,8 @@ class TrackingEventProcessorOptions
      *
      * For the best possible scenario, if it can be afforded, use a transaction comprising all the events of the batch
      * as well as the position storage.
-     *
-     * @var bool
      */
-    public $storePositionBeforeProcessing = false;
+    public bool $storePositionBeforeProcessing = false;
 
     /**
      * This option indicates if storing the position of the tracking event processor should be done
@@ -54,11 +48,12 @@ class TrackingEventProcessorOptions
      *
      * For the best possible scenario, if it can be afforded, use a transaction comprising all the events of the batch
      * as well as the position storage.
-     *
-     * @var bool
      */
-    public $storePositionForEachBatch = true;
+    public bool $storePositionForEachBatch = true;
 
+    /**
+     * @return static
+     */
     public function withStreamId(EventStreamId $streamId): self
     {
         $this->streamId = $streamId;
@@ -66,6 +61,9 @@ class TrackingEventProcessorOptions
         return $this;
     }
 
+    /**
+     * @return static
+     */
     public function withName(string $name): self
     {
         $this->name = $name;
@@ -73,6 +71,9 @@ class TrackingEventProcessorOptions
         return $this;
     }
 
+    /**
+     * @return static
+     */
     public function withBatchSize(int $nbEvents): self
     {
         $this->batchSize = $nbEvents;
@@ -80,11 +81,17 @@ class TrackingEventProcessorOptions
         return $this;
     }
 
+    /**
+     * @return static
+     */
     public function disableBatching(): self
     {
         return $this->withBatchSize(0);
     }
 
+    /**
+     * @return static
+     */
     public function storePositionPerBatch(bool $v = true): self
     {
         $this->storePositionForEachBatch = $v;
@@ -92,6 +99,9 @@ class TrackingEventProcessorOptions
         return $this;
     }
 
+    /**
+     * @return static
+     */
     public function storePositionPerEvent(bool $v = true): self
     {
         $this->storePositionForEachBatch = !$v;
@@ -99,6 +109,9 @@ class TrackingEventProcessorOptions
         return $this;
     }
 
+    /**
+     * @return static
+     */
     public function storePositionBeforeProcessing(bool $v = true): self
     {
         $this->storePositionBeforeProcessing = $v;
@@ -106,6 +119,9 @@ class TrackingEventProcessorOptions
         return $this;
     }
 
+    /**
+     * @return static
+     */
     public function storePositionAfterProcessing(bool $v = true): self
     {
         $this->storePositionBeforeProcessing = !$v;

@@ -10,14 +10,9 @@ use Psr\Log\LoggerInterface;
  */
 class LoggingMessageHandlerInterceptor implements MessageHandlerInterceptorInterface
 {
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-    /**
-     * @var MessageNormalizerInterface
-     */
-    private $messageNormalizer;
+    private LoggerInterface $logger;
+
+    private MessageNormalizerInterface $messageNormalizer;
 
     public function __construct(LoggerInterface $logger, MessageNormalizerInterface $messageNormalizer)
     {

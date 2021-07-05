@@ -11,12 +11,12 @@ use Morebec\Orkestra\Normalization\Denormalizer\ObjectDenormalizer\ReflectionCla
 class Denormalizer implements DenormalizerInterface
 {
     /** @var DenormalizerInterface[] */
-    private $builtInDenormalizers;
+    private array $builtInDenormalizers;
 
     /**
      * @var DenormalizerInterface[]
      */
-    private $denormalizers;
+    private array $denormalizers;
 
     public function __construct(array $denormalizers = [])
     {
@@ -79,10 +79,8 @@ class Denormalizer implements DenormalizerInterface
      */
     public function addDenormalizer(DenormalizerInterface $denormalizer): void
     {
-        if ($denormalizer instanceof DelegatingDenormalizerInterface) {
-            if (!$denormalizer->getDelegate()) {
-                $denormalizer->setDelegate($this);
-            }
+        if (($denormalizer instanceof DelegatingDenormalizerInterface) && !$denormalizer->getDelegate()) {
+            $denormalizer->setDelegate($this);
         }
 
         array_unshift($this->denormalizers, $denormalizer);

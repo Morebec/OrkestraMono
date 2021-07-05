@@ -8,10 +8,7 @@ namespace Morebec\Orkestra\DateTime;
  */
 class FixedClock implements ClockInterface
 {
-    /**
-     * @var DateTime
-     */
-    private $dateTime;
+    private DateTime $dateTime;
 
     /**
      * @param DateTime|null $dateTime if null will default to the current date time of the system

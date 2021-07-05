@@ -1,9 +1,12 @@
 <?php
 
-namespace Morebec\Orkestra\Messaging\Timeout;
+namespace Tests\Morebec\Orkestra\Messaging\Timeout;
 
 use Morebec\Orkestra\DateTime\DateTime;
 use Morebec\Orkestra\Messaging\MessageHeaders;
+use Morebec\Orkestra\Messaging\Timeout\InMemoryTimeoutStorage;
+use Morebec\Orkestra\Messaging\Timeout\TimeoutInterface;
+use Morebec\Orkestra\Messaging\Timeout\TimeoutWrapper;
 use PHPUnit\Framework\TestCase;
 
 class InMemoryTimeoutStorageTest extends TestCase

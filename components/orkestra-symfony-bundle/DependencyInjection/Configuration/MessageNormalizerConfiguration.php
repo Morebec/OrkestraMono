@@ -7,13 +7,12 @@ use Morebec\Orkestra\Messaging\Normalization\ClassMapMessageNormalizer;
 class MessageNormalizerConfiguration
 {
     /** @var string[] */
-    public $normalizers;
+    public array $normalizers;
 
     /** @var string[] */
-    public $denormalizers;
+    public array $denormalizers;
 
-    /** @var string|null */
-    public $implementationClassName;
+    public ?string $implementationClassName;
 
     public function __construct()
     {

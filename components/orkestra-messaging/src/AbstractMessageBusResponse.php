@@ -8,10 +8,7 @@ namespace Morebec\Orkestra\Messaging;
  */
 class AbstractMessageBusResponse implements MessageBusResponseInterface
 {
-    /**
-     * @var MessageBusResponseStatusCode
-     */
-    protected $statusCode;
+    protected MessageBusResponseStatusCode $statusCode;
 
     /**
      * @var mixed

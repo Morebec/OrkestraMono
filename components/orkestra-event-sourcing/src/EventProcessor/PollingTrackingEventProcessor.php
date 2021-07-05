@@ -11,8 +11,7 @@ use Morebec\Orkestra\EventSourcing\EventStore\EventStoreInterface;
  */
 class PollingTrackingEventProcessor extends TrackingEventProcessor
 {
-    /** @var PollingTrackingEventProcessorOptions */
-    protected $options;
+    protected PollingTrackingEventProcessorOptions $options;
 
     public function __construct(
         EventPublisherInterface $publisher,

@@ -6,23 +6,18 @@ class PollingTimeoutProcessorOptions
 {
     public const INFINITE = 0;
 
-    /** @var string */
-    public $name;
+    public string $name;
 
     /**
      *The delay between the polling of the storage in milliseconds.
-     *
-     * @var int
      */
-    public $pollingDelay = 1000;
+    public int $pollingDelay = 1000;
 
     /**
      * Duration in millisecond for the maximum time this processor should be running.
      * A value of 0 means no maximum.
-     *
-     * @var int
      */
-    public $maxProcessingTime = self::INFINITE;
+    public int $maxProcessingTime = self::INFINITE;
 
     public function withName(string $name): self
     {

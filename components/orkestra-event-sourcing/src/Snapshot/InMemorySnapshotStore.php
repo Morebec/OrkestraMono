@@ -6,10 +6,7 @@ use Morebec\Orkestra\EventSourcing\EventStore\EventStreamId;
 
 class InMemorySnapshotStore implements SnapshotStoreInterface
 {
-    /**
-     * @var array
-     */
-    private $snapshots;
+    private array $snapshots;
 
     public function __construct()
     {
@@ -25,6 +22,6 @@ class InMemorySnapshotStore implements SnapshotStoreInterface
     {
         $eventStreamIdStr = (string) $eventStreamId;
 
-        return \array_key_exists($eventStreamIdStr, $this->snapshots) ? $this->snapshots[$eventStreamIdStr] : null;
+        return $this->snapshots[$eventStreamIdStr] ?? null;
     }
 }

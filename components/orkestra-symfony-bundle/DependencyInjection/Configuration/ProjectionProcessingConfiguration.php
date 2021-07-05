@@ -7,7 +7,7 @@ class ProjectionProcessingConfiguration
     public const DEFAULT_GROUP_NAME = 'default';
 
     /** @var ProjectorGroupConfiguration[] */
-    public $projectorGroups;
+    public array $projectorGroups;
 
     public function __construct()
     {

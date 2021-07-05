@@ -6,10 +6,8 @@ class TruncateStreamOptions
 {
     /**
      * Version number from which the truncating should be performed in the given stream.
-     *
-     * @var EventStreamVersion
      */
-    public $beforeVersionNumber;
+    public EventStreamVersion $beforeVersionNumber;
 
     public static function beforeVersionNumber(EventStreamVersion $versionNumber): self
     {

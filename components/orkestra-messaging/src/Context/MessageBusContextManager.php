@@ -10,10 +10,7 @@ use Morebec\Orkestra\Messaging\MessageInterface;
  */
 class MessageBusContextManager implements MessageBusContextManagerInterface
 {
-    /**
-     * @var MessageBusContextStack
-     */
-    private $contextStack;
+    private MessageBusContextStack $contextStack;
 
     public function __construct(?MessageBusContext $previousContext = null)
     {

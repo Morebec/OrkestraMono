@@ -13,8 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 abstract class AbstractProjectionGroupEventProcessorConsoleCommand extends AbstractEventProcessorConsoleCommand
 {
-    /** @var ProjectorGroupRegistry */
-    protected $projectorGroupRegistry;
+    protected ProjectorGroupRegistry $projectorGroupRegistry;
 
     public function __construct(
         ProjectorGroupRegistry $projectorGroupRegistry,
@@ -45,9 +44,9 @@ abstract class AbstractProjectionGroupEventProcessorConsoleCommand extends Abstr
 
     protected function resetProcessor(EventProcessorInterface $processor): void
     {
-        /* @var TrackingEventProcessor $processor */
-
         parent::resetProcessor($processor);
+
+        /* @var TrackingEventProcessor $processor */
 
         /** @var ProjectorEventPublisher $publisher */
         $publisher = $processor->getPublisher();

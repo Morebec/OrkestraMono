@@ -10,10 +10,7 @@ use Ramsey\Uuid\Uuid;
  */
 class EventId
 {
-    /**
-     * @var string
-     */
-    private $value;
+    private string $value;
 
     /**
      * EventId constructor.

@@ -2,6 +2,11 @@
 
 namespace Morebec\Orkestra\PostgreSqlDocumentStore;
 
+/**
+ * Class CollectionTableColumnKeys.
+ *
+ * @internal
+ */
 final class CollectionTableColumnKeys
 {
     public const ID = 'id';

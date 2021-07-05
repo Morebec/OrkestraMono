@@ -10,7 +10,7 @@
         }
     ],
     "require": {
-        "php": ">=7.3",
+        "php": ">=7.4",
         "doctrine/instantiator": "1.*",
         "php-di/phpdoc-reader": "2.*",
         "ext-json": "*",

@@ -29,33 +29,18 @@ class PostgreSqlPersonalInformationStore implements PersonalInformationStoreInte
 
     public const KEY_NAME_KEY = 'key_name';
 
-    /**
-     * @var Connection
-     */
-    private $connection;
+    private Connection $connection;
 
-    /**
-     * @var PostgreSqlPersonalInformationStoreConfiguration
-     */
-    private $configuration;
-    /**
-     * @var ObjectNormalizerInterface
-     */
-    private $normalizer;
-    /**
-     * @var ClockInterface
-     */
-    private $clock;
+    private PostgreSqlPersonalInformationStoreConfiguration $configuration;
+
+    private ObjectNormalizerInterface $normalizer;
+
+    private ClockInterface $clock;
 
     public function __construct(Connection $connection, PostgreSqlPersonalInformationStoreConfiguration $config, ?ObjectNormalizerInterface $normalizer = null, ?ClockInterface $clock = null)
     {
-        if (!$normalizer) {
-            $normalizer = new ObjectNormalizer();
-        }
-
-        if (!$clock) {
-            $clock = new SystemClock();
-        }
+        $this->normalizer = $normalizer ?: new ObjectNormalizer();
+        $this->clock = $clock ?: new SystemClock();
 
         $this->configuration = $config;
         $this->connection = $connection;
@@ -66,8 +51,6 @@ class PostgreSqlPersonalInformationStore implements PersonalInformationStoreInte
 
         $this->openConnection();
         $this->setupSchema($config);
-        $this->normalizer = $normalizer;
-        $this->clock = $clock;
     }
 
     public function __destruct()
@@ -171,15 +154,15 @@ class PostgreSqlPersonalInformationStore implements PersonalInformationStoreInte
             ->andWhere(sprintf('%s = %s', self::KEY_NAME_KEY, $qb->createPositionalParameter($keyName)))
         ;
 
-        $result = $qb->execute();
+        $result = $qb->executeQuery();
 
         $record = $result->fetchAssociative();
 
         if ($record === false) {
             return null;
-        } else {
-            return $this->normalizer->denormalize($this->decryptRecord($record[self::DATA_KEY], $this->configuration->encryptionKey), RecordedPersonalData::class);
         }
+
+        return $this->normalizer->denormalize($this->decryptRecord($record[self::DATA_KEY], $this->configuration->encryptionKey), RecordedPersonalData::class);
     }
 
     public function findOneByReferenceToken(string $referenceToken): ?RecordedPersonalDataInterface
@@ -192,15 +175,15 @@ class PostgreSqlPersonalInformationStore implements PersonalInformationStoreInte
             ->where(sprintf('%s = %s', self::REFERENCE_TOKEN_KEY, $qb->createPositionalParameter($referenceToken)))
         ;
 
-        $result = $qb->execute();
+        $result = $qb->executeQuery();
 
         $record = $result->fetchAssociative();
 
         if ($record === false) {
             return null;
-        } else {
-            return $this->normalizer->denormalize($this->decryptRecord($record[self::DATA_KEY], $this->configuration->encryptionKey), RecordedPersonalData::class);
         }
+
+        return $this->normalizer->denormalize($this->decryptRecord($record[self::DATA_KEY], $this->configuration->encryptionKey), RecordedPersonalData::class);
     }
 
     public function findByPersonalToken(string $personalToken): array
@@ -213,7 +196,7 @@ class PostgreSqlPersonalInformationStore implements PersonalInformationStoreInte
             ->where(sprintf('%s = %s', self::PERSONAL_TOKEN_KEY, $qb->createPositionalParameter($personalToken)))
         ;
 
-        $result = $qb->execute();
+        $result = $qb->executeQuery();
 
         $records = [];
 
@@ -285,7 +268,7 @@ class PostgreSqlPersonalInformationStore implements PersonalInformationStoreInte
             ->from($this->configuration->personallyIdentifiableInformationTableName)
         ;
 
-        $result = $qb->execute();
+        $result = $qb->executeQuery();
 
         $rotateKeyForRecords = function () use ($result, $encryptionKey) {
             while ($record = $result->fetchAssociative()) {
@@ -302,7 +285,7 @@ class PostgreSqlPersonalInformationStore implements PersonalInformationStoreInte
 
     protected function convertPersonalDataToRecordedData(PersonalDataInterface $data, string $referenceToken): RecordedPersonalData
     {
-        $recorded = new RecordedPersonalData(
+        return new RecordedPersonalData(
             $data->getPersonalToken(),
             $referenceToken,
             $data->getKeyName(),
@@ -314,8 +297,6 @@ class PostgreSqlPersonalInformationStore implements PersonalInformationStoreInte
             $data->getMetadata(),
             $this->clock->now()
         );
-
-        return $recorded;
     }
 
     protected function generateReferenceToken(string $personalToken): string
@@ -325,7 +306,7 @@ class PostgreSqlPersonalInformationStore implements PersonalInformationStoreInte
 
     private function encryptRecord(array $normalizedRecord, string $encryptionKey): string
     {
-        $valueStr = json_encode($normalizedRecord);
+        $valueStr = json_encode($normalizedRecord, \JSON_THROW_ON_ERROR);
 
         $nonce = random_bytes(\SODIUM_CRYPTO_SECRETBOX_NONCEBYTES);
         $ciphertext = sodium_crypto_secretbox($valueStr, $nonce, $encryptionKey);
@@ -346,7 +327,7 @@ class PostgreSqlPersonalInformationStore implements PersonalInformationStoreInte
         $ciphertext = mb_substr($decoded, \SODIUM_CRYPTO_SECRETBOX_NONCEBYTES, null, '8bit');
         $rawValue = sodium_crypto_secretbox_open($ciphertext, $nonce, $encryptionKey);
 
-        return $rawValue !== false ? json_decode($rawValue, true) : null;
+        return $rawValue !== false ? json_decode($rawValue, true, 512, \JSON_THROW_ON_ERROR) : null;
     }
 
     private function rotateRecord(string $referenceToken, RecordedPersonalData $data, string $encryptionKey): void
@@ -363,7 +344,7 @@ class PostgreSqlPersonalInformationStore implements PersonalInformationStoreInte
     {
         $schema = new Schema();
 
-        $sm = $this->connection->getSchemaManager();
+        $sm = $this->connection->createSchemaManager();
         if (!$sm->tablesExist($configuration->personallyIdentifiableInformationTableName)) {
             $piiTable = $schema->createTable($configuration->personallyIdentifiableInformationTableName);
 

@@ -7,17 +7,16 @@ use Morebec\Orkestra\EventSourcing\EventStore\UpcastingEventStoreDecorator;
 
 class EventStoreConfiguration
 {
-    /** @var string */
-    public $implementationClassName;
+    public string $implementationClassName;
 
     /** @var string[] */
-    public $decorators = [];
+    public array $decorators = [];
 
     /** @var string[] */
-    public $subscribers = [];
+    public array $subscribers = [];
 
     /** @var string[] */
-    public $upcasters = [];
+    public array $upcasters = [];
 
     /**
      * Configures this event store to use the {@link InMemoryEventStore} implementation.

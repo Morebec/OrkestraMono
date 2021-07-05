@@ -9,10 +9,7 @@ namespace Morebec\Orkestra\Normalization\Denormalizer;
  */
 class MixedDenormalizer implements DenormalizerInterface
 {
-    /**
-     * @var DenormalizerInterface|null
-     */
-    private $delegate;
+    private ?DenormalizerInterface $delegate;
 
     public function __construct(?DenormalizerInterface $delegate = null)
     {

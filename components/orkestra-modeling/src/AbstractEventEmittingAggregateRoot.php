@@ -9,8 +9,7 @@ use Morebec\Orkestra\Messaging\Domain\Event\DomainEventInterface;
  */
 abstract class AbstractEventEmittingAggregateRoot implements AggregateRootInterface
 {
-    /** @var DomainEventCollectionInterface */
-    private $domainEvents;
+    private DomainEventCollectionInterface $domainEvents;
 
     public function __construct()
     {

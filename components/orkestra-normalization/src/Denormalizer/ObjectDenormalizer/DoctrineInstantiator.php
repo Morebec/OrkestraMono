@@ -10,10 +10,7 @@ use Doctrine\Instantiator\Instantiator;
  */
 class DoctrineInstantiator implements ClassInstantiatorInterface
 {
-    /**
-     * @var Instantiator
-     */
-    private $instantiator;
+    private Instantiator $instantiator;
 
     /**
      * DoctrineInstantiator constructor.

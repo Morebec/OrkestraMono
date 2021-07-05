@@ -10,11 +10,10 @@ class ProjectorGroupConfiguration
     /** @var string Default prefix used for the ID of the services in the DI container. */
     public const DEFAULT_PREFIX = 'projector_group_';
 
-    /** @var string|null */
-    public $groupName;
+    public ?string $groupName;
 
     /** @var string[] */
-    public $projectors = [];
+    public array $projectors = [];
 
     public function __construct(?string $groupName = null)
     {

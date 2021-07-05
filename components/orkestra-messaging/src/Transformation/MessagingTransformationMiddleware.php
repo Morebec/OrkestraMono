@@ -19,7 +19,7 @@ class MessagingTransformationMiddleware implements MessageBusMiddlewareInterface
     /**
      * @var MessagingTransformerInterface[]
      */
-    private $transformers;
+    private array $transformers;
 
     public function __construct(iterable $transformers)
     {

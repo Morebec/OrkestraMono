@@ -12,10 +12,7 @@ use Morebec\Orkestra\Messaging\Normalization\MessageNormalizerInterface;
  */
 abstract class AbstractDenormalizingProjector implements ProjectorInterface
 {
-    /**
-     * @var MessageNormalizerInterface
-     */
-    private $messageNormalizer;
+    private MessageNormalizerInterface $messageNormalizer;
 
     public function __construct(MessageNormalizerInterface $messageNormalizer)
     {
@@ -24,7 +21,7 @@ abstract class AbstractDenormalizingProjector implements ProjectorInterface
 
     public function project(RecordedEventDescriptor $descriptor): void
     {
-        /** @var DomainEventInterface $event */
+        /** @var DomainEventInterface|null $event */
         $event = $this->messageNormalizer->denormalize($descriptor->getEventData()->toArray(), $descriptor->getEventType());
         $this->projectEvent($event, $descriptor);
     }
@@ -32,5 +29,5 @@ abstract class AbstractDenormalizingProjector implements ProjectorInterface
     /**
      * Projects a Denormalized Domain Event.
      */
-    abstract protected function projectEvent(?DomainEventInterface $event, RecordedEventDescriptor $eventDescriptor): void;
+    abstract protected function projectEvent(DomainEventInterface $event, RecordedEventDescriptor $eventDescriptor): void;
 }

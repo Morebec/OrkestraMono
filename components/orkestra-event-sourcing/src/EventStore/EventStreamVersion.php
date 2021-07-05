@@ -17,10 +17,7 @@ class EventStreamVersion
      */
     public const INITIAL_VERSION = -1;
 
-    /**
-     * @var int
-     */
-    private $value;
+    private int $value;
 
     /**
      * EventStreamVersion constructor.

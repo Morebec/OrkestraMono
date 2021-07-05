@@ -9,12 +9,12 @@ namespace Morebec\Orkestra\Normalization\Normalizer;
 class Normalizer implements NormalizerInterface
 {
     /** @var NormalizerInterface[] */
-    private $builtInNormalizers;
+    private array $builtInNormalizers;
 
     /**
      * @var NormalizerInterface[]
      */
-    private $normalizers;
+    private array $normalizers;
 
     public function __construct()
     {

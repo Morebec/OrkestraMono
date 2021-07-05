@@ -20,14 +20,11 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 abstract class AbstractEventProcessorConsoleCommand extends Command implements EventProcessorListenerInterface
 {
-    /** @var SymfonyStyle */
-    protected $io;
+    protected SymfonyStyle $io;
 
-    /** @var ProgressBar|null */
-    protected $replayProgressBar;
+    protected ?ProgressBar $replayProgressBar;
 
-    /** @var string */
-    private $progressBarStyle;
+    private string $progressBarStyle;
 
     public function __construct(
         string $commandName = null,

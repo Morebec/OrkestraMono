@@ -13,17 +13,15 @@ use Morebec\Orkestra\Normalization\Denormalizer\DenormalizerInterface;
  */
 class ClassSpecificDenormalizer extends ReflectionClassDenormalizer
 {
-    /**
-     * @var string
-     */
-    protected $className;
+    protected string $className;
 
     /**
-     * List of callbacks to be executed when certain keys are missing.
+     * List of callbacks to be executed when certain keys are missing where they key of the array is the key for which
+     * the callable should be executed.
      *
-     * @var array
+     * @var callable[]
      */
-    protected $absentKeysCallbacks;
+    protected array $absentKeysCallbacks;
 
     public function __construct(
         string $className,

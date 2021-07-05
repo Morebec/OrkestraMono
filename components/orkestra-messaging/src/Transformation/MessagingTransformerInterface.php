@@ -8,7 +8,7 @@ use Morebec\Orkestra\Messaging\MessageInterface;
 
 /**
  * Transformers act as interceptors of messages and responses.
- * They are triggered bu the {@link MessagingTransformationMiddleware}.
+ * They are triggered by the {@link MessagingTransformationMiddleware}.
  */
 interface MessagingTransformerInterface
 {

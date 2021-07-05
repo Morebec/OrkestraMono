@@ -7,15 +7,9 @@ namespace Morebec\Orkestra\EventSourcing\EventStore;
  */
 class EventStream implements EventStreamInterface
 {
-    /**
-     * @var EventStreamId
-     */
-    private $id;
+    private EventStreamId $id;
 
-    /**
-     * @var EventStreamVersion
-     */
-    private $version;
+    private EventStreamVersion $version;
 
     public function __construct(EventStreamId $streamId, EventStreamVersion $streamVersion)
     {

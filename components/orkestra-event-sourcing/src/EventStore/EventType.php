@@ -10,10 +10,7 @@ use InvalidArgumentException;
  */
 class EventType
 {
-    /**
-     * @var string
-     */
-    private $value;
+    private string $value;
 
     /**
      * EventType constructor.

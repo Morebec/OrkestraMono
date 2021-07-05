@@ -10,10 +10,7 @@ use Morebec\Orkestra\Normalization\ObjectNormalizerInterface;
 
 class Snapshotter
 {
-    /**
-     * @var ObjectNormalizerInterface
-     */
-    private $objectNormalizer;
+    private ObjectNormalizerInterface $objectNormalizer;
 
     public function __construct(ObjectNormalizerInterface $objectNormalizer)
     {
@@ -27,8 +24,7 @@ class Snapshotter
         AbstractEventSourcedAggregateRoot $aggregateRoot
     ): Snapshot {
         $data = $this->objectNormalizer->normalize($aggregateRoot);
-        unset($data['domainEvents']);
-        unset($data['version']);
+        unset($data['domainEvents'], $data['version']);
 
         return new Snapshot($streamId, $version, $eventSequenceNumber, $data);
     }

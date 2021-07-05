@@ -17,10 +17,8 @@ class SubscriptionOptions
      * If the stream read is the Global Stream, this property corresponds to the sequence number.
      *
      * In essence this option serves as an offset to the read operation.
-     *
-     * @var int
      */
-    public $position = self::POSITION_START;
+    public int $position = self::POSITION_START;
 
     /**
      * Sugar syntax function.
@@ -46,10 +44,8 @@ class SubscriptionOptions
 
     public function from(int $position): self
     {
-        if ($position < 0) {
-            if ($position !== self::POSITION_START && $position !== self::POSITION_END) {
-                throw new \InvalidArgumentException('The position cannot be a negative number');
-            }
+        if (($position < 0) && $position !== self::POSITION_START && $position !== self::POSITION_END) {
+            throw new \InvalidArgumentException('The position cannot be a negative number');
         }
         $this->position = $position;
 

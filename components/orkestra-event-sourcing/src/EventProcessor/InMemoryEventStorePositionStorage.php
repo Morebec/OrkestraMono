@@ -7,7 +7,7 @@ class InMemoryEventStorePositionStorage implements EventStorePositionStorageInte
     /**
      * @var ?int[]
      */
-    private $data;
+    private ?array $data;
 
     public function __construct()
     {
@@ -35,6 +35,6 @@ class InMemoryEventStorePositionStorage implements EventStorePositionStorageInte
      */
     public function get(string $processorId): ?int
     {
-        return \array_key_exists($processorId, $this->data) ? $this->data[$processorId] : null;
+        return $this->data[$processorId] ?? null;
     }
 }

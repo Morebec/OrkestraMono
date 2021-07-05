@@ -11,17 +11,15 @@ class RecordedPersonalData implements RecordedPersonalDataInterface
 {
     /**
      * The person that is the owner of the record.
-     *
-     * @var string
      */
-    private $personalToken;
+    private string $personalToken;
 
     /**
      * This can be used when required to query a record.
      *
      * @var string name of the type of value that is saved (e.g. emailAddress, phoneNumber, IP Address).
      */
-    private $keyName;
+    private string $keyName;
 
     /** @var mixed value of the PII */
     private $value;
@@ -29,10 +27,8 @@ class RecordedPersonalData implements RecordedPersonalDataInterface
     /**
      * A business identification of a mean by which the personal information of a person or data subject was collected:
      * E.g.: A Product's Landing Page Contact Form, an External Organization etc, a user within the application.
-     *
-     * @var string
      */
-    private $source;
+    private string $source;
 
     /**
      * A list of business identifications of reasons why this information is collected by the operating business.
@@ -40,14 +36,14 @@ class RecordedPersonalData implements RecordedPersonalDataInterface
      *
      * @var string[]
      */
-    private $reasons;
+    private array $reasons;
 
     /**
      * A business identification of the ways in which this information is going to be processed.
      *
      * @var string[]
      */
-    private $processingRequirements;
+    private array $processingRequirements;
 
     /**
      * Date Time at which this information should be considered no longer needed and be automatically deleted.
@@ -61,10 +57,8 @@ class RecordedPersonalData implements RecordedPersonalDataInterface
      * 2. The registration is tried in the application's database.
      * 2a. If the transaction is committed successfully, the data is marked `$disposedAt = null`
      * 2b If the transaction had a hard failure (service down, or unable to recover) -> the data will disappear automatically.
-     *
-     * @var DateTime|null
      */
-    private $disposedAt;
+    private ?DateTime $disposedAt;
 
     /**
      * This metadata should be used to track additional information related to this record, such as
@@ -73,16 +67,12 @@ class RecordedPersonalData implements RecordedPersonalDataInterface
      * - Legal basis for storing this data.
      * - Processing Operations
      * - Agreements - (e.g: user consent v2021-01-01).
-     *
-     * @var array
      */
-    private $metadata;
+    private array $metadata;
 
-    /** @var DateTime */
-    private $recordedAt;
+    private DateTime $recordedAt;
 
-    /** @var string */
-    private $referenceToken;
+    private string $referenceToken;
 
     public function __construct(
         string $personalToken,

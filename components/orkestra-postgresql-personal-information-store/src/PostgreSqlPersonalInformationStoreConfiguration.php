@@ -12,5 +12,5 @@ class PostgreSqlPersonalInformationStoreConfiguration
      *
      * @var string
      */
-    public $encryptionKey = null;
+    public ?string $encryptionKey = null;
 }

@@ -23,30 +23,24 @@ use Morebec\Orkestra\Modeling\DomainEventCollection;
 use Morebec\Orkestra\Modeling\DomainEventCollectionInterface;
 use Morebec\Orkestra\Normalization\ObjectNormalizerInterface;
 
+/**
+ * Implementation of an aggregate root repository to be used as an implementation based on an event store.
+ * It supports Snapshotting, although would require a background process to perform the work of taking snapshot
+ * from time to time.
+ */
 class EventStoreRepository
 {
-    /**
-     * @var EventStoreInterface
-     */
-    protected $eventStore;
-    /**
-     * @var MessageNormalizerInterface
-     */
-    protected $normalizer;
+    protected EventStoreInterface $eventStore;
 
-    /** @var string|null */
-    protected $streamIdPrefix;
+    protected MessageNormalizerInterface $normalizer;
 
-    /** @var string */
-    protected $aggregateRootClass;
-    /**
-     * @var SnapshotStoreInterface
-     */
-    private $snapshotStore;
-    /**
-     * @var ObjectNormalizerInterface
-     */
-    private $objectNormalizer;
+    protected ?string $streamIdPrefix;
+
+    protected string $aggregateRootClass;
+
+    private SnapshotStoreInterface $snapshotStore;
+
+    private ObjectNormalizerInterface $objectNormalizer;
 
     public function __construct(
         EventStoreInterface $eventStore,
@@ -74,7 +68,10 @@ class EventStoreRepository
     public function save(string $id, AbstractEventSourcedAggregateRoot $aggregateRoot, ?AppendStreamOptions $options = null): void
     {
         if (!$options) {
-            $options = AppendStreamOptions::append()->expectVersion(EventStreamVersion::fromInt($aggregateRoot->getVersion()->toInt()));
+            $options = AppendStreamOptions::append()
+                ->expectVersion(
+                    EventStreamVersion::fromInt($aggregateRoot->getVersion()->toInt())
+                );
         }
 
         $this->eventStore->appendToStream(
@@ -118,15 +115,15 @@ class EventStoreRepository
         return $isInitialVersion ?
             $class::loadFromHistory(new DomainEventCollection($events)) :
             $this->objectNormalizer->denormalize($snapshot->getState(), $class)
-            ;
+        ;
     }
 
-    private function getStreamId(string $aggregateId): EventStreamId
+    protected function getStreamId(string $aggregateId): EventStreamId
     {
         return EventStreamId::fromString($this->streamIdPrefix.$aggregateId);
     }
 
-    private function convertEventsToEventDescriptors(DomainEventCollectionInterface $collection): array
+    protected function convertEventsToEventDescriptors(DomainEventCollectionInterface $collection): array
     {
         $convertFunction = function (DomainEventInterface $event) {
             return new EventDescriptor(
@@ -140,7 +137,7 @@ class EventStoreRepository
         return array_map($convertFunction, $collection->toArray());
     }
 
-    private function getSnapshot(EventStreamId $id): Snapshot
+    protected function getSnapshot(EventStreamId $id): Snapshot
     {
         $snapshot = $this->snapshotStore->findByStreamId($id);
 

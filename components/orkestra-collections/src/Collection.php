@@ -7,10 +7,7 @@ namespace Morebec\Orkestra\Collections;
  */
 class Collection implements \Iterator, \Countable
 {
-    /**
-     * @var iterable
-     */
-    protected $elements;
+    protected iterable $elements;
 
     public function __construct(iterable $elements = [], bool $preserveKeys = false)
     {

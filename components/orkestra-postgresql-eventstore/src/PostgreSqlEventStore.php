@@ -56,25 +56,16 @@ class PostgreSqlEventStore implements EventStoreInterface
 
     private const DIRECTION_BACKWARD = 'DESC';
 
-    /**
-     * @var Connection
-     */
-    private $connection;
+    private Connection $connection;
 
-    /**
-     * @var PostgreSqlEventStoreConfiguration
-     */
-    private $configuration;
+    private PostgreSqlEventStoreConfiguration $configuration;
 
-    /**
-     * @var ClockInterface
-     */
-    private $clock;
+    private ClockInterface $clock;
 
     /**
      * @var PostgreSqlSubscriberWrapper[]
      */
-    private $subscribers;
+    private array $subscribers;
 
     /**
      * @throws Exception
@@ -86,11 +77,7 @@ class PostgreSqlEventStore implements EventStoreInterface
             throw new RuntimeException('Extension not loaded: "pdo_pgsql"');
         }
 
-        if (!$clock) {
-            $clock = new SystemClock();
-        }
-
-        $this->clock = $clock;
+        $this->clock = $clock ?: new SystemClock();
 
         $this->connection = $connection;
 

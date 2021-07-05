@@ -7,14 +7,11 @@ namespace Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration;
  */
 class MessageBusHandlerConfiguration
 {
-    /** @var string */
-    public $serviceId;
+    public string $serviceId;
 
-    /** @var string */
-    public $className;
+    public string $className;
 
-    /** @var bool */
-    public $autoroute;
+    public bool $autoroute;
 
     public function __construct(string $serviceId, string $className, bool $autoRouted)
     {

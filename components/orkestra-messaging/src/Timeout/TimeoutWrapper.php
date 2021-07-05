@@ -9,14 +9,11 @@ use Morebec\Orkestra\Messaging\MessageHeaders;
  */
 class TimeoutWrapper
 {
-    /** @var string */
-    private $id;
+    private string $id;
 
-    /** @var TimeoutInterface */
-    private $timeout;
+    private TimeoutInterface $timeout;
 
-    /** @var MessageHeaders */
-    private $headers;
+    private MessageHeaders $headers;
 
     private function __construct(TimeoutInterface $timeout, MessageHeaders $headers)
     {

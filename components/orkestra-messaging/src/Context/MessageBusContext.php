@@ -13,15 +13,9 @@ use Morebec\Orkestra\Messaging\MessageInterface;
  */
 class MessageBusContext
 {
-    /**
-     * @var MessageInterface
-     */
-    private $message;
+    private MessageInterface $message;
 
-    /**
-     * @var MessageHeaders
-     */
-    private $messageHeaders;
+    private MessageHeaders $messageHeaders;
 
     public function __construct(
         MessageInterface $message,

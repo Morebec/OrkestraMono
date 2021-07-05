@@ -8,15 +8,9 @@ namespace Morebec\Orkestra\DateTime;
  */
 class DateRange
 {
-    /**
-     * @var Date
-     */
-    private $startDate;
+    private Date $startDate;
 
-    /**
-     * @var Date
-     */
-    private $endDate;
+    private Date $endDate;
 
     public function __construct(Date $startDate, Date $endDate)
     {

@@ -7,10 +7,7 @@ namespace Morebec\Orkestra\Messaging;
  */
 class MessageHandlerResponse extends AbstractMessageBusResponse
 {
-    /**
-     * @var string
-     */
-    protected $handlerName;
+    protected string $handlerName;
 
     public function __construct(string $handlerName, MessageBusResponseStatusCode $statusCode, $payload = null)
     {

@@ -36,24 +36,15 @@ use RuntimeException;
  */
 class TrackingEventProcessor implements ListenableEventProcessorInterface
 {
-    /** @var bool */
-    protected $running;
+    protected bool $running;
 
-    /** @var EventStorePositionStorageInterface */
-    protected $positionStorage;
+    protected EventStorePositionStorageInterface $positionStorage;
 
-    /**
-     * @var EventPublisherInterface
-     */
-    protected $publisher;
-    /**
-     * @var EventStoreInterface
-     */
-    protected $eventStore;
-    /**
-     * @var TrackingEventProcessorOptions
-     */
-    protected $options;
+    protected EventPublisherInterface $publisher;
+
+    protected EventStoreInterface $eventStore;
+
+    protected TrackingEventProcessorOptions $options;
 
     /** @var EventProcessorListenerInterface[] */
     protected $listeners;

@@ -12,11 +12,10 @@ use Morebec\Orkestra\Messaging\Validation\ValidateMessageMiddleware;
 
 class MessageBusConfiguration
 {
-    /** @var string */
-    public $implementationClassName;
+    public string $implementationClassName;
 
     /** @var string[] */
-    public $middleware;
+    public array $middleware;
 
     public function __construct()
     {

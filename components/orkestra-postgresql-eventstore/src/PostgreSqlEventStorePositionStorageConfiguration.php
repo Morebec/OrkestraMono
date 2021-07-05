@@ -4,6 +4,5 @@ namespace Morebec\Orkestra\PostgreSqlEventStore;
 
 class PostgreSqlEventStorePositionStorageConfiguration
 {
-    /** @var string */
-    public $positionsTableName = 'event_processor_positions';
+    public string $positionsTableName = 'event_processor_positions';
 }

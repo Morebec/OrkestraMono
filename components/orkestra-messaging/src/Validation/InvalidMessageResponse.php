@@ -10,20 +10,14 @@ use Morebec\Orkestra\Messaging\MessageBusResponseStatusCode;
  */
 class InvalidMessageResponse implements MessageBusResponseInterface
 {
-    /**
-     * @var MessageValidationErrorList
-     */
-    private $errors;
+    private MessageValidationErrorList $errors;
 
     public function __construct(MessageValidationErrorList $errors)
     {
         $this->errors = $errors;
     }
 
-    /**
-     * @return MessageValidationErrorList
-     */
-    public function getPayload()
+    public function getPayload(): MessageValidationErrorList
     {
         return $this->errors;
     }

@@ -2,12 +2,17 @@
 
 namespace Morebec\Orkestra\Normalization\Denormalizer;
 
+use Cake\Chronos\ChronosInterface;
 use DateTimeInterface;
+use InvalidArgumentException;
 use Morebec\Orkestra\DateTime\Date;
 use Morebec\Orkestra\DateTime\DateTime;
 
 class DateTimeDenormalizer implements DenormalizerInterface
 {
+    /**
+     * @return ChronosInterface|Date|DateTime
+     */
     public function denormalize(DenormalizationContextInterface $context)
     {
         if (!$this->supports($context)) {
@@ -20,7 +25,7 @@ class DateTimeDenormalizer implements DenormalizerInterface
             try {
                 // Try by default RFC3339_EXTENDED
                 return Date::createFromFormat(Date::RFC3339_EXTENDED, $value);
-            } catch (\InvalidArgumentException $exception) {
+            } catch (InvalidArgumentException $exception) {
                 // In case of failure try the generic date parser that might support things like YYYY-MM-DD or YYYY/MM/DD
                 return new Date($value);
             }

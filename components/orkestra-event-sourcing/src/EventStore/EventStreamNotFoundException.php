@@ -6,10 +6,7 @@ use Throwable;
 
 class EventStreamNotFoundException extends \RuntimeException implements EventStoreExceptionInterface
 {
-    /**
-     * @var EventStreamId
-     */
-    private $streamId;
+    private EventStreamId $streamId;
 
     public function __construct(EventStreamId $streamId, $code = 0, Throwable $previous = null)
     {

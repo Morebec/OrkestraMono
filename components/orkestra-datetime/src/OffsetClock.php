@@ -9,17 +9,11 @@ namespace Morebec\Orkestra\DateTime;
  */
 class OffsetClock implements ClockInterface
 {
-    /**
-     * @var DateTime
-     */
-    private $dateTime;
-
-    private $offsetInterval;
+    private \DateInterval $offsetInterval;
 
     public function __construct(DateTime $startingDateTime, string $timeZone = DateTime::DEFAULT_SYSTEM_TIME_ZONE)
     {
         date_default_timezone_set($timeZone);
-        $this->dateTime = $startingDateTime;
 
         $realTimeNow = new DateTime();
 

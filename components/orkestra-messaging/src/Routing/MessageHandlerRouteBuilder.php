@@ -13,15 +13,9 @@ use ReflectionException;
  */
 class MessageHandlerRouteBuilder
 {
-    /**
-     * @var string
-     */
-    private $messageHandlerClassName;
+    private string $messageHandlerClassName;
 
-    /**
-     * @var array
-     */
-    private $disabledMethods;
+    private array $disabledMethods;
 
     public function __construct(string $messageHandlerClassName)
     {
@@ -55,7 +49,7 @@ class MessageHandlerRouteBuilder
         $reflectionClass = new ReflectionClass($this->messageHandlerClassName);
         $methods = ($reflectionClass)->getMethods();
         foreach ($methods as $method) {
-            if (\in_array($method->getName(), $this->disabledMethods)) {
+            if (\in_array($method->getName(), $this->disabledMethods, true)) {
                 continue;
             }
 

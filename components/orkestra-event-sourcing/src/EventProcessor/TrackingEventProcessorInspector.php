@@ -2,7 +2,6 @@
 
 namespace Morebec\Orkestra\EventSourcing\EventProcessor;
 
-use Morebec\Orkestra\EventSourcing\EventStore\EventStreamVersion;
 use Morebec\Orkestra\EventSourcing\EventStore\ReadStreamOptions;
 
 /**
@@ -27,7 +26,7 @@ class TrackingEventProcessorInspector
         } else {
             $stream = $eventStore->getStream($streamId);
             $streamVersion = $stream ? $stream->getVersion()->toInt() : 0;
-            $firstPosition = $streamVersion === EventStreamVersion::INITIAL_VERSION ? EventStreamVersion::INITIAL_VERSION : $streamVersion;
+            $firstPosition = $streamVersion;
             $lastPosition = $streamVersion;
         }
 

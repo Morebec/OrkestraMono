@@ -2,8 +2,6 @@
 
 namespace Morebec\Orkestra\Messaging\Timeout;
 
-use Morebec\Orkestra\DateTime\ClockInterface;
-use Morebec\Orkestra\Messaging\MessageBusInterface;
 use Morebec\Orkestra\Messaging\MessageHeaders;
 
 /**
@@ -11,29 +9,11 @@ use Morebec\Orkestra\Messaging\MessageHeaders;
  */
 class TimeoutManager implements TimeoutManagerInterface
 {
-    /**
-     * @var TimeoutStorageInterface
-     */
-    private $storage;
+    private TimeoutStorageInterface $storage;
 
-    /**
-     * @var ClockInterface
-     */
-    private $clock;
-
-    /**
-     * @var MessageBusInterface
-     */
-    private $messageBus;
-
-    public function __construct(
-        ClockInterface $clock,
-        TimeoutStorageInterface $storage,
-        MessageBusInterface $messageBus
-    ) {
+    public function __construct(TimeoutStorageInterface $storage)
+    {
         $this->storage = $storage;
-        $this->clock = $clock;
-        $this->messageBus = $messageBus;
     }
 
     public function schedule(TimeoutInterface $timeout, ?MessageHeaders $headers = null): void

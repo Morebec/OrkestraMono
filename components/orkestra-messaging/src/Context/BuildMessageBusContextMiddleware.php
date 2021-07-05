@@ -17,15 +17,9 @@ use Ramsey\Uuid\Uuid;
  */
 class BuildMessageBusContextMiddleware implements MessageBusMiddlewareInterface
 {
-    /**
-     * @var ClockInterface
-     */
-    private $clock;
+    private ClockInterface $clock;
 
-    /**
-     * @var MessageBusContextManagerInterface
-     */
-    private $contextManager;
+    private MessageBusContextManagerInterface $contextManager;
 
     public function __construct(ClockInterface $clock, MessageBusContextManagerInterface $contextManager)
     {

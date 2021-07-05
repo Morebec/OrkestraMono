@@ -10,14 +10,9 @@ use Morebec\Orkestra\EventSourcing\Upcasting\UpcasterChain;
  */
 class UpcastingEventStoreDecorator implements EventStoreInterface
 {
-    /**
-     * @var EventStoreInterface
-     */
-    private $eventStore;
-    /**
-     * @var UpcasterChain
-     */
-    private $upcasterChain;
+    private EventStoreInterface $eventStore;
+
+    private UpcasterChain $upcasterChain;
 
     public function __construct(EventStoreInterface $eventStore, UpcasterChain $upcasterChain)
     {

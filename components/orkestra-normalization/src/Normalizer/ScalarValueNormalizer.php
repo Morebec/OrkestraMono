@@ -23,6 +23,6 @@ class ScalarValueNormalizer implements NormalizerInterface
 
     public function supports(NormalizationContextInterface $context): bool
     {
-        return is_scalar($context->getValue()) ? true : false;
+        return is_scalar($context->getValue());
     }
 }

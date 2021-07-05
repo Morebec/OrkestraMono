@@ -7,10 +7,7 @@ namespace Morebec\Orkestra\EventSourcing\Modeling;
  */
 class EventSourcedAggregateRootVersion
 {
-    /**
-     * @var int
-     */
-    private $value;
+    private int $value;
 
     public function __construct(int $value)
     {

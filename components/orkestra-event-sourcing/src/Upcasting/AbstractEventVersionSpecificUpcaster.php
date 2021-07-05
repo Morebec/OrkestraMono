@@ -8,10 +8,7 @@ namespace Morebec\Orkestra\EventSourcing\Upcasting;
  */
 abstract class AbstractEventVersionSpecificUpcaster extends AbstractEventSpecificUpcaster
 {
-    /**
-     * @var int
-     */
-    protected $schemaVersion;
+    protected int $schemaVersion;
 
     public function __construct(string $eventType, int $schemaVersion)
     {

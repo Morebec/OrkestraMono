@@ -14,14 +14,9 @@ use Throwable;
  */
 class MalformedValueForTargetTypeException extends \InvalidArgumentException implements DenormalizationExceptionInterface
 {
-    /**
-     * @var string
-     */
-    private $expectedType;
-    /**
-     * @var DenormalizationContextInterface
-     */
-    private $context;
+    private string $expectedType;
+
+    private DenormalizationContextInterface $context;
 
     public function __construct(string $expectedType, DenormalizationContextInterface $context, DenormalizerInterface $denormalizer, Throwable $previous = null)
     {

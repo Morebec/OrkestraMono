@@ -16,15 +16,13 @@ use Morebec\Orkestra\EventSourcing\EventStore\RecordedEventDescriptor;
 class ProjectorGroup implements ProjectorInterface
 {
     public const TYPE_NAME = 'projector_group';
-    /**
-     * @var string
-     */
-    private $name;
+
+    private string $name;
 
     /**
      * @var ProjectorInterface[]
      */
-    private $projectors;
+    private array $projectors;
 
     public function __construct(string $groupName, iterable $projectors)
     {

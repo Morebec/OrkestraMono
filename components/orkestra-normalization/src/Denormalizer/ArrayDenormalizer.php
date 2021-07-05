@@ -11,17 +11,15 @@ class ArrayDenormalizer implements DelegatingDenormalizerInterface
 {
     /**
      * Delegate normalizer to denormalize individual object properties.
-     *
-     * @var DenormalizerInterface|null
      */
-    private $delegate;
+    private ?DenormalizerInterface $delegate;
 
     public function __construct(?DenormalizerInterface $delegate = null)
     {
         $this->delegate = $delegate;
     }
 
-    public function denormalize(DenormalizationContextInterface $context)
+    public function denormalize(DenormalizationContextInterface $context): array
     {
         $className = $context->getTypeName();
         $value = $context->getValue();

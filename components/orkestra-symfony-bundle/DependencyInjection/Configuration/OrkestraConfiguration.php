@@ -14,20 +14,15 @@ use Symfony\Component\DependencyInjection\Loader\Configurator\ServicesConfigurat
  */
 class OrkestraConfiguration
 {
-    /** @var MessageBusConfiguration|null */
-    private $messageBusConfiguration;
+    private ?MessageBusConfiguration $messageBusConfiguration;
 
-    /** @var EventStoreConfiguration|null */
-    private $eventStoreConfiguration;
+    private ?EventStoreConfiguration $eventStoreConfiguration;
 
-    /** @var TimeoutProcessingConfiguration|null */
-    private $timeoutProcessingConfiguration;
+    private ?TimeoutProcessingConfiguration $timeoutProcessingConfiguration;
 
-    /** @var EventProcessingConfiguration|null */
-    private $eventProcessingConfiguration;
+    private ?EventProcessingConfiguration $eventProcessingConfiguration;
 
-    /** @var ContainerConfigurator */
-    private $container;
+    private ContainerConfigurator $container;
 
     /** @var ServicesConfigurator */
     private $services;

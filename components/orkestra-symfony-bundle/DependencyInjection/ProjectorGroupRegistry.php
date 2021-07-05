@@ -7,7 +7,7 @@ use Morebec\Orkestra\EventSourcing\Projection\ProjectorGroup;
 class ProjectorGroupRegistry
 {
     /** @var ProjectorGroup[] */
-    private $projectorGroups;
+    private array $projectorGroups;
 
     public function __construct(iterable $projectorGroups = [])
     {

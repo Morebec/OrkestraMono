@@ -9,17 +9,15 @@ class ObjectReflectionNormalizer implements NormalizerInterface
 {
     /**
      * Delegate normalizer to denormalize individual object properties.
-     *
-     * @var NormalizerInterface
      */
-    private $delegate;
+    private NormalizerInterface $delegate;
 
     public function __construct(NormalizerInterface $delegate)
     {
         $this->delegate = $delegate;
     }
 
-    public function normalize(NormalizationContextInterface $context)
+    public function normalize(NormalizationContextInterface $context): array
     {
         if (!$this->supports($context)) {
             throw new UnsupportedNormalizerValueException($context, $this);

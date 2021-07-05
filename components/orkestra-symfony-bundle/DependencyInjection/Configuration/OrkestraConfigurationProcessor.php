@@ -11,8 +11,7 @@ use RuntimeException;
 
 class OrkestraConfigurationProcessor
 {
-    /** @var OrkestraKernel */
-    private $kernel;
+    private OrkestraKernel $kernel;
 
     public function __construct(OrkestraKernel $kernel)
     {

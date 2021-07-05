@@ -19,14 +19,9 @@ use Morebec\Orkestra\Messaging\MessageHeaders;
  */
 class MessageBusContextEventStoreDecorator implements EventStoreInterface
 {
-    /**
-     * @var EventStoreInterface
-     */
-    private $eventStore;
-    /**
-     * @var MessageBusContextProviderInterface
-     */
-    private $contextProvider;
+    private EventStoreInterface $eventStore;
+
+    private MessageBusContextProviderInterface $contextProvider;
 
     public function __construct(
         EventStoreInterface $eventStore,

@@ -7,10 +7,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ProgressBarBuilder
 {
-    private function __construct()
-    {
-    }
-
     public static function modern(OutputInterface $output, int $max = 0, float $minSecondsBetweenRedraws = 1 / 25): ProgressBar
     {
         $bar = new ProgressBar($output, $max, $minSecondsBetweenRedraws);

@@ -14,15 +14,9 @@ use Morebec\Orkestra\Normalization\Normalizer\NormalizerInterface;
  */
 class ObjectNormalizer implements ObjectNormalizerInterface
 {
-    /**
-     * @var Normalizer
-     */
-    private $normalizer;
+    private Normalizer $normalizer;
 
-    /**
-     * @var Denormalizer
-     */
-    private $denormalizer;
+    private Denormalizer $denormalizer;
 
     public function __construct()
     {

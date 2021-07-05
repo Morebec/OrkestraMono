@@ -10,7 +10,7 @@ class MessageBus implements MessageBusInterface
     /**
      * @var MessageBusMiddlewareInterface[]
      */
-    private $middleware;
+    private array $middleware;
 
     public function __construct(iterable $middleware = [])
     {
@@ -66,10 +66,8 @@ class MessageBus implements MessageBusInterface
 
         $middleware = $this->middleware[$currentMiddlewareIndex];
 
-        $self = $this;
-
-        return function (MessageInterface $message, MessageHeaders $headers) use ($self, $currentMiddlewareIndex, $middleware): MessageBusResponseInterface {
-            $nextCallable = $self->createCallableForNextMiddleware($currentMiddlewareIndex + 1);
+        return function (MessageInterface $message, MessageHeaders $headers) use ($currentMiddlewareIndex, $middleware): MessageBusResponseInterface {
+            $nextCallable = $this->createCallableForNextMiddleware($currentMiddlewareIndex + 1);
 
             /* @var MessageBusMiddlewareInterface $middleware */
             return $middleware($message, $headers, $nextCallable);

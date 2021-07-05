@@ -23,19 +23,24 @@ class AbstractDenormalizingProjectorTest extends TestCase
         $normalizer = $this->getMockBuilder(MessageNormalizerInterface::class)->getMock();
         $projector = $this->createProjector($normalizer);
 
-        $normalizer->expects($this->once())->method('denormalize');
+        $normalizer->expects($this->once())->method('denormalize')->willReturn(new class() implements DomainEventInterface {
+            public static function getTypeName(): string
+            {
+                return 'test-event';
+            }
+        });
 
         $projector->project(
             new RecordedEventDescriptor(
-            EventId::fromString('event_id'),
-            EventType::fromString('test-event'),
-            new EventMetadata(),
-            new EventData(),
-            EventStreamId::fromString('stream'),
-            EventStreamVersion::fromInt(2),
-            EventSequenceNumber::fromInt(2),
-            DateTime::now()
-        )
+                EventId::fromString('event_id'),
+                EventType::fromString('test-event'),
+                new EventMetadata(),
+                new EventData(),
+                EventStreamId::fromString('stream'),
+                EventStreamVersion::fromInt(2),
+                EventSequenceNumber::fromInt(2),
+                DateTime::now()
+            )
         );
 
         $this->assertTrue($projector->eventDenormalized);
@@ -46,7 +51,7 @@ class AbstractDenormalizingProjectorTest extends TestCase
         return new class($messageNormalizer) extends AbstractDenormalizingProjector {
             public $eventDenormalized = false;
 
-            protected function projectEvent(?DomainEventInterface $event, RecordedEventDescriptor $eventDescriptor): void
+            protected function projectEvent(DomainEventInterface $event, RecordedEventDescriptor $eventDescriptor): void
             {
                 $this->eventDenormalized = true;
             }

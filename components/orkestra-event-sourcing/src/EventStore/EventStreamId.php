@@ -9,10 +9,7 @@ use InvalidArgumentException;
  */
 class EventStreamId
 {
-    /**
-     * @var string
-     */
-    private $value;
+    private string $value;
 
     /**
      * EventId constructor.

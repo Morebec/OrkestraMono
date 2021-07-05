@@ -15,12 +15,9 @@ use Reflector;
  */
 class ReflectionClassPropertyTypeResolver
 {
-    /**
-     * @var UseStatementParser
-     */
-    private $parser;
+    private UseStatementParser $parser;
 
-    private $builtInTypes = [
+    private array $builtInTypes = [
         'bool',
         'null',
         'boolean',
@@ -95,16 +92,14 @@ class ReflectionClassPropertyTypeResolver
     /**
      * Resolves a type to its FQDN.
      *
-     * @return string
-     *
      * @throws AnnotationException
      */
-    private function resolveType(string $type, ReflectionProperty $property)
+    private function resolveType(string $type, ReflectionProperty $property): string
     {
         $appendArray = strpos($type, '[]') !== false;
         $type = str_replace('[]', '', $type);
 
-        if (\in_array($type, $this->builtInTypes)) {
+        if (\in_array($type, $this->builtInTypes, true)) {
             if ($appendArray) {
                 $type .= '[]';
             }
@@ -143,11 +138,9 @@ class ReflectionClassPropertyTypeResolver
     /**
      * Attempts to resolve the FQN of the provided $type based on the $class and $member context.
      *
-     * @param string $type
-     *
      * @return string|null Fully qualified name of the type, or null if it could not be resolved
      */
-    private function tryResolveFqn($type, ReflectionClass $class, Reflector $member)
+    private function tryResolveFqn(string $type, ReflectionClass $class, Reflector $member): ?string
     {
         $alias = false === ($pos = strpos($type, '\\')) ? $type : substr($type, 0, $pos);
         $loweredAlias = strtolower($alias);
@@ -172,30 +165,28 @@ class ReflectionClassPropertyTypeResolver
             return $type;
         }
 
-        if (version_compare(\PHP_VERSION, '5.4.0', '<')) {
+        if (\PHP_VERSION_ID < 50400) {
             return null;
-        } else {
-            // If all fail, try resolving through related traits
-            return $this->tryResolveFqnInTraits($type, $class, $member);
         }
+
+        // If all fail, try resolving through related traits
+        return $this->tryResolveFqnInTraits($type, $class, $member);
     }
 
     /**
      * Attempts to resolve the FQN of the provided $type based on the $class and $member context, specifically searching
      * through the traits that are used by the provided $class.
      *
-     * @param string $type
-     *
      * @return string|null Fully qualified name of the type, or null if it could not be resolved
      */
-    private function tryResolveFqnInTraits($type, ReflectionClass $class, Reflector $member)
+    private function tryResolveFqnInTraits(string $type, ReflectionClass $class, Reflector $member): ?string
     {
         /** @var ReflectionClass[] $traits */
         $traits = [];
 
         // Get traits for the class and its parents
         while ($class) {
-            $traits = array_merge($traits, $class->getTraits());
+            $traits = [...$traits, ...$class->getTraits()];
             $class = $class->getParentClass();
         }
 
@@ -203,9 +194,13 @@ class ReflectionClassPropertyTypeResolver
             // Eliminate traits that don't have the property/method/parameter
             if ($member instanceof ReflectionProperty && !$trait->hasProperty($member->name)) {
                 continue;
-            } elseif ($member instanceof ReflectionMethod && !$trait->hasMethod($member->name)) {
+            }
+
+            if ($member instanceof ReflectionMethod && !$trait->hasMethod($member->name)) {
                 continue;
-            } elseif ($member instanceof ReflectionParameter && !$trait->hasMethod($member->getDeclaringFunction()->name)) {
+            }
+
+            if ($member instanceof ReflectionParameter && !$trait->hasMethod($member->getDeclaringFunction()->name)) {
                 continue;
             }
 
@@ -222,10 +217,8 @@ class ReflectionClassPropertyTypeResolver
 
     /**
      * @param string $class
-     *
-     * @return bool
      */
-    private function classExists($class)
+    private function classExists($class): bool
     {
         return class_exists($class) || interface_exists($class);
     }
@@ -291,7 +284,6 @@ class ReflectionClassPropertyTypeResolver
     {
         $php74OrGreater = \PHP_VERSION_ID >= 70400;
         if ($php74OrGreater) {
-            /** @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection */
             $propertyType = $property->getType();
             if ($propertyType) {
                 $types = [$propertyType->getName()];

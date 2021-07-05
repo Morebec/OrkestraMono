@@ -10,14 +10,9 @@ use Throwable;
  */
 class CannotDenormalizePropertyException extends \InvalidArgumentException implements DenormalizationExceptionInterface
 {
-    /**
-     * @var string
-     */
-    private $propertyName;
-    /**
-     * @var string
-     */
-    private $className;
+    private string $propertyName;
+
+    private string $className;
 
     public function __construct(ClassPropertyDenormalizationContextInterface $context, Throwable $previous = null)
     {

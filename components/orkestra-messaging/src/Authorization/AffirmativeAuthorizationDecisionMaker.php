@@ -17,7 +17,7 @@ class AffirmativeAuthorizationDecisionMaker implements AuthorizationDecisionMake
     /**
      * @var MessageAuthorizerInterface[]
      */
-    private $authorizers;
+    private array $authorizers;
 
     public function __construct(iterable $authorizers = [])
     {

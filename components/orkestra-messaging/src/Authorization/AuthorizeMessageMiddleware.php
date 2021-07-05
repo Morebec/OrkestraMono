@@ -12,10 +12,7 @@ use Morebec\Orkestra\Messaging\Middleware\MessageBusMiddlewareInterface;
  */
 class AuthorizeMessageMiddleware implements MessageBusMiddlewareInterface
 {
-    /**
-     * @var AuthorizationDecisionMakerInterface
-     */
-    private $decisionMaker;
+    private AuthorizationDecisionMakerInterface $decisionMaker;
 
     public function __construct(AuthorizationDecisionMakerInterface $decisionMaker)
     {

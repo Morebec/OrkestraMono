@@ -7,7 +7,7 @@ use Morebec\Orkestra\DateTime\DateTime;
 class InMemoryTimeoutStorage implements TimeoutStorageInterface
 {
     /** @var TimeoutWrapper[] */
-    private $wrappers;
+    private array $wrappers;
 
     public function __construct()
     {
@@ -39,9 +39,7 @@ class InMemoryTimeoutStorage implements TimeoutStorageInterface
      */
     public function findByEndsAtBetween(DateTime $from, DateTime $to): array
     {
-        return array_filter($this->wrappers, static function (TimeoutWrapper $wrapper) use ($from, $to) {
-            return $wrapper->getTimeout()->getEndsAt()->isBetween($from, $to);
-        });
+        return array_filter($this->wrappers, static fn (TimeoutWrapper $wrapper) => $wrapper->getTimeout()->getEndsAt()->isBetween($from, $to));
     }
 
     /**

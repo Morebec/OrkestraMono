@@ -10,7 +10,7 @@
         }
     ],
     "require": {
-        "php": ">=7.3",
+        "php": ">=7.4",
         "ramsey/uuid": "^4.1",
         "morebec/orkestra-datetime": "^2.4",
         "morebec/orkestra-enum": "^2.4",

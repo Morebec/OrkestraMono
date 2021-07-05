@@ -18,7 +18,7 @@ class JsonSerializableNormalizer implements NormalizerInterface
         /** @var JsonSerializable $value */
         $value = $context->getValue();
 
-        return json_decode($value->jsonSerialize(), true);
+        return json_decode($value->jsonSerialize(), true, 512, \JSON_THROW_ON_ERROR);
     }
 
     public function supports($context): bool

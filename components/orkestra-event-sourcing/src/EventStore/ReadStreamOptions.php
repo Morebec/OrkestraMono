@@ -13,23 +13,19 @@ class ReadStreamOptions
 
     /**
      * The direction into which to perform the read operation. (Default forward).
-     *
-     * @var ReadStreamDirection
      */
-    public $direction;
+    public ReadStreamDirection $direction;
 
     /**
      * The maximum number of events to return for a given read operation.
-     *
-     * @var int|null
      */
-    public $maxCount = 1000;
+    public ?int $maxCount = 1000;
 
     /** @var EventType[] */
-    public $eventTypes = [];
+    public array $eventTypes = [];
 
     /** @var EventType[] */
-    public $ignoredEventTypes = [];
+    public array $ignoredEventTypes = [];
 
     /**
      * Position from which the reading should be performed.
@@ -38,10 +34,8 @@ class ReadStreamOptions
      * If the stream read is the Global Stream, this property corresponds to the sequence number.
      *
      * In essence this option serves as an offset to the read operation.
-     *
-     * @var int
      */
-    public $position = self::POSITION_START;
+    public int $position = self::POSITION_START;
 
     public function __construct()
     {
@@ -126,11 +120,10 @@ class ReadStreamOptions
 
     public function from(int $position): self
     {
-        if ($position < 0) {
-            if ($position !== self::POSITION_START && $position !== self::POSITION_END) {
-                throw new \InvalidArgumentException('The position cannot be a negative number');
-            }
+        if (($position < 0) && $position !== self::POSITION_START && $position !== self::POSITION_END) {
+            throw new \InvalidArgumentException('The position cannot be a negative number');
         }
+
         $this->position = $position;
 
         return $this;

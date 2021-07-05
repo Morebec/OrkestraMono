@@ -8,11 +8,9 @@ namespace Morebec\Orkestra\Retry;
  */
 class RetryContext
 {
-    /** @var int */
-    public $attemptNumber;
+    public int $attemptNumber;
 
-    /** @var int */
-    public $maxAttempt;
+    public int $maxAttempt;
 
     public function __construct(int $attemptNumber, int $maxAttempt)
     {

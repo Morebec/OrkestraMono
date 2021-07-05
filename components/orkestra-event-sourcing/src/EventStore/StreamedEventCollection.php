@@ -8,15 +8,12 @@ namespace Morebec\Orkestra\EventSourcing\EventStore;
  */
 class StreamedEventCollection implements StreamedEventCollectionInterface
 {
-    /**
-     * @var EventStreamId
-     */
-    private $streamId;
+    private EventStreamId $streamId;
 
     /**
      * @var RecordedEventDescriptor[]
      */
-    private $events;
+    private array $events;
 
     /**
      * StreamedEventCollection constructor.
@@ -39,20 +36,12 @@ class StreamedEventCollection implements StreamedEventCollectionInterface
 
     public function getFirst(): ?RecordedEventDescriptor
     {
-        if ($this->isEmpty()) {
-            return null;
-        }
-
-        return $this->events[0];
+        return $this->events[0] ?? null;
     }
 
     public function getLast(): ?RecordedEventDescriptor
     {
-        if ($this->isEmpty()) {
-            return null;
-        }
-
-        return $this->events[$this->getCount() - 1];
+        return $this->events[$this->getCount() - 1] ?? null;
     }
 
     public function toArray(): array

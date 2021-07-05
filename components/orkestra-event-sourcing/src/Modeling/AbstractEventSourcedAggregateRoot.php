@@ -16,10 +16,8 @@ abstract class AbstractEventSourcedAggregateRoot extends AbstractEventEmittingAg
 
     /**
      * Current version of this aggregate, used for optimistic concurrency control.
-     *
-     * @var EventSourcedAggregateRootVersion
      */
-    protected $version;
+    protected EventSourcedAggregateRootVersion $version;
 
     final public function __construct()
     {

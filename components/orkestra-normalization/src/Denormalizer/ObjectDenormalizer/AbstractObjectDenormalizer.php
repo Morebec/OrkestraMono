@@ -16,15 +16,12 @@ use Morebec\Orkestra\Normalization\Denormalizer\UnsupportedDenormalizerValueExce
  */
 abstract class AbstractObjectDenormalizer implements DenormalizerInterface
 {
-    /**
-     * @var ClassInstantiatorInterface
-     */
-    protected $instantiator;
+    protected ClassInstantiatorInterface $instantiator;
 
     /**
      * @var ClassPropertyDenormalizerInterface[]
      */
-    protected $propertyDenormalizers;
+    protected array $propertyDenormalizers;
 
     public function __construct()
     {

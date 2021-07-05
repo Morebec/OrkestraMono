@@ -9,10 +9,15 @@ namespace Morebec\Orkestra\EventSourcing\Upcasting;
 class UpcasterChain implements UpcasterInterface
 {
     /**
-     * @var array
+     * @var UpcasterInterface[]
      */
-    private $upcasters;
+    private array $upcasters;
 
+    /**
+     * UpcasterChain constructor.
+     *
+     * @param iterable|UpcasterInterface[] $upcasters
+     */
     public function __construct(iterable $upcasters)
     {
         $this->upcasters = [];
@@ -65,8 +70,8 @@ class UpcasterChain implements UpcasterInterface
         $events = $head[0]->upcast($event);
 
         $result = [];
-        foreach ($events as $key => $msg) {
-            $result = array_merge($result, $this->doUpcast($tail, $msg));
+        foreach ($events as $msg) {
+            $result = [...$result, ...$this->doUpcast($tail, $msg)];
         }
 
         return $result;

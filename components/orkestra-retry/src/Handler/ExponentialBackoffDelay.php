@@ -20,27 +20,15 @@ use Morebec\Orkestra\Retry\RetryContext;
  */
 class ExponentialBackoffDelay
 {
-    /**
-     * @var int
-     */
-    private $maxWaitTimeMs;
+    private int $maxWaitTimeMs;
 
-    /**
-     * @var int
-     */
-    private $interval;
-    /**
-     * @var float
-     */
-    private $backOffRate;
-    /**
-     * @var int
-     */
-    private $jitterMin;
-    /**
-     * @var int
-     */
-    private $jitterMax;
+    private int $interval;
+
+    private float $backOffRate;
+
+    private int $jitterMin;
+
+    private int $jitterMax;
 
     public function __construct(int $baseInMs = 10, float $backOffRate = 2.0, int $maxWaitTimeMs = 1000 * 60, int $jitterMin = 10, int $jitterMax = 10)
     {

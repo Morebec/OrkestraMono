@@ -6,10 +6,8 @@ class NormalizationContext implements NormalizationContextInterface
 {
     /** @var mixed */
     private $data;
-    /**
-     * @var NormalizationContextInterface|null
-     */
-    private $parentContext;
+
+    private ?NormalizationContextInterface $parentContext;
 
     public function __construct($data, ?NormalizationContextInterface $parentContext = null)
     {

@@ -14,7 +14,7 @@ class DomainEventCollection implements DomainEventCollectionInterface
     /**
      * @var DomainEventInterface[]
      */
-    private $events;
+    private array $events;
 
     /**
      * DomainEventCollection constructor.
@@ -37,9 +37,7 @@ class DomainEventCollection implements DomainEventCollectionInterface
     public function remove(DomainEventInterface $event): void
     {
         $nbEvents = \count($this->events);
-        $this->events = $this->filter(static function ($e) use ($event) {
-            return $e !== $event;
-        })->toArray();
+        $this->events = $this->filter(static fn ($e) => $e !== $event)->toArray();
 
         if ($nbEvents === \count($this->events)) {
             throw new InvalidArgumentException('Domain Event was not found in collection.');
@@ -53,9 +51,7 @@ class DomainEventCollection implements DomainEventCollectionInterface
 
     public function ofType(string $eventClass): DomainEventCollectionInterface
     {
-        return $this->filter(static function (DomainEventInterface $event) use ($eventClass) {
-            return is_a($event, $eventClass, true) || $event::getTypeName() === $eventClass;
-        });
+        return $this->filter(static fn (DomainEventInterface $event) => is_a($event, $eventClass, true) || $event::getTypeName() === $eventClass);
     }
 
     public function filter(callable $predicate): DomainEventCollectionInterface
@@ -82,13 +78,9 @@ class DomainEventCollection implements DomainEventCollectionInterface
 
     public function getLast(): ?DomainEventInterface
     {
-        if ($this->isEmpty()) {
-            return null;
-        }
-
         $nbEvents = \count($this->events);
 
-        return $this->events[$nbEvents - 1];
+        return $this->events[$nbEvents - 1] ?? null;
     }
 
     public function getLastOfType(string $eventClass): ?DomainEventInterface
@@ -98,11 +90,7 @@ class DomainEventCollection implements DomainEventCollectionInterface
 
     public function getFirst(): ?DomainEventInterface
     {
-        if ($this->isEmpty()) {
-            return null;
-        }
-
-        return $this->events[0];
+        return $this->events[0] ?? null;
     }
 
     public function getFirstOfType(string $eventClass): ?DomainEventInterface

@@ -13,7 +13,7 @@
         "morebec/orkestra-postgresql-personal-information-store": "PostgreSQL implementation of the Personal Information Store with encryption"
     },
     "require": {
-        "php": ">=7.3",
+        "php": ">=7.4",
         "morebec/orkestra-datetime": "^2.4"
     },
     "require-dev": {

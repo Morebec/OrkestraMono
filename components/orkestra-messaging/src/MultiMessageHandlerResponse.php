@@ -14,7 +14,7 @@ class MultiMessageHandlerResponse extends AbstractMessageBusResponse
     /**
      * @var MessageHandlerResponse[]
      */
-    private $handlerResponses;
+    private array $handlerResponses;
 
     public function __construct(iterable $handlerResponses)
     {
@@ -111,7 +111,7 @@ class MultiMessageHandlerResponse extends AbstractMessageBusResponse
                     MessageBusResponseStatusCode::FAILED,
                     MessageBusResponseStatusCode::INVALID,
                     MessageBusResponseStatusCode::REFUSED,
-                ]);
+                ], true);
             }, \ARRAY_FILTER_USE_KEY);
         }
 

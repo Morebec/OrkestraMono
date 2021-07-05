@@ -30,15 +30,12 @@ use Throwable;
  */
 class HandleMessageMiddleware implements MessageBusMiddlewareInterface
 {
-    /**
-     * @var MessageHandlerProviderInterface
-     */
-    private $handlerProvider;
+    private MessageHandlerProviderInterface $handlerProvider;
 
     /**
      * @var MessageHandlerInterceptorInterface[]
      */
-    private $interceptors;
+    private array $interceptors;
 
     public function __construct(
         MessageHandlerProviderInterface $handlerProvider,

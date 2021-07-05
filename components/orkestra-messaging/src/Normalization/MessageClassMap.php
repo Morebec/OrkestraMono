@@ -5,7 +5,7 @@ namespace Morebec\Orkestra\Messaging\Normalization;
 class MessageClassMap implements MessageClassMapInterface
 {
     /** @var string[] */
-    private $classMap;
+    private array $classMap;
 
     public function __construct(iterable $mappings = [])
     {
@@ -22,11 +22,7 @@ class MessageClassMap implements MessageClassMapInterface
 
     public function getClassNameForMessageTypeName(string $messageTypeName): ?string
     {
-        if (!\array_key_exists($messageTypeName, $this->classMap)) {
-            return null;
-        }
-
-        return $this->classMap[$messageTypeName];
+        return $this->classMap[$messageTypeName] ?? null;
     }
 
     public function toArray(): array

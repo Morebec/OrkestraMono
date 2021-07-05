@@ -15,10 +15,6 @@ use Morebec\Orkestra\PostgreSqlDocumentStore\Filter\Filter;
  */
 final class FilterQueryBuilderConfigurator
 {
-    public function __construct()
-    {
-    }
-
     /**
      * Configures a Query Builder according to a Filter.
      */
@@ -44,7 +40,7 @@ final class FilterQueryBuilderConfigurator
         // We need to make it so that:
         // 'field.nested.childField becomes data->nested->>childField.
         // If it is created at, updated at, or Id we will do it on the columns directly.
-        if (!\in_array($field, [CollectionTableColumnKeys::ID, CollectionTableColumnKeys::CREATED_AT, CollectionTableColumnKeys::UPDATED_AT])) {
+        if (!\in_array($field, [CollectionTableColumnKeys::ID, CollectionTableColumnKeys::CREATED_AT, CollectionTableColumnKeys::UPDATED_AT], true)) {
             // Explode . into an array
             $parts = explode('.', $field);
 
@@ -86,7 +82,7 @@ final class FilterQueryBuilderConfigurator
         if ($value === null) {
             $value = 'NULL';
         } elseif ($value instanceof DateTime || $value instanceof Date) {
-            $value = "{$value->toAtomString()}";
+            $value = ($value->toAtomString());
         }
 
         return $value;

@@ -10,10 +10,7 @@ use Morebec\Orkestra\Messaging\MessageInterface;
  */
 class MessageRouter implements MessageRouterInterface
 {
-    /**
-     * @var MessageRouteCollection
-     */
-    private $routes;
+    private MessageRouteCollection $routes;
 
     public function __construct(iterable $routes = [])
     {

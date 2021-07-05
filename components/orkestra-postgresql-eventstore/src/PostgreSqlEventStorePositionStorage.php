@@ -8,14 +8,9 @@ use Morebec\Orkestra\EventSourcing\EventProcessor\EventStorePositionStorageInter
 
 class PostgreSqlEventStorePositionStorage implements EventStorePositionStorageInterface
 {
-    /**
-     * @var \Doctrine\DBAL\Connection
-     */
-    private $connection;
-    /**
-     * @var PostgreSqlEventStorePositionStorageConfiguration
-     */
-    private $configuration;
+    private Connection $connection;
+
+    private PostgreSqlEventStorePositionStorageConfiguration $configuration;
 
     public function __construct(Connection $connection, PostgreSqlEventStorePositionStorageConfiguration $configuration)
     {
@@ -62,7 +57,7 @@ class PostgreSqlEventStorePositionStorage implements EventStorePositionStorageIn
             ->where(ProcessorPositionsTableKeys::ID.' = '.$qb->createPositionalParameter($processorId))
         ;
 
-        $result = $qb->execute();
+        $result = $qb->executeQuery();
 
         $value = $result->fetchOne();
 
@@ -83,7 +78,7 @@ class PostgreSqlEventStorePositionStorage implements EventStorePositionStorageIn
     {
         $schema = new Schema();
 
-        $sm = $this->connection->getSchemaManager();
+        $sm = $this->connection->createSchemaManager();
         if (!$sm->tablesExist($configuration->positionsTableName)) {
             $eventsTable = $schema->createTable($configuration->positionsTableName);
             $eventsTable->addColumn(ProcessorPositionsTableKeys::ID, 'string', ['notnull' => true]);

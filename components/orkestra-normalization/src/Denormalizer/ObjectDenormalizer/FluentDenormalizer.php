@@ -55,9 +55,7 @@ class FluentDenormalizer extends ClassSpecificDenormalizer
      */
     public function whenKeyAbsentReturn(string $key, $value): self
     {
-        $this->absentKeysCallbacks[$key] = static function (DenormalizationContextInterface $context) use ($value) {
-            return $value;
-        };
+        $this->absentKeysCallbacks[$key] = static fn (DenormalizationContextInterface $context) => $value;
 
         return $this;
     }
@@ -89,14 +87,10 @@ class FluentDenormalizer extends ClassSpecificDenormalizer
     {
         $this->propertyDenormalizers[$key] = new CallbackClassPropertyDenormalizer(
             // Supports
-            static function (DenormalizationContextInterface $context) use ($key) {
-                return $context->getTypeName() === $key;
-            },
+            static fn (DenormalizationContextInterface $context) => $context->getTypeName() === $key,
 
             // Denormalize
-            static function (DenormalizationContextInterface $context) use ($value) {
-                return $value;
-            }
+            static fn (DenormalizationContextInterface $context) => $value
         );
 
         return $this;
@@ -111,9 +105,7 @@ class FluentDenormalizer extends ClassSpecificDenormalizer
     {
         $this->propertyDenormalizers[$key] = new CallbackClassPropertyDenormalizer(
         // Supports
-            static function (DenormalizationContextInterface $context) use ($key) {
-                return $context->getTypeName() === $key;
-            },
+            static fn (DenormalizationContextInterface $context) => $context->getTypeName() === $key,
 
             // Denormalize
             $callable

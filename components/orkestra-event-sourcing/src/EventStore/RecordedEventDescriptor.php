@@ -10,43 +10,21 @@ use Morebec\Orkestra\DateTime\DateTime;
  */
 class RecordedEventDescriptor implements EventDescriptorInterface
 {
-    /**
-     * @var EventId
-     */
-    protected $eventId;
+    protected EventId $eventId;
 
-    /**
-     * @var EventType
-     */
-    protected $eventType;
+    protected EventType $eventType;
 
-    /**
-     * @var EventMetadata
-     */
-    protected $eventMetadata;
+    protected EventMetadata $eventMetadata;
 
-    /**
-     * @var EventStreamId
-     */
-    protected $streamId;
+    protected EventStreamId $streamId;
 
-    /**
-     * @var EventStreamVersion
-     */
-    protected $streamVersion;
+    protected EventStreamVersion $streamVersion;
 
-    /** @var EventData */
-    protected $eventData;
+    protected EventData $eventData;
 
-    /**
-     * @var DateTime
-     */
-    protected $recordedAt;
+    protected DateTime $recordedAt;
 
-    /**
-     * @var EventSequenceNumber
-     */
-    protected $sequenceNumber;
+    protected EventSequenceNumber $sequenceNumber;
 
     public function __construct(
         EventId $eventId,

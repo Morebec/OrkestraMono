@@ -8,24 +8,13 @@ use Morebec\Orkestra\EventSourcing\EventStore\EventStreamVersion;
 
 class Snapshot
 {
-    /**
-     * @var array
-     */
-    private $state;
+    private array $state;
 
-    /**
-     * @var EventStreamVersion
-     */
-    private $streamVersion;
+    private EventStreamVersion $streamVersion;
 
-    /**
-     * @var EventSequenceNumber
-     */
-    private $sequenceNumber;
-    /**
-     * @var EventStreamId
-     */
-    private $streamId;
+    private EventSequenceNumber $sequenceNumber;
+
+    private EventStreamId $streamId;
 
     public function __construct(
         EventStreamId $streamId,

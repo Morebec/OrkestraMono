@@ -9,18 +9,14 @@ use Morebec\Orkestra\DateTime\DateTime;
 class Criterion
 {
     /** @var string field */
-    private $field;
+    private string $field;
 
-    /** @var FilterOperator */
-    private $operator;
+    private FilterOperator $operator;
 
     /** @var mixed value */
     private $value;
 
-    /**
-     * @var string|null
-     */
-    private $cast;
+    private ?string $cast;
 
     /**
      * Constructs a criterion.

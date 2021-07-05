@@ -10,20 +10,11 @@ use Morebec\Orkestra\Messaging\MessageInterface;
  */
 class MessageRoute implements MessageRouteInterface
 {
-    /**
-     * @var string
-     */
-    private $messageTypeName;
+    private string $messageTypeName;
 
-    /**
-     * @var string
-     */
-    private $messageHandlerClassName;
+    private string $messageHandlerClassName;
 
-    /**
-     * @var string
-     */
-    private $messageHandlerMethodName;
+    private string $messageHandlerMethodName;
 
     public function __construct(
         string $messageTypeName,

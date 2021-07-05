@@ -17,10 +17,7 @@ class DebugMessageRouterConsoleCommand extends Command
 {
     protected static $defaultName = 'orkestra:messaging:debug-router';
 
-    /**
-     * @var MessageRouterInterface
-     */
-    private $router;
+    private MessageRouterInterface $router;
 
     public function __construct(MessageRouterInterface $router)
     {
@@ -33,7 +30,7 @@ class DebugMessageRouterConsoleCommand extends Command
         $this->addArgument('messageTypeName', InputArgument::OPTIONAL, '(Optional) filter the results by a certain messageTypeName');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
 

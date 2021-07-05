@@ -10,10 +10,7 @@ use Morebec\Orkestra\EventSourcing\EventStore\RecordedEventDescriptor;
  */
 abstract class AbstractFilteringEventPublisherDecorator implements EventPublisherInterface
 {
-    /**
-     * @var EventPublisherInterface
-     */
-    private $decorated;
+    private EventPublisherInterface $decorated;
 
     public function __construct(EventPublisherInterface $decorated)
     {

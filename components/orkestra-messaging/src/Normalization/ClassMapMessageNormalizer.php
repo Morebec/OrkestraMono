@@ -14,14 +14,9 @@ use Morebec\Orkestra\Normalization\ObjectNormalizerInterface;
  */
 class ClassMapMessageNormalizer implements MessageNormalizerInterface
 {
-    /**
-     * @var MessageClassMapInterface
-     */
-    private $classMap;
-    /**
-     * @var ObjectNormalizerInterface|null
-     */
-    private $objectNormalizer;
+    private MessageClassMapInterface $classMap;
+
+    private ?ObjectNormalizerInterface $objectNormalizer;
 
     public function __construct(MessageClassMapInterface $classMap, ?ObjectNormalizerInterface $objectNormalizer = null)
     {

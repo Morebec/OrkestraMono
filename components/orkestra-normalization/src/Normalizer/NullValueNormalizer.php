@@ -7,6 +7,9 @@ namespace Morebec\Orkestra\Normalization\Normalizer;
  */
 class NullValueNormalizer implements NormalizerInterface
 {
+    /**
+     * @return null
+     */
     public function normalize(NormalizationContextInterface $context)
     {
         if (!$this->supports($context)) {

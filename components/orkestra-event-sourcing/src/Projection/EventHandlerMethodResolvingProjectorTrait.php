@@ -13,7 +13,7 @@ use Morebec\Orkestra\Messaging\Domain\Event\DomainEventInterface;
  */
 trait EventHandlerMethodResolvingProjectorTrait
 {
-    protected function projectEvent(?DomainEventInterface $event, RecordedEventDescriptor $eventDescriptor): void
+    protected function projectEvent(DomainEventInterface $event, RecordedEventDescriptor $eventDescriptor): void
     {
         $eventClass = \get_class($event);
         $self = new \ReflectionClass($this);

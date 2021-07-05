@@ -14,7 +14,7 @@ interface MessageRouteInterface
     /**
      * Indicates if this route matches a given message with headers.
      */
-    public function matches(MessageInterface $message, MessageHeaders $messageHeaders): bool;
+    public function matches(MessageInterface $message, MessageHeaders $headers): bool;
 
     /**
      * Returns the unique ID of the route given its message type and handler.

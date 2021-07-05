@@ -13,7 +13,7 @@ class ArrayNormalizer implements DelegatingNormalizerInterface
      *
      * @var NormalizerInterface
      */
-    private $delegate;
+    private ?NormalizerInterface $delegate;
 
     public function __construct(NormalizerInterface $delegate = null)
     {
@@ -28,9 +28,7 @@ class ArrayNormalizer implements DelegatingNormalizerInterface
 
         $delegate = $this->delegate;
 
-        return array_map(function ($itemValue) use ($delegate, $context) {
-            return $delegate->normalize(new NormalizationContext($itemValue, $context));
-        }, $context->getValue());
+        return array_map(static fn ($itemValue) => $delegate->normalize(new NormalizationContext($itemValue, $context)), $context->getValue());
     }
 
     public function supports(NormalizationContextInterface $context): bool

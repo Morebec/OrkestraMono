@@ -17,15 +17,9 @@ use Psr\Container\ContainerInterface;
  */
 class MessageRouterCache
 {
-    /**
-     * @var string
-     */
-    private $cacheDirectory;
+    private string $cacheDirectory;
 
-    /**
-     * @var ObjectNormalizer
-     */
-    private $normalizer;
+    private ObjectNormalizer $normalizer;
 
     public function __construct(string $cacheDirectory)
     {
@@ -33,7 +27,7 @@ class MessageRouterCache
         $this->normalizer = new ObjectNormalizer();
 
         $this->normalizer->addDenormalizer(new class() implements DenormalizerInterface {
-            public function denormalize(DenormalizationContextInterface $context)
+            public function denormalize(DenormalizationContextInterface $context): MessageRoute
             {
                 $data = $context->getValue();
 
@@ -53,6 +47,8 @@ class MessageRouterCache
 
     /**
      * Dumps a set of routes to the cache.
+     *
+     * @throws \JsonException
      */
     public function dumpRoutes(MessageRouteCollection $routes): void
     {
@@ -63,6 +59,8 @@ class MessageRouterCache
 
     /**
      * Loads the routes back from the cache.
+     *
+     * @throws \JsonException
      */
     public function loadRoutes(): MessageRouteCollection
     {

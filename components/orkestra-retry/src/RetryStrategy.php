@@ -19,10 +19,8 @@ class RetryStrategy implements RetryStrategyInterface
      * This means that if an operation fails every time and the maximum attempt is 3 the total number of
      * time the operation will be executed will be 4.
      * Once for the normal flow + 3 for the maximumAttempts value.
-     *
-     * @var int
      */
-    protected $maximumAttempts;
+    protected int $maximumAttempts;
 
     /**
      * @var callable
@@ -109,12 +107,12 @@ class RetryStrategy implements RetryStrategyInterface
 
     public function retryIfInstanceOf(string $className): self
     {
-        return self::retryIf(RetryIfThrowableIsInstanceOf::className($className));
+        return $this->retryIf(RetryIfThrowableIsInstanceOf::className($className));
     }
 
     public function retryIfNotInstanceOf(string $className): self
     {
-        return self::retryIf(RetryIfThrowableIsNotInstanceOf::className($className));
+        return $this->retryIf(RetryIfThrowableIsNotInstanceOf::className($className));
     }
 
     public function retryAfter(callable $fun): self
@@ -129,7 +127,7 @@ class RetryStrategy implements RetryStrategyInterface
 
     public function retryAfterDelay(int $nbMillis): self
     {
-        return self::retryAfter(FixedDelay::of($nbMillis));
+        return $this->retryAfter(FixedDelay::of($nbMillis));
     }
 
     public function useExponentialBackoff(
@@ -139,7 +137,7 @@ class RetryStrategy implements RetryStrategyInterface
         int $jitterMin = 10,
         int $jitterMax = 10
     ): self {
-        return self::retryAfter(new ExponentialBackoffDelay($baseInMs, $backOffRate, $maxWaitTimeMs, $jitterMin, $jitterMax));
+        return $this->retryAfter(new ExponentialBackoffDelay($baseInMs, $backOffRate, $maxWaitTimeMs, $jitterMin, $jitterMax));
     }
 
     public function onError(callable $fun): self

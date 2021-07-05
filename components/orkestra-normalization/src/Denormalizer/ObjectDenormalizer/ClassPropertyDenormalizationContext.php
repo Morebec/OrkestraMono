@@ -6,21 +6,16 @@ use Morebec\Orkestra\Normalization\Denormalizer\DenormalizationContextInterface;
 
 class ClassPropertyDenormalizationContext implements ClassPropertyDenormalizationContextInterface
 {
-    private $propertyName;
+    private string $propertyName;
 
     /**
      * @var mixed
      */
     private $value;
 
-    /**
-     * @var DenormalizationContextInterface
-     */
-    private $parentContext;
-    /**
-     * @var string
-     */
-    private $propertyTypeName;
+    private DenormalizationContextInterface $parentContext;
+
+    private string $propertyTypeName;
 
     /**
      * ClassPropertyDenormalizationContext constructor.

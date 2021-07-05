@@ -6,8 +6,6 @@ class PollingTrackingEventProcessorOptions extends TrackingEventProcessorOptions
 {
     /**
      * Delay between polls in milliseconds.
-     *
-     * @var int
      */
-    public $pollingDelay = 10;
+    public int $pollingDelay = 10;
 }

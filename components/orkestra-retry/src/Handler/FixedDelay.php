@@ -10,10 +10,7 @@ use Morebec\Orkestra\Retry\RetryContext;
  */
 class FixedDelay
 {
-    /**
-     * @var int
-     */
-    private $delay;
+    private int $delay;
 
     public function __construct(int $delay)
     {

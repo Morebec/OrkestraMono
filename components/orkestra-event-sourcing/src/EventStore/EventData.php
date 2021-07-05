@@ -8,13 +8,10 @@ namespace Morebec\Orkestra\EventSourcing\EventStore;
  */
 class EventData
 {
-    /** @var mixed[] */
-    protected $data;
+    protected array $data;
 
     /**
      * EventMetadata constructor.
-     *
-     * @param mixed[] $data
      */
     public function __construct(array $data = [])
     {
@@ -30,11 +27,7 @@ class EventData
      */
     public function getValue(string $key, $defaultValue = null)
     {
-        if (!\array_key_exists($key, $this->data)) {
-            return $defaultValue;
-        }
-
-        return $this->data[$key];
+        return $this->data[$key] ?? $defaultValue;
     }
 
     /**
