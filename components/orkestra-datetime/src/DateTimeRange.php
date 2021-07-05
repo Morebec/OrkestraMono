@@ -16,6 +16,9 @@ class DateTimeRange
     {
         $this->startDate = $startDate;
         $this->endDate = $endDate;
+        if (!$endDate->isAfter($startDate)) {
+            throw new \InvalidArgumentException('The end date must be after the start date.');
+        }
     }
 
     /**
@@ -26,6 +29,22 @@ class DateTimeRange
     public function isInRange(DateTime $dateTime, bool $includeEnd = true): bool
     {
         return $dateTime->isBetween($this->startDate, $this->endDate, $includeEnd);
+    }
+
+    /**
+     * Indicates if this date range overlaps another one.
+     */
+    public function overlaps(self $dateRange): bool
+    {
+        return ($this->startDate <= $dateRange->endDate) && ($this->endDate >= $dateRange->startDate);
+    }
+
+    /**
+     * Lossy function to convert this datetime range into a date range.
+     */
+    public function toDateRange(): DateRange
+    {
+        return new DateRange(new Date($this->startDate), new Date($this->endDate));
     }
 
     /**
