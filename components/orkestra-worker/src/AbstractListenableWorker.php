@@ -30,9 +30,7 @@ abstract class AbstractListenableWorker implements ListenableWorkerInterface
      */
     public function removeListener(WorkerListenerInterface $listener): void
     {
-        $this->listeners = array_filter($this->listeners, static function (WorkerListenerInterface $l) use ($listener) {
-            return $listener !== $l;
-        });
+        $this->listeners = array_filter($this->listeners, static fn (WorkerListenerInterface $l) => $listener !== $l);
     }
 
     /**

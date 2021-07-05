@@ -1,8 +1,8 @@
 {
     "name": "morebec/orkestra-worker",
     "type": "library",
-    "description": "Simple library to trivially implement background workers to perform long running business logic",
-    "license": "Apache 2.0",
+    "description": "Simple library to trivially implement background workers to perform long-running business logic",
+    "license": "Apache-2.0",
     "authors": [
         {
             "name": "jwillp",
