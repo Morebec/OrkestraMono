@@ -56,6 +56,7 @@
     },
     "autoload-dev": {
         "psr-4": {
+            "Tests\\App\\": "components/orkestra-framework/tests",
             "Tests\\Morebec\\OrkestraSymfonyBundle\\": "components/orkestra-symfony-bundle/Tests/",
             "Tests\\Morebec\\Orkestra\\Collections\\": "components/orkestra-collections/tests",
             "Tests\\Morebec\\Orkestra\\DateTime\\": "components/orkestra-datetime/tests",
@@ -74,7 +75,8 @@
             "Tests\\Morebec\\Orkestra\\PostgreSqlTimeoutStorage\\": "components/orkestra-postgresql-timeout-storage/tests",
             "Tests\\Morebec\\Orkestra\\Privacy\\": "components/orkestra-privacy/tests",
             "Tests\\Morebec\\Orkestra\\Retry\\": "components/orkestra-retry/tests",
-            "Tests\\Morebec\\Orkestra\\SymfonyBundle\\": "components/orkestra-symfony-bundle/Tests/"
+            "Tests\\Morebec\\Orkestra\\SymfonyBundle\\": "components/orkestra-symfony-bundle/Tests/",
+            "Tests\\Morebec\\Orkestra\\Worker\\": "components/orkestra-worker/tests"
         }
     },
     "require-dev": {
@@ -88,6 +90,7 @@
     },
     "autoload": {
         "psr-4": {
+            "App\\": "components/orkestra-framework/src",
             "Morebec\\OrkestraSymfonyBundle\\": "components/orkestra-symfony-bundle/.",
             "Morebec\\Orkestra\\Collections\\": "components/orkestra-collections/src",
             "Morebec\\Orkestra\\DateTime\\": "components/orkestra-datetime/src",
@@ -106,7 +109,8 @@
             "Morebec\\Orkestra\\PostgreSqlTimeoutStorage\\": "components/orkestra-postgresql-timeout-storage/src",
             "Morebec\\Orkestra\\Privacy\\": "components/orkestra-privacy/src",
             "Morebec\\Orkestra\\Retry\\": "components/orkestra-retry/src",
-            "Morebec\\Orkestra\\SymfonyBundle\\": "components/orkestra-symfony-bundle/."
+            "Morebec\\Orkestra\\SymfonyBundle\\": "components/orkestra-symfony-bundle/.",
+            "Morebec\\Orkestra\\Worker\\": "components/orkestra-worker/src"
         }
     },
     "replace": {
@@ -127,7 +131,8 @@
         "morebec/orkestra-privacy": "2.3.2",
         "morebec/orkestra-retry": "2.3.2",
         "morebec/orkestra-server": "2.3.2",
-        "morebec/orkestra-symfony-bundle": "2.3.2"
+        "morebec/orkestra-symfony-bundle": "2.3.2",
+        "morebec/orkestra-worker": "self.version"
     },
     "scripts": {
         "auto-scripts": {

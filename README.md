@@ -32,13 +32,14 @@ Here's a list of the current core components of Orkestra:
 - **[Collections](https://github.com/Morebec/orkestra-collections)**: Provides typed Collections.
 - **[Exceptions](https://github.com/Morebec/orkestra-collections)**: Provides common exceptions.
 - **[Retry](https://github.com/Morebec/orkestra-retry)**: Provides utilities to improve the resiliency of some components in a system through the use of Retry Classes with support for delays and exponential backoff. 
+- **[Worker](https://github.com/Morebec/orkestra-worker)**: Provides simple interfaces and base classes to define workers that should be used to run business logic in background processes.
 
 #### Infrastructure Specific Components
 There are also infrastructure specific implementations of some the Interfaces from the core Components:
-- **[PostgreSQLDocumentStore](https://github.com/Morebec/orkestra-postgresql-document-store)**: Allows to treat PostgreSQL like a Document Store.
+- **[PostgreSQLDocumentStore](https://github.com/Morebec/orkestra-postgresql-document-store)**: Allows treating PostgreSQL like a Document Store.
 - **[PostgreSQLEventStore](https://github.com/Morebec/orkestra-postgresql-event-store)**: Implementation of an Event Store in PostgreSQL.
 - **[PostgreSQLPersonalInformationStore](https://github.com/Morebec/orkestra-postgresql-personal-information-store)**: To be used with the [Privacy](https://github.com/Morebec/orkestra-privacy) component, allows storing personal data of users in an encrypted form in a PostgreSQL Database.
-- **[PostgreSQLTimerStorage](https://github.com/Morebec/orkestra-postgresql-timer-storage)**: Allows to store timers of the [Messaging](https://github.com/Morebec/orkestra-messaging) component, making it easy to trigger tasks in the future in a much more complex way than Cron by using custom logic.
+- **[PostgreSQLTimerStorage](https://github.com/Morebec/orkestra-postgresql-timer-storage)**: Allows storing timers of the [Messaging](https://github.com/Morebec/orkestra-messaging) component, making it easy to trigger tasks in the future in a much more complex way than Cron by using custom logic.
 
 #### Framework Integrations
 Here are additional components for easier integration with specific frameworks:
