@@ -6,13 +6,12 @@ use Morebec\Orkestra\EventSourcing\EventProcessor\InMemoryEventStorePositionStor
 
 class EventProcessingConfiguration
 {
-    public string $eventStorePositionStorageImplementationClassName;
-
-    public ?ProjectionProcessingConfiguration $projectionProcessingConfiguration;
+    public array $eventStorePositionStorageImplementationClassNames = [];
+    public ?ProjectionProcessingConfiguration $projectionProcessingConfiguration = null;
 
     public function usingEventStorePositionStorageImplementation(string $className): self
     {
-        $this->eventStorePositionStorageImplementationClassName = $className;
+        $this->eventStorePositionStorageImplementationClassNames[] = $className;
 
         return $this;
     }

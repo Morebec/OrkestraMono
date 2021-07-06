@@ -2,7 +2,6 @@
 
 namespace Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration;
 
-use Morebec\Orkestra\EventSourcing\EventProcessor\EventStorePositionStorageInterface;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 
 class EventProcessingConfigurationProcessor
@@ -11,14 +10,13 @@ class EventProcessingConfigurationProcessor
         OrkestraConfiguration $orkestraConfiguration,
         EventProcessingConfiguration $configuration
     ): void {
-        try {
-            $orkestraConfiguration->container()->services()->get(EventStorePositionStorageInterface::class);
-        } catch (ServiceNotFoundException $exception) {
-            $orkestraConfiguration->service(
-                EventStorePositionStorageInterface::class,
-                $configuration->eventStorePositionStorageImplementationClassName
-            );
-        }
+        array_map(static function ($className) use ($orkestraConfiguration) {
+            try {
+                $orkestraConfiguration->container()->services()->get($className);
+            } catch (ServiceNotFoundException $exception) {
+                $orkestraConfiguration->service($className);
+            }
+        }, $configuration->eventStorePositionStorageImplementationClassNames);
 
         if ($configuration->projectionProcessingConfiguration) {
             $this->processProjectionProcessingConfiguration($orkestraConfiguration, $configuration->projectionProcessingConfiguration);

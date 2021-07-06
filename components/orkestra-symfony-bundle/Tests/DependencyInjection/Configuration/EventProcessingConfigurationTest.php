@@ -14,7 +14,7 @@ class EventProcessingConfigurationTest extends TestCase
         $configuration = new EventProcessingConfiguration();
         $configuration->usingEventStorePositionStorageImplementation(InMemoryEventStorePositionStorage::class);
 
-        self::assertEquals(InMemoryEventStorePositionStorage::class, $configuration->eventStorePositionStorageImplementationClassName);
+        self::assertContains(InMemoryEventStorePositionStorage::class, $configuration->eventStorePositionStorageImplementationClassNames);
     }
 
     public function testUsingInMemoryEventStorePositionStorage(): void
@@ -22,7 +22,7 @@ class EventProcessingConfigurationTest extends TestCase
         $configuration = new EventProcessingConfiguration();
         $configuration->usingInMemoryEventStorePositionStorage();
 
-        self::assertEquals(InMemoryEventStorePositionStorage::class, $configuration->eventStorePositionStorageImplementationClassName);
+        self::assertContains(InMemoryEventStorePositionStorage::class, $configuration->eventStorePositionStorageImplementationClassNames);
     }
 
     public function testConfigureProjectionProcessing(): void
