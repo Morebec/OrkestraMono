@@ -15,6 +15,8 @@ use Morebec\Orkestra\Messaging\Normalization\MessageNormalizerInterface;
 use Morebec\Orkestra\Messaging\Routing\HandleMessageMiddleware;
 use Morebec\Orkestra\Messaging\Routing\MessageHandlerRouteBuilder;
 use Morebec\Orkestra\Messaging\Routing\MessageRouteCollection;
+use Morebec\Orkestra\Messaging\Routing\MessageRouter;
+use Morebec\Orkestra\Messaging\Routing\MessageRouterInterface;
 use Morebec\Orkestra\Messaging\Routing\RouteMessageMiddleware;
 use Morebec\Orkestra\Messaging\Transformation\MessagingTransformationMiddleware;
 use Morebec\Orkestra\Messaging\Validation\ValidateMessageMiddleware;
@@ -83,6 +85,12 @@ class MessageBusConfigurationProcessor
                     $orkestraConfiguration->container()->services()->get(MessageBusContextProviderInterface::class);
                 } catch (ServiceNotFoundException $exception) {
                     $orkestraConfiguration->service(MessageBusContextProviderInterface::class, MessageBusContextProvider::class);
+                }
+            } elseif ($middlewareClassName === RouteMessageMiddleware::class) {
+                try {
+                    $orkestraConfiguration->container()->services()->get(MessageRouterInterface::class);
+                } catch (ServiceNotFoundException $exception) {
+                    $orkestraConfiguration->service(MessageRouterInterface::class, MessageRouter::class);
                 }
             }
 
