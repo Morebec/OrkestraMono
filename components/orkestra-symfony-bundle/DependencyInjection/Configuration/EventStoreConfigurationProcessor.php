@@ -14,8 +14,6 @@ class EventStoreConfigurationProcessor
         OrkestraConfiguration $orkestraConfiguration,
         EventStoreConfiguration $configuration
     ): void {
-        $orkestraConfiguration->service(EventStoreInterface::class, $configuration->implementationClassName);
-
         try {
             $eventStoreService = $orkestraConfiguration->container()->services()->get(EventStoreInterface::class);
         } catch (ServiceNotFoundException $exception) {
