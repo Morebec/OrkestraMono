@@ -11,6 +11,7 @@ use Morebec\Orkestra\Messaging\Context\MessageBusContextProvider;
 use Morebec\Orkestra\Messaging\Context\MessageBusContextProviderInterface;
 use Morebec\Orkestra\Messaging\MessageBusInterface;
 use Morebec\Orkestra\Messaging\Normalization\ClassMapMessageNormalizer;
+use Morebec\Orkestra\Messaging\Normalization\MessageClassMapInterface;
 use Morebec\Orkestra\Messaging\Normalization\MessageNormalizerInterface;
 use Morebec\Orkestra\Messaging\Routing\ContainerMessageHandlerProvider;
 use Morebec\Orkestra\Messaging\Routing\HandleMessageMiddleware;
@@ -294,7 +295,8 @@ class MessageBusConfigurationProcessor
 
             if ($messageNormalizerConfiguration->implementationClassName === ClassMapMessageNormalizer::class) {
                 $orkestraConfiguration->service(SymfonyMessageClassMapFactory::class);
-                $messageNormalizerService->factory([service(SymfonyMessageClassMapFactory::class), 'buildClassMap']);
+                $orkestraConfiguration->service(MessageClassMapInterface::class)
+                    ->factory([service(SymfonyMessageClassMapFactory::class), 'buildClassMap']);
             }
         }
 
