@@ -4,6 +4,7 @@ namespace Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration;
 
 use Morebec\Orkestra\DateTime\ClockInterface;
 use Morebec\Orkestra\DateTime\SystemClock;
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ServiceConfigurator;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ServicesConfigurator;
@@ -14,6 +15,10 @@ use Symfony\Component\DependencyInjection\Loader\Configurator\ServicesConfigurat
  */
 class OrkestraConfiguration
 {
+    /**
+     * @var CompilerPassInterface[]
+     */
+    public array $compilerPasses = [];
     private ?MessageBusConfiguration $messageBusConfiguration;
 
     private ?EventStoreConfiguration $eventStoreConfiguration;
@@ -119,6 +124,12 @@ class OrkestraConfiguration
         return $this->eventProcessingConfiguration;
     }
 
+    public function getProjectionProcessingConfiguration(): ?ProjectionProcessingConfiguration
+    {
+        return $this->eventProcessingConfiguration->projectionProcessingConfiguration ?? null;
+    }
+
+    // SYMFONY SPECIFIC
     public function container(): ContainerConfigurator
     {
         return $this->container;
@@ -151,5 +162,86 @@ class OrkestraConfiguration
     public function service(string $serviceId, ?string $serviceClass = null): ServiceConfigurator
     {
         return $this->services->set($serviceId, $serviceClass);
+    }
+
+    public function compilerPass(CompilerPassInterface $compilerPass): self
+    {
+        $this->compilerPasses[] = $compilerPass;
+
+        return $this;
+    }
+
+    // ORKESTRA SPECIFIC
+
+    /**
+     * Configures a Command handler with the message bus.
+     */
+    public function commandHandler(string $serviceId, string $className = null, bool $autoroute = true): DefaultMessageBusConfiguration
+    {
+        if (!($this->messageBusConfiguration instanceof DefaultMessageBusConfiguration)) {
+            throw new \RuntimeException('The commandHandler method can only be used with the DefaultMessageBusConfiguration');
+        }
+
+        return $this->messageBusConfiguration->commandHandler($serviceId, $className, $autoroute);
+    }
+
+    /**
+     * Configures a Query handler with the message bus.
+     */
+    public function queryHandler(string $serviceId, string $className = null, bool $autoroute = true): DefaultMessageBusConfiguration
+    {
+        if (!($this->messageBusConfiguration instanceof DefaultMessageBusConfiguration)) {
+            throw new \RuntimeException('The queryHandler method can only be used with the DefaultMessageBusConfiguration');
+        }
+
+        return $this->messageBusConfiguration->queryHandler($serviceId, $className, $autoroute);
+    }
+
+    /**
+     * Configures an Event handler with the message bus.
+     */
+    public function eventHandler(string $serviceId, string $className = null, bool $autoroute = true): DefaultMessageBusConfiguration
+    {
+        if (!($this->messageBusConfiguration instanceof DefaultMessageBusConfiguration)) {
+            throw new \RuntimeException('The eventHandler method can only be used with the DefaultMessageBusConfiguration');
+        }
+
+        return $this->messageBusConfiguration->eventHandler($serviceId, $className, $autoroute);
+    }
+
+    /**
+     * Configures a timeout handler with the message bus.
+     */
+    public function timeoutHandler(string $serviceId, string $className = null, bool $autoroute = true): DefaultMessageBusConfiguration
+    {
+        if (!($this->messageBusConfiguration instanceof DefaultMessageBusConfiguration)) {
+            throw new \RuntimeException('The timeoutHandler method can only be used with the DefaultMessageBusConfiguration');
+        }
+
+        return $this->messageBusConfiguration->timeoutHandler($serviceId, $className, $autoroute);
+    }
+
+    /**
+     * Configures a process manager with the message bus.
+     */
+    public function processManager(string $serviceId, string $className = null, bool $autoroute = true): DefaultMessageBusConfiguration
+    {
+        if (!($this->messageBusConfiguration instanceof DefaultMessageBusConfiguration)) {
+            throw new \RuntimeException('The processManager method can only be used with the DefaultMessageBusConfiguration');
+        }
+
+        return $this->messageBusConfiguration->processManager($serviceId, $className, $autoroute);
+    }
+
+    /**
+     * Configures a message handler with the message bus.
+     */
+    public function messageHandler(string $serviceId, ?string $className, bool $autoroute): DefaultMessageBusConfiguration
+    {
+        if (!($this->messageBusConfiguration instanceof DefaultMessageBusConfiguration)) {
+            throw new \RuntimeException('The messageHandler method can only be used with the DefaultMessageBusConfiguration');
+        }
+
+        return $this->messageBusConfiguration->messageHandler($serviceId, $className, $autoroute);
     }
 }

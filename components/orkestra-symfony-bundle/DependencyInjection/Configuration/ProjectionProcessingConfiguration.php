@@ -14,13 +14,23 @@ class ProjectionProcessingConfiguration
         $this->projectorGroups = [];
 
         // Add a default group.
-        $this->configureProjectionGroup(new ProjectorGroupConfiguration(self::DEFAULT_GROUP_NAME));
+        $this->configureProjectorGroup(new ProjectorGroupConfiguration(self::DEFAULT_GROUP_NAME));
     }
 
-    public function configureProjectionGroup(ProjectorGroupConfiguration $configuration): self
+    public function configureProjectorGroup(ProjectorGroupConfiguration $configuration): self
     {
         $this->projectorGroups[$configuration->groupName] = $configuration;
 
         return $this;
+    }
+
+    public function getProjectorGroupConfiguration(string $groupName): ProjectorGroupConfiguration
+    {
+        $group = $this->projectorGroups[$groupName] ?? null;
+        if (!$group) {
+            throw new \InvalidArgumentException('Projector Group not found. Did you configure it properly ?');
+        }
+
+        return $group;
     }
 }

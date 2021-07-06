@@ -10,11 +10,15 @@ use Morebec\Orkestra\Messaging\Context\MessageBusContextManagerInterface;
 use Morebec\Orkestra\Messaging\Context\MessageBusContextProvider;
 use Morebec\Orkestra\Messaging\Context\MessageBusContextProviderInterface;
 use Morebec\Orkestra\Messaging\MessageBusInterface;
+use Morebec\Orkestra\Messaging\Normalization\ClassMapMessageNormalizer;
+use Morebec\Orkestra\Messaging\Normalization\MessageNormalizerInterface;
 use Morebec\Orkestra\Messaging\Routing\HandleMessageMiddleware;
 use Morebec\Orkestra\Messaging\Routing\MessageHandlerRouteBuilder;
 use Morebec\Orkestra\Messaging\Routing\MessageRouteCollection;
 use Morebec\Orkestra\Messaging\Routing\RouteMessageMiddleware;
+use Morebec\Orkestra\Messaging\Transformation\MessagingTransformationMiddleware;
 use Morebec\Orkestra\Messaging\Validation\ValidateMessageMiddleware;
+use Morebec\Orkestra\SymfonyBundle\DependencyInjection\SymfonyMessageClassMapFactory;
 use Morebec\Orkestra\SymfonyBundle\Messaging\MessageRouterCache;
 use Morebec\Orkestra\SymfonyBundle\OrkestraKernel;
 use ReflectionException;
@@ -45,6 +49,9 @@ class MessageBusConfigurationProcessor
         // REGISTER MESSAGE BUS
         $messageBusService = $orkestraConfiguration->service(MessageBusInterface::class, $messageBusConfiguration->implementationClassName);
 
+        // Message Normalizer
+        $this->processMessageNormalizer($orkestraConfiguration, $messageBusConfiguration);
+
         // REGISTER MIDDLEWARE
         $this->processMiddleware($orkestraConfiguration, $messageBusConfiguration, $messageBusService);
 
@@ -56,9 +63,12 @@ class MessageBusConfigurationProcessor
 
         // Validators
         $this->processMessageValidators($orkestraConfiguration, $messageBusConfiguration);
+
+        // Transformers
+        $this->processMessagingTransformers($orkestraConfiguration, $messageBusConfiguration);
     }
 
-    public function processMiddleware(OrkestraConfiguration $orkestraConfiguration, MessageBusConfiguration $messageBusConfiguration, ServiceConfigurator $messageBusService): void
+    protected function processMiddleware(OrkestraConfiguration $orkestraConfiguration, MessageBusConfiguration $messageBusConfiguration, ServiceConfigurator $messageBusService): void
     {
         $middlewareAsServiceReference = array_map(static function (string $middlewareClassName) use ($orkestraConfiguration) {
             if ($middlewareClassName === BuildMessageBusContextMiddleware::class) {
@@ -99,7 +109,7 @@ class MessageBusConfigurationProcessor
      * @throws JsonException
      * @throws ReflectionException
      */
-    public function processMessageHandlers(
+    protected function processMessageHandlers(
         OrkestraConfiguration $orkestraConfiguration,
         MessageBusConfiguration $messageBusConfiguration
     ): void {
@@ -153,7 +163,7 @@ class MessageBusConfigurationProcessor
         }
     }
 
-    private function processMessageAuthorizers(
+    protected function processMessageAuthorizers(
         OrkestraConfiguration $orkestraConfiguration,
         MessageBusConfiguration $messageBusConfiguration
     ): void {
@@ -186,7 +196,7 @@ class MessageBusConfigurationProcessor
         ]);
     }
 
-    private function processMessageValidators(
+    protected function processMessageValidators(
         OrkestraConfiguration $orkestraConfiguration,
         MessageBusConfiguration $messageBusConfiguration
     ): void {
@@ -217,5 +227,79 @@ class MessageBusConfigurationProcessor
         $validateMessageMiddlewareService->args([
             $validatorServiceReferences,
         ]);
+    }
+
+    protected function processMessagingTransformers(
+        OrkestraConfiguration $orkestraConfiguration,
+        MessageBusConfiguration $messageBusConfiguration
+    ): void {
+        if (!($messageBusConfiguration instanceof DefaultMessageBusConfiguration)) {
+            return;
+        }
+
+        try {
+            $messagingTransformationMiddlewareService = $orkestraConfiguration
+                ->container()
+                ->services()
+                ->get(MessagingTransformationMiddleware::class)
+            ;
+        } catch (ServiceNotFoundException $exception) {
+            return;
+        }
+
+        $transformerServiceReferences = [];
+        foreach ($messageBusConfiguration->messagingTransformers as $messagingTransformer) {
+            try {
+                $orkestraConfiguration->container()->services()->get($messagingTransformer);
+            } catch (ServiceNotFoundException $exception) {
+                $orkestraConfiguration->service($messagingTransformer);
+            }
+            $transformerServiceReferences[] = service($messagingTransformer);
+        }
+
+        $messagingTransformationMiddlewareService->args([
+            $transformerServiceReferences,
+        ]);
+    }
+
+    protected function processMessageNormalizer(
+        OrkestraConfiguration $orkestraConfiguration,
+        MessageBusConfiguration $messageBusConfiguration
+    ): void {
+        $messageNormalizerConfiguration = $messageBusConfiguration->messageNormalizerConfiguration;
+
+        try {
+            $messageNormalizerService = $orkestraConfiguration->container()->services()->get(MessageNormalizerInterface::class);
+        } catch (ServiceNotFoundException $exception) {
+            $messageNormalizerService = $orkestraConfiguration->service(
+                MessageNormalizerInterface::class,
+                $messageNormalizerConfiguration->implementationClassName
+            );
+
+            if ($messageNormalizerConfiguration->implementationClassName === ClassMapMessageNormalizer::class) {
+                $orkestraConfiguration->service(SymfonyMessageClassMapFactory::class);
+                $messageNormalizerService->factory([SymfonyMessageClassMapFactory::class, 'buildClassMap']);
+            }
+        }
+
+        // Add normalizers
+        foreach ($messageNormalizerConfiguration->normalizers as $normalizerClassName) {
+            try {
+                $orkestraConfiguration->container()->services()->get($normalizerClassName);
+            } catch (ServiceNotFoundException $exception) {
+                $orkestraConfiguration->service($normalizerClassName);
+                $messageNormalizerService->call('addNormalizer', [service($normalizerClassName)]);
+            }
+        }
+
+        // Add denormalizers
+        foreach ($messageNormalizerConfiguration->denormalizers as $denormalizerClassName) {
+            try {
+                $orkestraConfiguration->container()->services()->get($denormalizerClassName);
+            } catch (ServiceNotFoundException $exception) {
+                $orkestraConfiguration->service($denormalizerClassName);
+                $messageNormalizerService->call('addDenormalizer', [service($denormalizerClassName)]);
+            }
+        }
     }
 }

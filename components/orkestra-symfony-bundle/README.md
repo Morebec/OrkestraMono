@@ -58,28 +58,58 @@ while still allowing all the power of Symfony.
 
 #### Step 1: Create a configuration class for the Module
 1. Create a directory under `src` with the name of your Module. E.g. `Shipping'.
-2. Inside this directory, create a class implementing the `SymfonyOrkestraModuleConfiguratorInterface`.
+2. Inside this directory, create a class implementing the `OrkestraModuleConfiguratorInterface`.
 This class will be used by the bundle to register the service dependencies of the module with Symfony's service container
 as well as the controller routes with the Symfony Router *(not to be confused with `MessageRoutes`)*.
+
 ```php
-class SandboxModuleConfiguratorConfigurator implements SymfonyOrkestraModuleConfiguratorInterface
+class ShippingModuleConfigurator implements OrkestraModuleConfiguratorInterface
 {
-    public function configureContainer(ContainerConfigurator $container): void
+    public function configureContainer(OrkestraConfiguration $conf): void
     {
-        $conf = new SymfonyOrkestraModuleContainerConfigurator($container);
+        $conf->useSystemClock();
+        
+        // Configure the message bus
+        $conf->configureMessageBus(
+            (new DefaultMessageBusConfiguration())
+                ->withMiddleware(YourCustomMiddleware::class)
+        );
+        
+        // Configure the event store
+        $conf->configureEventStore(
+            (new EventStoreConfiguration())
+                    ->usingImplementation(PostgreSqlEventStore::class)
+                    ->decoratedBy(UpcastingEventStoreDecorator::class)
+                    ->decoratedBy(MessageBusContextEventStoreDecorator::class)
+                    ->withUpcaster(YourEventUpcaster::classs)
+        );
+        
+        // Configure Event Processing.
+        $conf->configureEventProcessing(
+            (new EventProcessingConfiguration())
+                ->usingEventStorePositionStorageImplementation(PostgreSqlEventStorePositionStorage::class)
+                
+                // Configure Projection Processing
+                ->configureProjectionProcessing(
+                    (new ProjectionProcessingConfiguration())
+                        ->configureProjectorGroup(
+                        (new ProjectorGroupConfiguration())
+                            ->withName('api')
+                            ->withProjector(YourProjector::class)
+                        )
+                )
+        );
 
-        $conf->services()
-            ->defaults()
-            ->autowire()
-            ->autoconfigure()
-        ;
-
-        $conf->commandHandler(SandBoxMessageHandler::class)
+        $conf->commandHandler(ShippingMessageHandler::class)
             ->autoroute()
             ->disableMethodRoute('__invoke')
         ;
 
-        $conf->consoleCommand(SandboxConsoleCommand::class);
+        $conf->consoleCommand(ShippingConsoleCommand::class);
+        
+        
+        // Configure a service using Symfony's container as per usual.
+        $conf->service(LoggerInterface::class, YourLogger::class)->args('%env.logDir%)');
 
     }
 
@@ -88,139 +118,194 @@ class SandboxModuleConfiguratorConfigurator implements SymfonyOrkestraModuleConf
     }
 }
 ```
-> Note: The bundle provides a class `SymfonyOrkestraModuleContainerConfigurator` that allows to fluently define services
+> Note: The `OrkestraConfiguration` class provides utility methods that allows to fluently define services
 > with a language closer to the technical requirements of Orkestra with methods such as:
 > - `$config->eventHandler(/* ... */)`
 > - `$config->commandHandler(/* ... */)`
 > - `$config->queryHandler,(/* ... */)`
 > - `$config->processManager(/* ... */)`
-> - `$config->messageValidator(/* ... */)`
-> - `$config->messageAuthorizer(/* ... */)`
-> - `$config->messageHandlerInterceptor(/* ... */)`
 > - `$config->upcaster(/* ... */)`
 > - `$config->repository(/* ... */)`
 > - etc.
 > 
-> It can be instantiated easily by doing the following:
-> ```php
-> $config = new SymfonyOrkestraModuleContainerConfigurator($container); 
-> ```
+> These methods are shorthands for the longer versions that require using the Configuration classes.
 
 #### Step 2: Enable the Module
 Then, enable the module by adding its Configurator to the list of registered Module Configurators in the `config/modules.php` file of your project:
 ```php
 return [
     // ...
-    SandboxModuleConfiguratorConfigurator::class => ['all' => true],
+    ShippingModuleConfiguratorConfigurator::class => ['all' => true],
 ];
 ``` 
 > Module Configurations are registered just like Symfony Bundles allowing you to provide the environment in which they should exist.
 > If you need a different configurator on a per-environment basis, you can simply check for the environment using `$_ENV['APP_ENV]` in the configurators code
 > or define different `ModuleConfigurator` classes that are environment specific.
 
-### Adding Compiler Passes
-The module configurator do not currently have a specific method to add compiler passes (as per Symfony,s limitations), instead, you can rely on the `ContainerConfigurator`
-to register custom `Container Extensions`. 
-
-For more information on this please refer to the Official Symfony Documentation.
 
 ### Configuring the Message Bus
-The `MessageBusInterface` can be configured to receive more Middleware.
-By default, it receives the out of the box Orkestra middleware in the following order:
-
-- `LoggerMiddleware`
-- `BuildMessageBusContextMiddleware`
-- `ValidateMessageMiddleware`
-- `AuthorizeMessageMiddleware`
-- `RouteMessageMiddleware`
-- `HandleMessageMiddleware`
-
-To specify the middleware in a custom fashion, you can do *one* the following in your module configurators
-:
-```php
-// Specify middleware as constructor arguments:
-$services->get(MessageBusInterface::class)->args([/* custom middleware */]);
-
-// To append a specific middleware
-$services->get(MessageBusInterface::class)->call('appendMiddleware', [/* custom middleware */]);
-
-// To prepend  a specific middleware
-$services->get(MessageBusInterface::class)->call('prependMiddleware', [/* custom middleware */]);
-
-// To completely replace middleware (this would be similar to the constructor arguments, although less performant).
-$services->get(MessageBusInterface::class)->call('replaceMiddleware', [/* custom middleware */]);
-```
-
-#### Configuring the Message Router
-By default, this bundle does not load any routes, unless you either tag your message handler services with both `orkestra.messaging.message_handler` and `orkestra.messaging.routing.autoroute` 
-or using if you are using the `SymfonyOrkestraModuleContainerConfigurator` utility with a call to the `autoroute` method:
+The configuration of the message bus can be done using Symfony's dependency injection by providing services
+and wiring them. However, this can be tedious to perform on every project.
+This bundle provides an easy way to define the middleware, message interceptors and dependencies of the message
+bus through a fluent API using the `MessageBusConfiguration` class:
 
 ```php
-// The autoroute method call is what autoregisters the route.
-$config->commandHandler(YourHandler::class)->autoroute();
+/** @var OrkestraConfiguration $configuration */
+$configuration->configureMessageBus(
+    (new MessageBusConfiguration())
+        ->withMiddleware(YourCustomMiddleware::class)
+);        
 ```
 
-When doing this, the bundle will inspect the methods of these services, and infer routes from them.
+Alternatively, there is also an implementation of this MessageBusConfiguration
+that setups up all the default middleware of Orkestra, the `DefaultMessageBusConfiguration`:
 
-The message bus implementation provided by this bundle will also cache these automatically resolved routes
-in Symfony's cache for every subsequent requests, once the container is built.
+```php
+/** @var OrkestraConfiguration $configuration */
+$configuration->configureMessageBus(
+    (MessageBusConfiguration::defaultConfiguration())
+        ->withMiddleware(YourCustomMiddleware::class)
+);
 
-If you want to instead provide the routes manually, simply create a configurator class as per [Symfony's documentation on Service configurators](https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&ved=2ahUKEwjj3bGpo-_vAhUGpZ4KHXq6CgoQFjABegQIAhAD&url=https%3A%2F%2Fsymfony.com%2Fdoc%2Fcurrent%2Fservice_container%2Fconfigurators.html&usg=AOvVaw38HZe2zCFZ6WrboNk28cVu). 
+// Or 
+$configuration->configureMessageBus(
+    (DefaultMessageBusConfiguration::defaultConfiguration())
+        ->withMiddleware(YourCustomMiddleware::class)
+        // Command Handlers
+        ->commandHandler(YourCommandHandler::class)
+        // Query Handlers
+        ->commandHandler(YourQueryHandler::class)
+        // Event Handlers
+        ->eventHandlers(YourEventHandler::class)
+        // Timeout Handlers
+        ->timeoutHandler(YourTimeoutHandler::class) 
+        // Generic Message Handlers
+        ->eventHandlers(YourEventHandler::class)
+        // Message Handler Interceptors
+        ->messageHandlerInterceptor(YourInterceptor::class)
+        // Validators
+        ->messageValidator(YourValidator::class)
+        // Authorizers
+        ->messageAuthorizer(YourAuthorizer::class)
+        // Transformers
+        ->messageTransformer(YourTransformer::class)
+);
+```
 
+> The benefit of using the `DefaultMessageBusConfiguration` is that it allows to quickly set up a working
+> message bus as well as simplifying the way to define message handlers so that they can be routed automatically.
+> The same autoconfiguration applies for message validators, authorizers, and messaging transformers.
+
+### Defining message bus dependencies in modules
+Normally the configuration of the message bus is defined in a `Core` module that serves as a cross-cutting 
+dependency-builder module, however, most message handlers are usually defined in their appropriate modules.
+
+In the case on way to define register them with the message bus is to do the following:
+
+```php
+/** @var OrkestraConfiguration $configuration */
+$configuration->getMessageBusConfiguration()
+        ->withMessageHandler(YourMessageHandler::class)
+;
+
+// Alternatively using the helper methods of the OrkestraConfiguration class
+// This will behind the scene find the message bus configuration and attach
+// the handler to it.
+$configuration
+    ->messageHandler(YourMessageHandler::class)
+;
+```
+
+### Configuring Timeout Processing
+Timeout Handlers being message handlers have to be registered with the message bus. However they have dependencies for
+infrastructure concerns such as processing that need to be defined in a separate configuraiton:
+
+```php
+/** @var OrkestraConfiguration $configuration */
+$configuration
+    ->configureTimeoutProcessing(
+        (new TimeoutProcessingConfiguration())
+            ->usingManagerImplementation(TimeoutManager::class)
+            // Alternatively for the manager you can use the default implementation (TimeoutManager):
+            ->usingDefaultManagerImplementation()
+            
+            // Storage
+            ->usingStorageImplementation(PostgreSqlTimeoutStorage::class)
+    );
+```
+
+### Configuring the Event Store
+The configuration of the event store follows the same configuration principles as the message bus:
+
+```php
+/** @var OrkestraConfiguration $configuration */
+$configuration->configureEventStore(
+    (new EventStoreConfiguration())
+            ->usingImplementation(PostgreSqlEventStore::class)
+            
+            // Decorators priority ordered by order of declaration.
+            ->decoratedBy(UpcastingEventStoreDecorator::class)
+            ->decoratedBy(MessageBusContextEventStoreDecorator::class)
+            
+            // The chain is done in order of declaration.
+            // No need to define the UpcasterChain, it is automatically registered.
+            ->withUpcaster(YourEventUpcaster::classs)
+);
+```
+### Configuring Event Processing
+```php
+/** @var OrkestraConfiguration $configuration */
+$configuration->cconfigureEventProcessing(
+    (new EventProcessingConfiguration())
+        
+        // Position storage for Tracking Event Processors.
+        ->usingEventStorePositionStorageImplementation(PostgreSqlEventStorePositionStorage::class)
+        
+        // Configure Projection Processing
+        ->configureProjectionProcessing(
+            (new ProjectionProcessingConfiguration())
+                ->configureProjectorGroup(
+                (new ProjectorGroupConfiguration())
+                    ->withName('api')
+                    ->withProjector(YourProjector::class)
+                )
+        )
+);
+```
+
+#### Configuring Projectors
+Projecting events is part of the event processing configuration and benefits from a tailored configuration class.
+This configuration class is used in order to easily define projectors that need to be grouped together as a single processing unit.
+
+When using the `ProjectionProcessingConfiguration` class, the groups will automatically be registered in a registry that can then be queried to dynamically resolve these groups.
+
+One of the benefit is to be able to create a command like: `orkestra:projection-processor` console command that allows to
+control the projector groups by name.
+
+To configure the projector groups outside a core module you can do the following:
+```php
+// Adding a new projector group
+
+/** @var OrkestraConfiguration $configuration */
+$configuration->getProjectionProcessingConfiguration()
+    ->configureProjectorGroup(
+    (new ProjectorGroupConfiguration())
+        ->withName('api')
+        ->withProjector(YourProjector::class)
+);
+```
+
+### Adding Compiler Passes
+To add compiler passes, one can simply use the `OrkestraConfiguration` class:
+
+```php
+/** @var OrkestraConfiguration $configuration */
+$configuration->compilerPass(new YourCompilerPass());
+```
+Alternatively, you can rely on Symfony's `ContainerConfigurator` to register custom `Container Extensions`. 
+
+For more information on this please refer to the Official Symfony Documentation.
 
 #### Configuring the Message Normalizer
 The `MessageNormalizerInterface` can be configured to receive more `NormalizerInterface` and `DenormalizerInterface` as per your needs.
 Simply create a configurator class as per [Symfony's documentation on Service configurators](https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&ved=2ahUKEwjj3bGpo-_vAhUGpZ4KHXq6CgoQFjABegQIAhAD&url=https%3A%2F%2Fsymfony.com%2Fdoc%2Fcurrent%2Fservice_container%2Fconfigurators.html&usg=AOvVaw38HZe2zCFZ6WrboNk28cVu). 
-
-### Adding Validators
-The `SymfonyOrkestraModuleContainerConfigurator` provides a method to automatically register validators: 
-`SymfonyOrkestraModuleContainerConfigurator::messageValidator`.
-
-This is done behind the scene through tags and autowiring of tagged services.
-
-Orkestra does not provide a default implementation of a Validation library simply a set of interfaces.
-Here's an example of a validator using Symfony's Validator:
-
-```php
-class SandboxCommandValidator implements MessageValidatorInterface
-{
-    /**
-     * @var ValidatorInterface
-     */
-    private $validator;
-
-    public function __construct(ValidatorInterface $validator)
-    {
-        $this->validator = $validator;
-    }
-
-    public function validate(essageInterface $message, MessageHeaders $headers): MessageValidationErrorList
-    {
-        /** @var SandboxCommand $command */
-        $command = $message;
-
-
-        $metadata = $this->validator->getMetadataFor(SandboxCommand::class);
-        $metadata->addPropertyConstraint('userId', new Assert\NotBlank());
-
-        $errors = $this->validator->validate($command);
-
-        $c = (new Collection($errors))
-            ->map(static function (ConstraintViolation $v) {
-                return new MessageValidationError($v->getMessage(), $v->getPropertyPath(), $v->getInvalidValue());
-            })
-            ->flatten()
-        ;
-
-        return new MessageValidationErrorList($c);
-    }
-
-    public function supports(MessageInterface $message, MessageHeaders $headers): bool
-    {
-        return $message instanceof SandboxCommand;
-    }
-}
-```
-
-## Adding Authorizers
-To add authorizers, you can follow the exact same process as the Validators.

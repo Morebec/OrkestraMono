@@ -6,6 +6,7 @@ use Morebec\Orkestra\Messaging\Authorization\AuthorizeMessageMiddleware;
 use Morebec\Orkestra\Messaging\MessageBus;
 use Morebec\Orkestra\Messaging\Routing\HandleMessageMiddleware;
 use Morebec\Orkestra\Messaging\Routing\LoggingMessageHandlerInterceptor;
+use Morebec\Orkestra\Messaging\Transformation\MessagingTransformerInterface;
 use Morebec\Orkestra\Messaging\Validation\ValidateMessageMiddleware;
 
 class DefaultMessageBusConfiguration extends MessageBusConfiguration
@@ -24,6 +25,9 @@ class DefaultMessageBusConfiguration extends MessageBusConfiguration
     /** @var string[] */
     public array $messageHandlerInterceptors = [];
 
+    /** @var string[] */
+    public array $messagingTransformers = [];
+
     public function __construct()
     {
         parent::__construct();
@@ -31,6 +35,7 @@ class DefaultMessageBusConfiguration extends MessageBusConfiguration
             ->withBuildMessageBusContextMiddleware()
             ->withLoggerMiddleware()
             ->withValidateMessageMiddleware()
+            ->withMessagingTransformationMiddleware()
             ->withAuthorizeMessageMiddleware()
             ->withRouteMessageMiddleware()
             ->withHandleMessageMiddleware()
@@ -121,11 +126,25 @@ class DefaultMessageBusConfiguration extends MessageBusConfiguration
     }
 
     /**
+     * Configures a message handler.
+     *
      * @return $this
      */
     public function messageHandler(string $serviceId, ?string $className, bool $autoroute): self
     {
         $this->messageHandlers[$serviceId] = new MessageBusHandlerConfiguration($serviceId, $className, $autoroute);
+
+        return $this;
+    }
+
+    /**
+     * Configures a {@link MessagingTransformerInterface}.
+     *
+     * @return $this
+     */
+    public function messagingTransformer(string $className): self
+    {
+        $this->messagingTransformers[] = $className;
 
         return $this;
     }

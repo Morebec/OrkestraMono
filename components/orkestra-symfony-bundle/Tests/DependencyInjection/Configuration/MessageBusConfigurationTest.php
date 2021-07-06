@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Morebec\OrkestraSymfonyBundle\Module;
+namespace Tests\Morebec\OrkestraSymfonyBundle\DependencyInjection\Configuration;
 
 use Morebec\Orkestra\Messaging\Authorization\AuthorizeMessageMiddleware;
 use Morebec\Orkestra\Messaging\MessageBus;
@@ -8,6 +8,7 @@ use Morebec\Orkestra\Messaging\Middleware\LoggerMiddleware;
 use Morebec\Orkestra\Messaging\Validation\ValidateMessageMiddleware;
 use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\DefaultMessageBusConfiguration;
 use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\MessageBusConfiguration;
+use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\MessageNormalizerConfiguration;
 use PHPUnit\Framework\TestCase;
 
 class MessageBusConfigurationTest extends TestCase
@@ -23,6 +24,18 @@ class MessageBusConfigurationTest extends TestCase
             LoggerMiddleware::class,
             ValidateMessageMiddleware::class,
         ], $configuration->middleware);
+    }
+
+    public function testConfigureMessageNormalizer(): void
+    {
+        $configuration = new MessageBusConfiguration();
+
+        $messageNormalizerConfiguration = new MessageNormalizerConfiguration();
+        $messageNormalizerConfiguration->usingDefaultImplementation();
+
+        $configuration->configureMessageNormalizer($messageNormalizerConfiguration);
+
+        self::assertEquals($messageNormalizerConfiguration, $configuration->messageNormalizerConfiguration);
     }
 
     public function testUsingImplementation(): void

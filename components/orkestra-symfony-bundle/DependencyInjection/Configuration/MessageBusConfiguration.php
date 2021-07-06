@@ -8,6 +8,7 @@ use Morebec\Orkestra\Messaging\MessageBus;
 use Morebec\Orkestra\Messaging\Middleware\LoggerMiddleware;
 use Morebec\Orkestra\Messaging\Routing\HandleMessageMiddleware;
 use Morebec\Orkestra\Messaging\Routing\RouteMessageMiddleware;
+use Morebec\Orkestra\Messaging\Transformation\MessagingTransformationMiddleware;
 use Morebec\Orkestra\Messaging\Validation\ValidateMessageMiddleware;
 
 class MessageBusConfiguration
@@ -17,9 +18,12 @@ class MessageBusConfiguration
     /** @var string[] */
     public array $middleware;
 
+    public ?MessageNormalizerConfiguration $messageNormalizerConfiguration;
+
     public function __construct()
     {
         $this->middleware = [];
+        $this->configureMessageNormalizer((new MessageNormalizerConfiguration())->usingDefaultImplementation());
         $this->usingDefaultImplementation();
     }
 
@@ -48,6 +52,13 @@ class MessageBusConfiguration
     public function usingImplementation(string $className): self
     {
         $this->implementationClassName = $className;
+
+        return $this;
+    }
+
+    public function configureMessageNormalizer(MessageNormalizerConfiguration $configuration): self
+    {
+        $this->messageNormalizerConfiguration = $configuration;
 
         return $this;
     }
@@ -104,6 +115,16 @@ class MessageBusConfiguration
     public function withRouteMessageMiddleware(): self
     {
         return $this->withMiddleware(RouteMessageMiddleware::class);
+    }
+
+    /**
+     * Configures this message bus to use the {@link MessagingTransformationMiddleware}.
+     *
+     * @return $this
+     */
+    public function withMessagingTransformationMiddleware(): self
+    {
+        return $this->withMiddleware(MessagingTransformationMiddleware::class);
     }
 
     /**

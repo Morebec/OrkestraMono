@@ -147,5 +147,10 @@ class OrkestraKernel extends BaseKernel
         // Apply configuration here since multiple module can redefine the configuration at any point.
         $processor = new OrkestraConfigurationProcessor($this);
         $processor->processConfiguration($orkestraConfiguration);
+
+        // Add Compiler PAsses
+        foreach ($orkestraConfiguration->compilerPasses as $compilerPass) {
+            $this->container->addCompilerPass($compilerPass);
+        }
     }
 }
