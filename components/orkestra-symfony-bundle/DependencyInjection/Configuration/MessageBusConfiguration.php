@@ -157,6 +157,11 @@ class MessageBusConfiguration
         return $this->withMiddleware(HandleMessageMiddleware::class);
     }
 
+    /**
+     * Replaces a middleware in this configuration.
+     *
+     * @return $this
+     */
     public function withMiddlewareReplacedBy(string $replacedMiddlewareClassName, string $substituteMiddlewareClassName): self
     {
         foreach ($this->middleware as $index => $m) {
@@ -164,6 +169,54 @@ class MessageBusConfiguration
                 $this->middleware[$index] = $substituteMiddlewareClassName;
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * Configures the message bus to use a middleware and order it right after a given preceding one.
+     *
+     * @return $this
+     */
+    public function withMiddlewareAfter(string $middleware, string $precedingMiddleware): self
+    {
+        $foundIndex = null;
+        foreach ($this->middleware as $key => $m) {
+            if ($m === $precedingMiddleware) {
+                $foundIndex = $key;
+                break;
+            }
+        }
+
+        if ($foundIndex === null) {
+            throw new \InvalidArgumentException("Middleware \"$precedingMiddleware\" was not found.");
+        }
+
+        array_splice($this->middleware, $foundIndex + 1, 0, $middleware);
+
+        return $this;
+    }
+
+    /**
+     * Configures the message bus to use a middleware and order it right before a given following one.
+     *
+     * @return $this
+     */
+    public function withMiddlewareBefore(string $middleware, string $followingMiddleware): self
+    {
+        $foundIndex = null;
+        foreach ($this->middleware as $key => $m) {
+            if ($m === $followingMiddleware) {
+                $foundIndex = $key;
+                break;
+            }
+        }
+
+        if ($foundIndex === null) {
+            throw new \InvalidArgumentException("Middleware \"$followingMiddleware\" was not found.");
+        }
+
+        array_splice($this->middleware, $foundIndex, 0, $middleware);
 
         return $this;
     }
