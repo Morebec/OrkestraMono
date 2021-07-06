@@ -78,7 +78,7 @@ class MessageBusConfigurationProcessor
 
     protected function processMiddleware(OrkestraConfiguration $orkestraConfiguration, MessageBusConfiguration $messageBusConfiguration, ServiceConfigurator $messageBusService): void
     {
-        $middlewareAsServiceReference = array_map(static function (string $middlewareClassName) use ($orkestraConfiguration) {
+        $middlewareAsServiceReference = array_map(function (string $middlewareClassName) use ($orkestraConfiguration) {
             if ($middlewareClassName === BuildMessageBusContextMiddleware::class) {
                 // Register dependencies.
                 try {
@@ -97,6 +97,7 @@ class MessageBusConfigurationProcessor
                     $orkestraConfiguration->container()->services()->get(MessageRouterInterface::class);
                 } catch (ServiceNotFoundException $exception) {
                     $orkestraConfiguration->service(MessageRouterInterface::class, CachedMessageRouter::class);
+                    $orkestraConfiguration->service(MessageRouterCache::class)->args([$this->kernel->getCacheDir()]);
                 }
 
                 try {
