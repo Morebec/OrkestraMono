@@ -43,7 +43,7 @@ class SymfonyMessageClassMapFactory
     public function buildClassMap(): MessageClassMapInterface
     {
         $sourceDir = $this->sourceDir;
-        $map = $this->cache->get(self::CACHE_KEY, static function (ItemInterface $item) use ($sourceDir) {
+        $map = $this->cache->get(self::CACHE_KEY, function (ItemInterface $item) use ($sourceDir) {
             $item->expiresAfter(null);
             $classes = ClassDiscoverer::discover($sourceDir);
 

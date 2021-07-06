@@ -294,7 +294,7 @@ class MessageBusConfigurationProcessor
 
             if ($messageNormalizerConfiguration->implementationClassName === ClassMapMessageNormalizer::class) {
                 $orkestraConfiguration->service(SymfonyMessageClassMapFactory::class);
-                $messageNormalizerService->factory([SymfonyMessageClassMapFactory::class, 'buildClassMap']);
+                $messageNormalizerService->factory([service(SymfonyMessageClassMapFactory::class), 'buildClassMap']);
             }
         }
 
