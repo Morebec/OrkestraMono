@@ -26,6 +26,7 @@ use Morebec\Orkestra\Messaging\Routing\RouteMessageMiddleware;
 use Morebec\Orkestra\Messaging\Transformation\MessagingTransformationMiddleware;
 use Morebec\Orkestra\Messaging\Validation\ValidateMessageMiddleware;
 use Morebec\Orkestra\SymfonyBundle\DependencyInjection\SymfonyMessageClassMapFactory;
+use Morebec\Orkestra\SymfonyBundle\Messaging\CachedMessageRouter;
 use Morebec\Orkestra\SymfonyBundle\Messaging\MessageRouterCache;
 use Morebec\Orkestra\SymfonyBundle\OrkestraKernel;
 use ReflectionException;
@@ -95,7 +96,7 @@ class MessageBusConfigurationProcessor
                 try {
                     $orkestraConfiguration->container()->services()->get(MessageRouterInterface::class);
                 } catch (ServiceNotFoundException $exception) {
-                    $orkestraConfiguration->service(MessageRouterInterface::class, MessageRouter::class);
+                    $orkestraConfiguration->service(MessageRouterInterface::class, CachedMessageRouter::class);
                 }
 
                 try {
@@ -191,7 +192,7 @@ class MessageBusConfigurationProcessor
         }
 
         try {
-            $authorizeMessageMiddlewareService = $orkestraConfiguration
+            $orkestraConfiguration
                 ->container()
                 ->services()
                 ->get(AuthorizeMessageMiddleware::class)
