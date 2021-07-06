@@ -246,8 +246,8 @@ $configuration
 
 
 ### Configuring Timeout Processing
-Timeout Handlers being message handlers have to be registered with the message bus. However they have dependencies for
-infrastructure concerns such as processing that need to be defined in a separate configuraiton:
+Timeout Handlers being message handlers have to be registered with the message bus. However, they have dependencies for
+infrastructure concerns such as processing that need to be defined in a separate configuration:
 
 ```php
 /** @var OrkestraConfiguration $configuration */

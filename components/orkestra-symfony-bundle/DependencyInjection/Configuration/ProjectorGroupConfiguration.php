@@ -34,8 +34,10 @@ class ProjectorGroupConfiguration
         return $this;
     }
 
-    public function withProjector(string $projectorClassName): void
+    public function withProjector(string $projectorClassName): self
     {
         $this->projectors[] = $projectorClassName;
+
+        return $this;
     }
 }
