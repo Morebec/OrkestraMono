@@ -64,7 +64,12 @@ class MessageRouterCache
      */
     public function loadRoutes(): MessageRouteCollection
     {
-        $data = json_decode(file_get_contents($this->getCacheFile()), true, 512, \JSON_THROW_ON_ERROR);
+        $cacheFile = $this->getCacheFile();
+        if (file_exists($cacheFile)) {
+            return new MessageRouteCollection([]);
+        }
+
+        $data = json_decode(file_get_contents($cacheFile), true, 512, \JSON_THROW_ON_ERROR);
         $routes = [];
         foreach ($data as $datum) {
             $routes[] = $this->normalizer->denormalize($datum, MessageRouteInterface::class);

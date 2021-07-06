@@ -20,7 +20,6 @@ use Morebec\Orkestra\Messaging\Routing\HandleMessageMiddleware;
 use Morebec\Orkestra\Messaging\Routing\MessageHandlerProviderInterface;
 use Morebec\Orkestra\Messaging\Routing\MessageHandlerRouteBuilder;
 use Morebec\Orkestra\Messaging\Routing\MessageRouteCollection;
-use Morebec\Orkestra\Messaging\Routing\MessageRouter;
 use Morebec\Orkestra\Messaging\Routing\MessageRouterInterface;
 use Morebec\Orkestra\Messaging\Routing\RouteMessageMiddleware;
 use Morebec\Orkestra\Messaging\Transformation\MessagingTransformationMiddleware;
