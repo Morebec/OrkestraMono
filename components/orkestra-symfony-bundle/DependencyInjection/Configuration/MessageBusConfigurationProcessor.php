@@ -3,7 +3,9 @@
 namespace Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration;
 
 use JsonException;
+use Morebec\Orkestra\Messaging\Authorization\AuthorizationDecisionMakerInterface;
 use Morebec\Orkestra\Messaging\Authorization\AuthorizeMessageMiddleware;
+use Morebec\Orkestra\Messaging\Authorization\VetoAuthorizationDecisionMaker;
 use Morebec\Orkestra\Messaging\Context\BuildMessageBusContextMiddleware;
 use Morebec\Orkestra\Messaging\Context\MessageBusContextManager;
 use Morebec\Orkestra\Messaging\Context\MessageBusContextManagerInterface;
@@ -208,9 +210,14 @@ class MessageBusConfigurationProcessor
             $authorizerServiceReferences[] = service($authorizerClassName);
         }
 
-        $authorizeMessageMiddlewareService->args([
-            $authorizerServiceReferences,
-        ]);
+        try {
+            $orkestraConfiguration->container()->services()->get(AuthorizationDecisionMakerInterface::class);
+        } catch (ServiceNotFoundException $exception) {
+            $orkestraConfiguration->service(
+                AuthorizationDecisionMakerInterface::class,
+                VetoAuthorizationDecisionMaker::class
+            )->args([$authorizerServiceReferences]);
+        }
     }
 
     protected function processMessageValidators(
