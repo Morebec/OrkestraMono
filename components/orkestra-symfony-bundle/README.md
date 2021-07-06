@@ -216,6 +216,35 @@ $configuration
 ;
 ```
 
+
+#### Configuring the Message Normalizer
+The `MessageNormalizerInterface` can be configured to receive more `NormalizerInterface` and `DenormalizerInterface` as per your needs:
+
+```php
+/** @var OrkestraConfiguration $configuration */
+$configuration->getMessageBusConfiguration()
+        ->configureMessageNormalizer(
+            (new MessageNormalizerConfiguration())
+                ->usingDefaultImplementation()
+                ->withNormalizationPair(
+                    YourNormalizer::class,
+                    YourDenormalizer::class
+                )
+                // Or
+                ->withNormalizer(YourNormalizer::class)
+                ->withDenormalizer(YourDenormalizer::class)
+        )
+;
+
+// Alternatively using the helper methods of the OrkestraConfiguration class
+// This will behind the scene find the message bus configuration and attach
+// the handler to it.
+$configuration
+    ->messageHandler(YourMessageHandler::class)
+;
+```
+
+
 ### Configuring Timeout Processing
 Timeout Handlers being message handlers have to be registered with the message bus. However they have dependencies for
 infrastructure concerns such as processing that need to be defined in a separate configuraiton:
@@ -306,6 +335,4 @@ Alternatively, you can rely on Symfony's `ContainerConfigurator` to register cus
 
 For more information on this please refer to the Official Symfony Documentation.
 
-#### Configuring the Message Normalizer
-The `MessageNormalizerInterface` can be configured to receive more `NormalizerInterface` and `DenormalizerInterface` as per your needs.
-Simply create a configurator class as per [Symfony's documentation on Service configurators](https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&ved=2ahUKEwjj3bGpo-_vAhUGpZ4KHXq6CgoQFjABegQIAhAD&url=https%3A%2F%2Fsymfony.com%2Fdoc%2Fcurrent%2Fservice_container%2Fconfigurators.html&usg=AOvVaw38HZe2zCFZ6WrboNk28cVu). 
+ 
