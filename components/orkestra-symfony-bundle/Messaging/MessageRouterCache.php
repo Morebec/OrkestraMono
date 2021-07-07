@@ -65,7 +65,7 @@ class MessageRouterCache
     public function loadRoutes(): MessageRouteCollection
     {
         $cacheFile = $this->getCacheFile();
-        if (file_exists($cacheFile)) {
+        if (!file_exists($cacheFile)) {
             return new MessageRouteCollection([]);
         }
 
