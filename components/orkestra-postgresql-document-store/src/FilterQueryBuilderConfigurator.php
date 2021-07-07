@@ -7,6 +7,7 @@ use Morebec\Orkestra\DateTime\Date;
 use Morebec\Orkestra\DateTime\DateTime;
 use Morebec\Orkestra\PostgreSqlDocumentStore\Filter\Criterion;
 use Morebec\Orkestra\PostgreSqlDocumentStore\Filter\Filter;
+use Morebec\Orkestra\PostgreSqlDocumentStore\Filter\FilterOperator;
 
 /**
  * Takes a Filter and a DBAL query builder and configures the latter with the former.
@@ -90,14 +91,24 @@ final class FilterQueryBuilderConfigurator
 
     private function convertCriterionOperatorToSql(Criterion $criterion): string
     {
-        return (string) $criterion->getOperator();
+        $operator = $criterion->getOperator();
+
+        // Support for NULL and EQUAL operator.
+        if ($criterion->getValue() === null && $operator->isEqualTo(FilterOperator::EQUAL())) {
+            $operator = FilterOperator::IS();
+        }
+
+        return (string) $operator;
     }
 
     private function convertCriterionToSql(Criterion $criterion, QueryBuilder $qb): string
     {
         $field = $this->convertCriterionFieldToSql($criterion);
         $operator = $this->convertCriterionOperatorToSql($criterion);
-        $value = $qb->createPositionalParameter($this->convertCriterionValueToSql($criterion));
+        // There seem to be a problem when the value is null in a positional argument.
+        $value = $criterion->getValue() === null ? 'NULL' :
+            $qb->createPositionalParameter($this->convertCriterionValueToSql($criterion))
+        ;
 
         return "$field $operator $value";
     }

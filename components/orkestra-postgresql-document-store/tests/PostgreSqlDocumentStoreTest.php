@@ -37,7 +37,7 @@ class PostgreSqlDocumentStoreTest extends TestCase
 
     public function testInsertDocument(): void
     {
-        $id = uniqid('doc_');
+        $id = uniqid('doc_', false);
         $this->store->insertDocument('test_insert_document', $id, [
             'hello' => 'world',
         ]);
@@ -49,35 +49,50 @@ class PostgreSqlDocumentStoreTest extends TestCase
 
     public function testFindOneDocument(): void
     {
-        $id = uniqid('doc_');
-        $this->store->insertDocument('test_insert_document', $id, [
+        $id = uniqid('doc_', false);
+        $document = [
             'hello' => 'world',
-        ]);
+            'nullField' => null,
+        ];
+        $this->store->insertDocument('test_insert_document', $id, $document);
 
+        // FIND BY ID
         // Filter
         $data = $this->store->findOneDocument('test_insert_document', Filter::findById($id));
-        $this->assertEquals(['hello' => 'world'], $data);
+        $this->assertEquals($document, $data);
         // String
         $data = $this->store->findOneDocument('test_insert_document', "id = '{$id}'");
-        $this->assertEquals(['hello' => 'world'], $data);
+        $this->assertEquals($document, $data);
 
+        // FIND BY FIELD
         // Filter
         $data = $this->store->findOneDocument('test_insert_document', Filter::findByField('hello', FilterOperator::EQUAL(), 'world'));
-        $this->assertEquals(['hello' => 'world'], $data);
+        $this->assertEquals($document, $data);
         // String
         $data = $this->store->findOneDocument('test_insert_document', "data->>'hello' = 'world'");
-        $this->assertEquals(['hello' => 'world'], $data);
+        $this->assertEquals($document, $data);
 
+        // FIND BY FIELD DOES NOT MATCH
         // Filter
         $data = $this->store->findOneDocument('test_insert_document', Filter::findByField('hello', FilterOperator::EQUAL(), 'planet'));
         $this->assertNull($data);
-
         // String
         $data = $this->store->findOneDocument('test_insert_document', "data->>'hello' = 'planet'");
         $this->assertNull($data);
 
+        // FIND BY FIELD is NULL
+        $data = $this->store->findOneDocument('test_insert_document', Filter::findByField('nullField', FilterOperator::IS(), null));
+        $this->assertEquals($document, $data);
+        $data = $this->store->findOneDocument('test_insert_document', "data->>'nullField' IS NULL");
+        $this->assertEquals($document, $data);
+
+        // FIND BY FIELD is NULL
+        // ENSURE THAT USING THE EQUAL instead of IS with null returns the indended result.
+        $data = $this->store->findOneDocument('test_insert_document', Filter::findByField('nullField', FilterOperator::EQUAL(), null));
+        $this->assertEquals($document, $data);
+
         $clock = new SystemClock();
-        $id = uniqid('doc_');
+        $id = uniqid('doc_', false);
         $doc = [
             'username' => 'postgresql',
             'nbTokens' => 5,
