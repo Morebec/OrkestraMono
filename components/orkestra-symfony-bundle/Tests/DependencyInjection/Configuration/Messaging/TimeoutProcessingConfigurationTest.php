@@ -1,11 +1,11 @@
 <?php
 
-namespace Tests\Morebec\OrkestraSymfonyBundle\DependencyInjection\Configuration;
+namespace Tests\Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\Messaging;
 
 use Morebec\Orkestra\Messaging\Timeout\InMemoryTimeoutStorage;
 use Morebec\Orkestra\Messaging\Timeout\TimeoutManager;
 use Morebec\Orkestra\Messaging\Timeout\TimeoutManagerInterface;
-use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\TimeoutProcessingConfiguration;
+use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\Messaging\TimeoutProcessingConfiguration;
 use PHPUnit\Framework\TestCase;
 
 class TimeoutProcessingConfigurationTest extends TestCase

@@ -1,10 +1,10 @@
 <?php
 
-namespace Tests\Morebec\OrkestraSymfonyBundle\DependencyInjection\Configuration;
+namespace Tests\Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\EventProcessing;
 
 use Morebec\Orkestra\EventSourcing\EventProcessor\InMemoryEventStorePositionStorage;
-use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\EventProcessingConfiguration;
-use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\ProjectionProcessingConfiguration;
+use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\EventProcessing\EventProcessingConfiguration;
+use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\EventProcessing\ProjectionProcessingConfiguration;
 use PHPUnit\Framework\TestCase;
 
 class EventProcessingConfigurationTest extends TestCase

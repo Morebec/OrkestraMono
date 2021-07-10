@@ -1,10 +1,13 @@
 <?php
 
-namespace Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration;
+namespace Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\EventStore;
 
 use Morebec\Orkestra\EventSourcing\EventStore\InMemoryEventStore;
 use Morebec\Orkestra\EventSourcing\EventStore\UpcastingEventStoreDecorator;
 
+/**
+ * Configures the event store dependencies.
+ */
 class EventStoreConfiguration
 {
     public string $implementationClassName;
@@ -50,6 +53,18 @@ class EventStoreConfiguration
     public function decoratedBy(string $className): self
     {
         $this->decorators[] = $className;
+
+        return $this;
+    }
+
+    /**
+     * Removes a previously defined decorator.
+     *
+     * @return $this
+     */
+    public function notDecoratedBy(string $className): self
+    {
+        $this->decorators = array_filter($this->decorators, static fn (string $decorator) => $decorator !== $className);
 
         return $this;
     }

@@ -5,9 +5,11 @@ namespace Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration;
 use JsonException;
 use Morebec\Orkestra\EventSourcing\EventStore\EventStoreInterface;
 use Morebec\Orkestra\Messaging\MessageBusInterface;
+use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\EventProcessing\EventProcessingConfigurationProcessor;
+use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\EventStore\EventStoreConfigurationProcessor;
 use Morebec\Orkestra\SymfonyBundle\OrkestraKernel;
+use Morebec\OrkestraSymfonyBundle\DependencyInjection\Configuration\Messaging\MessagingConfigurationProcessor;
 use ReflectionException;
-use RuntimeException;
 
 class OrkestraConfigurationProcessor
 {
@@ -24,12 +26,9 @@ class OrkestraConfigurationProcessor
      */
     public function processConfiguration(OrkestraConfiguration $configuration): void
     {
-        // CONFIGURE MESSAGE BUS
+        // CONFIGURE MESSAGING
         if (interface_exists(MessageBusInterface::class)) {
-            $this->processMessageBusConfiguration($configuration);
-
-            // CONFIGURE TIMEOUT PROCESSING
-            $this->processTimeoutProcessingConfiguration($configuration);
+            $this->processMessagingConfiguration($configuration);
         }
 
         // CONFIGURE EVENT STORE
@@ -40,29 +39,14 @@ class OrkestraConfigurationProcessor
     }
 
     /**
-     * Configures the message bus with the container configurator.
-     *
      * @throws JsonException
      * @throws ReflectionException
      */
-    public function processMessageBusConfiguration(OrkestraConfiguration $configuration): void
+    public function processMessagingConfiguration(OrkestraConfiguration $configuration): void
     {
-        $messageBusConfiguration = $configuration->getMessageBusConfiguration();
-        if (!$messageBusConfiguration) {
-            throw new RuntimeException('The configuration of the Message Bus was not defined. Please define it explicitly');
-        }
-
-        $processor = new MessageBusConfigurationProcessor($this->kernel);
-        $processor->process($configuration, $messageBusConfiguration);
-    }
-
-    public function processTimeoutProcessingConfiguration(OrkestraConfiguration $configuration): void
-    {
-        $processor = new TimeoutProcessingConfigurationProcessor();
-
-        $timeoutProcessingConfiguration = $configuration->getTimeoutProcessingConfiguration();
-        if ($timeoutProcessingConfiguration) {
-            $processor->process($configuration, $timeoutProcessingConfiguration);
+        $processor = new MessagingConfigurationProcessor($this->kernel);
+        if ($configuration->messagingConfiguration) {
+            $processor->process($configuration, $configuration->messagingConfiguration);
         }
     }
 
@@ -72,16 +56,19 @@ class OrkestraConfigurationProcessor
     public function processEventStoreConfiguration(OrkestraConfiguration $configuration): void
     {
         $processor = new EventStoreConfigurationProcessor();
-        $eventStoreConfiguration = $configuration->getEventStoreConfiguration();
+        $eventStoreConfiguration = $configuration->eventStore();
         if ($eventStoreConfiguration) {
             $processor->process($configuration, $eventStoreConfiguration);
         }
     }
 
+    /**
+     * Configures the event processing with the container configurator.
+     */
     public function processEventProcessingConfiguration(OrkestraConfiguration $configuration): void
     {
         $processor = new EventProcessingConfigurationProcessor();
-        $eventProcessingConfiguration = $configuration->getEventProcessingConfiguration();
+        $eventProcessingConfiguration = $configuration->eventProcessing();
 
         if ($eventProcessingConfiguration) {
             $processor->process($configuration, $eventProcessingConfiguration);

@@ -1,6 +1,6 @@
 <?php
 
-namespace Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration;
+namespace Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\EventProcessing;
 
 /**
  * Represents a configuration of ProjectorGroups for DI.

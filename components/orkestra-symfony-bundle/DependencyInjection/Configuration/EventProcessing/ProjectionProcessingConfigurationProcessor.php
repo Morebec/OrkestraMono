@@ -1,8 +1,9 @@
 <?php
 
-namespace Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration;
+namespace Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\EventProcessing;
 
 use Morebec\Orkestra\EventSourcing\Projection\ProjectorGroup;
+use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\OrkestraConfiguration;
 use Morebec\Orkestra\SymfonyBundle\DependencyInjection\ProjectorGroupRegistry;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;

@@ -1,9 +1,13 @@
 <?php
 
-namespace Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration;
+namespace Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\EventProcessing;
 
+use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\OrkestraConfiguration;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 
+/**
+ * @internal
+ */
 class EventProcessingConfigurationProcessor
 {
     public function process(

@@ -1,6 +1,6 @@
 <?php
 
-namespace Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration;
+namespace Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\Messaging;
 
 use Morebec\Orkestra\Messaging\Authorization\AuthorizeMessageMiddleware;
 use Morebec\Orkestra\Messaging\Context\BuildMessageBusContextMiddleware;
@@ -11,8 +11,13 @@ use Morebec\Orkestra\Messaging\Routing\RouteMessageMiddleware;
 use Morebec\Orkestra\Messaging\Transformation\MessagingTransformationMiddleware;
 use Morebec\Orkestra\Messaging\Validation\ValidateMessageMiddleware;
 
+/**
+ * Configures the dependencies of a message bus.
+ */
 class MessageBusConfiguration
 {
+    public string $serviceId;
+
     public string $implementationClassName;
 
     /** @var string[] */
@@ -23,13 +28,19 @@ class MessageBusConfiguration
     public function __construct()
     {
         $this->middleware = [];
-        $this->configureMessageNormalizer((new MessageNormalizerConfiguration())->usingDefaultImplementation());
         $this->usingDefaultImplementation();
     }
 
     public static function defaultConfiguration(): DefaultMessageBusConfiguration
     {
         return new DefaultMessageBusConfiguration();
+    }
+
+    public function usingServiceId(string $serviceId): self
+    {
+        $this->serviceId = $serviceId;
+
+        return $this;
     }
 
     /**
@@ -52,13 +63,6 @@ class MessageBusConfiguration
     public function usingImplementation(string $className): self
     {
         $this->implementationClassName = $className;
-
-        return $this;
-    }
-
-    public function configureMessageNormalizer(MessageNormalizerConfiguration $configuration): self
-    {
-        $this->messageNormalizerConfiguration = $configuration;
 
         return $this;
     }

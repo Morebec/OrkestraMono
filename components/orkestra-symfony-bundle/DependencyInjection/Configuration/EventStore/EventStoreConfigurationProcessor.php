@@ -1,13 +1,19 @@
 <?php
 
-namespace Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration;
+namespace Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\EventStore;
 
 use Morebec\Orkestra\EventSourcing\EventStore\EventStoreInterface;
 use Morebec\Orkestra\EventSourcing\EventStore\EventStreamId;
 use Morebec\Orkestra\EventSourcing\Upcasting\UpcasterChain;
+use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\OrkestraConfiguration;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 
+/**
+ * Applies the {@link EventStoreConfiguration} to the container.
+ *
+ * @internal
+ */
 class EventStoreConfigurationProcessor
 {
     public function process(

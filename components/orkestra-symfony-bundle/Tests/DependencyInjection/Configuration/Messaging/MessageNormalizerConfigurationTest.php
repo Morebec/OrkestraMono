@@ -1,11 +1,11 @@
 <?php
 
-namespace Tests\Morebec\OrkestraSymfonyBundle\DependencyInjection\Configuration;
+namespace Tests\Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\Messaging;
 
 use Morebec\Orkestra\Messaging\Normalization\ClassMapMessageNormalizer;
 use Morebec\Orkestra\Normalization\Denormalizer\ScalarValueDenormalizer;
 use Morebec\Orkestra\Normalization\Normalizer\ScalarValueNormalizer;
-use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\MessageNormalizerConfiguration;
+use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\Messaging\MessageNormalizerConfiguration;
 use PHPUnit\Framework\TestCase;
 
 class MessageNormalizerConfigurationTest extends TestCase

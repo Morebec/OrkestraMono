@@ -1,6 +1,6 @@
 <?php
 
-namespace Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration;
+namespace Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\Messaging;
 
 use Morebec\Orkestra\Messaging\Timeout\TimeoutManager;
 

@@ -1,9 +1,9 @@
 <?php
 
-namespace Tests\Morebec\OrkestraSymfonyBundle\DependencyInjection\Configuration;
+namespace Tests\Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\EventProcessing;
 
 use Morebec\Orkestra\EventSourcing\Projection\ProjectorInterface;
-use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\ProjectorGroupConfiguration;
+use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\EventProcessing\ProjectorGroupConfiguration;
 use PHPUnit\Framework\TestCase;
 
 class ProjectorGroupConfigurationTest extends TestCase

@@ -1,7 +1,12 @@
 <?php
 
-namespace Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration;
+namespace Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\EventProcessing;
 
+use Morebec\OrkestraSymfonyBundle\Tests\DependencyInjection\Configuration\NotConfiguredException;
+
+/**
+ * @internal
+ */
 class ProjectionProcessingConfiguration
 {
     public const DEFAULT_GROUP_NAME = 'default';
@@ -24,11 +29,14 @@ class ProjectionProcessingConfiguration
         return $this;
     }
 
-    public function getProjectorGroupConfiguration(string $groupName): ProjectorGroupConfiguration
+    /**
+     * Returns a previously configured projectorGroup or throws an exception if not found.
+     */
+    public function projectorGroup(string $groupName): ProjectorGroupConfiguration
     {
         $group = $this->projectorGroups[$groupName] ?? null;
         if (!$group) {
-            throw new \InvalidArgumentException('Projector Group not found. Did you configure it properly ?');
+            throw new NotConfiguredException("Projector Group \"$groupName\" not configured.");
         }
 
         return $group;

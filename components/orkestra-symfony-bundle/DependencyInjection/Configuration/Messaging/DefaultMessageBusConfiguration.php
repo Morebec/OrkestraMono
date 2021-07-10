@@ -1,9 +1,10 @@
 <?php
 
-namespace Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration;
+namespace Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\Messaging;
 
 use Morebec\Orkestra\Messaging\Authorization\AuthorizeMessageMiddleware;
 use Morebec\Orkestra\Messaging\MessageBus;
+use Morebec\Orkestra\Messaging\MessageBusInterface;
 use Morebec\Orkestra\Messaging\Routing\HandleMessageMiddleware;
 use Morebec\Orkestra\Messaging\Routing\LoggingMessageHandlerInterceptor;
 use Morebec\Orkestra\Messaging\Transformation\MessagingTransformerInterface;
@@ -32,6 +33,7 @@ class DefaultMessageBusConfiguration extends MessageBusConfiguration
     {
         parent::__construct();
         $this->usingImplementation(self::DEFAULT_IMPLEMENTATION_CLASS_NAME)
+            ->usingServiceId(MessageBusInterface::class)
             ->withBuildMessageBusContextMiddleware()
             ->withLoggerMiddleware()
             ->withValidateMessageMiddleware()

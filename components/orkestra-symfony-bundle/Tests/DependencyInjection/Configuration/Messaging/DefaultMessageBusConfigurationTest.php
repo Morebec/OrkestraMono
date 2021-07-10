@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Morebec\OrkestraSymfonyBundle\DependencyInjection\Configuration;
+namespace Tests\Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\Messaging;
 
 use Morebec\Orkestra\Messaging\Authorization\MessageAuthorizerInterface;
 use Morebec\Orkestra\Messaging\Domain\Command\DomainCommandHandlerInterface;
@@ -11,7 +11,7 @@ use Morebec\Orkestra\Messaging\Routing\MessageHandlerInterceptorInterface;
 use Morebec\Orkestra\Messaging\Timeout\TimeoutHandlerInterface;
 use Morebec\Orkestra\Messaging\Transformation\MessagingTransformerInterface;
 use Morebec\Orkestra\Messaging\Validation\MessageValidatorInterface;
-use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\DefaultMessageBusConfiguration;
+use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\Messaging\DefaultMessageBusConfiguration;
 use PHPUnit\Framework\TestCase;
 
 class DefaultMessageBusConfigurationTest extends TestCase
