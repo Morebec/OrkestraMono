@@ -143,9 +143,31 @@ return [
 > or define different `ModuleConfigurator` classes that are environment specific.
 
 
-### Configuring the Message Bus
-The configuration of the message bus can be done using Symfony's dependency injection by providing services
-and wiring them. However, this can be tedious to perform on every project.
+### Configuring Messaging
+The messaging configuration serves to easily configure with Symfony's dependency injection the dependencies of the
+[Messaging](https://github.com/Morebec/orkestra-messaging) component.
+
+It provides methods using a fluent API to configure, message normalization, message buses and their respective dependencies.
+
+```php
+/** @var OrkestraConfiguration $configuration */
+$configuration->configureMessaging(
+    (new MessagingConfiguration())
+        ->configureMessageBus(
+            (new MessageBusConfiguration())
+                ->withMiddleware(YourCustomMiddleware::class)
+        )
+        ->configureMessageNormalization(
+            (new MessageNormalizerConfiguration())
+                ->withNormalizationPair(YourNormalizer::class, YourDenormalizer::class)
+        )
+        ->configureTimeoutProcessing(
+            (new TimeoutProcessingConfiguration())->usingDefaultManagerImplementation()
+        )
+);        
+```
+
+#### Configuring a Message bus
 This bundle provides an easy way to define the middleware, message interceptors and dependencies of the message
 bus through a fluent API using the `MessageBusConfiguration` class:
 
@@ -196,7 +218,7 @@ $configuration->configureMessageBus(
 > message bus as well as simplifying the way to define message handlers so that they can be routed automatically.
 > The same autoconfiguration applies for message validators, authorizers, and messaging transformers.
 
-### Defining message bus dependencies in modules
+##### Defining message bus dependencies in modules
 Normally the configuration of the message bus is defined in a `Core` module that serves as a cross-cutting 
 dependency-builder module, however, most message handlers are usually defined in their appropriate modules.
 
@@ -245,7 +267,7 @@ $configuration
 ```
 
 
-### Configuring Timeout Processing
+#### Configuring Timeout Processing
 Timeout Handlers being message handlers have to be registered with the message bus. However, they have dependencies for
 infrastructure concerns such as processing that need to be defined in a separate configuration:
 
@@ -264,7 +286,7 @@ $configuration
 ```
 
 ### Configuring the Event Store
-The configuration of the event store follows the same configuration principles as the message bus:
+The configuration of the event store follows the same configuration principles:
 
 ```php
 /** @var OrkestraConfiguration $configuration */
@@ -281,7 +303,9 @@ $configuration->configureEventStore(
             ->withUpcaster(YourEventUpcaster::classs)
 );
 ```
+
 ### Configuring Event Processing
+Here's a quick example of event processing configuration:
 ```php
 /** @var OrkestraConfiguration $configuration */
 $configuration->cconfigureEventProcessing(
