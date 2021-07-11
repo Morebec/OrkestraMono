@@ -29,16 +29,27 @@ class MessageBus implements MessageBusInterface
         return $next($message, $headers);
     }
 
+    /**
+     * Appends new middleware to this message bus.
+     */
     public function appendMiddleware(MessageBusMiddlewareInterface $middleware): void
     {
         $this->middleware[] = $middleware;
     }
 
+    /**
+     * Prepends new middleware to this message bus.
+     */
     public function prependMiddleware(MessageBusMiddlewareInterface $middleware): void
     {
         array_unshift($this->middleware, $middleware);
     }
 
+    /**
+     * Completely replaces the middleware of this message bus.
+     *
+     * @param MessageBusMiddlewareInterface[] $middleware
+     */
     public function replaceMiddleware(iterable $middleware): void
     {
         $this->middleware = [];
@@ -47,6 +58,11 @@ class MessageBus implements MessageBusInterface
         }
     }
 
+    /**
+     * Returns the middleware of this message bus.
+     *
+     * @return MessageBusMiddlewareInterface[]
+     */
     public function getMiddleware(): iterable
     {
         return $this->middleware;
