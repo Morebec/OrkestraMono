@@ -2,6 +2,8 @@
 
 namespace Morebec\Orkestra\EventSourcing\EventProcessor;
 
+use Morebec\Orkestra\Worker\WorkerInterface;
+
 /**
  * Events coming out of a an application model can be used as an integration model for other systems,
  * to trigger side effects to the same system from which these events originated or simply, to compute read models
@@ -21,7 +23,7 @@ namespace Morebec\Orkestra\EventSourcing\EventProcessor;
  *
  * NOTE: Although the naming resembles the Axon Framework, there are many differences with it regarding these services.
  */
-interface EventProcessorInterface
+interface EventProcessorInterface extends WorkerInterface
 {
     /**
      * Returns the name of this event processor.
