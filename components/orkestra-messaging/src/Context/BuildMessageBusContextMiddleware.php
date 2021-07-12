@@ -13,7 +13,9 @@ use Morebec\Orkestra\Messaging\Middleware\MessageBusMiddlewareInterface;
 use Ramsey\Uuid\Uuid;
 
 /**
- * Middleware responsible for building the message bus context.
+ * Middleware responsible for building the message bus context allowing to do some tracing
+ * with correlation and causation.
+ * This middleware should be the first one when used.
  */
 class BuildMessageBusContextMiddleware implements MessageBusMiddlewareInterface
 {

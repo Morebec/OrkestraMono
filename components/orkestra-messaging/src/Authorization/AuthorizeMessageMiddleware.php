@@ -41,4 +41,16 @@ class AuthorizeMessageMiddleware implements MessageBusMiddlewareInterface
 
         return $response;
     }
+
+    /**
+     * Adds an authorizer.
+     *
+     * @return $this
+     */
+    public function addAuthorizer(MessageAuthorizerInterface $authorizer): self
+    {
+        $this->decisionMaker->addAuthorizer($authorizer);
+
+        return $this;
+    }
 }

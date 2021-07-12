@@ -21,7 +21,7 @@ class MessagingTransformationMiddleware implements MessageBusMiddlewareInterface
      */
     private array $transformers;
 
-    public function __construct(iterable $transformers)
+    public function __construct(iterable $transformers = [])
     {
         $this->transformers = [];
         foreach ($transformers as $transformer) {

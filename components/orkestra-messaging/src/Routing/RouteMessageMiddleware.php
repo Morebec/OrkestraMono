@@ -39,4 +39,28 @@ class RouteMessageMiddleware implements MessageBusMiddlewareInterface
 
         return $next($message, $headers, $next);
     }
+
+    /**
+     * Registers multiple routes.
+     * If one of route is already registered, aborts the registration process.
+     *
+     * @param iterable|MessageRouteInterface[] $routes
+     */
+    public function registerRoutes(iterable $routes): self
+    {
+        $this->router->registerRoutes($routes);
+
+        return $this;
+    }
+
+    /**
+     * Registers a route with the router.
+     * If this route is already registered, aborts the registration process.
+     */
+    public function registerRoute(MessageRouteInterface $route): self
+    {
+        $this->router->registerRoute($route);
+
+        return $this;
+    }
 }

@@ -22,12 +22,12 @@ class LoggerMiddleware implements MessageBusMiddlewareInterface
 {
     private LoggerInterface $logger;
 
-    private MessageNormalizerInterface $objectNormalizer;
+    private MessageNormalizerInterface $messageNormalizer;
 
-    public function __construct(LoggerInterface $logger, MessageNormalizerInterface $objectNormalizer)
+    public function __construct(LoggerInterface $logger, MessageNormalizerInterface $messageNormalizer)
     {
         $this->logger = $logger;
-        $this->objectNormalizer = $objectNormalizer;
+        $this->messageNormalizer = $messageNormalizer;
     }
 
     public function __invoke(MessageInterface $message, MessageHeaders $headers, callable $next): MessageBusResponseInterface
@@ -148,6 +148,6 @@ class LoggerMiddleware implements MessageBusMiddlewareInterface
             }
         }
 
-        return $this->objectNormalizer->normalize($message);
+        return $this->messageNormalizer->normalize($message);
     }
 }

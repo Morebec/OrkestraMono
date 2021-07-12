@@ -2,6 +2,8 @@
 
 namespace Morebec\Orkestra\Messaging;
 
+use Throwable;
+
 /**
  * Represents a response pertaining to sending a message.
  * It can serve as an ACK or NACK for sending messages.
@@ -12,7 +14,7 @@ interface MessageBusResponseInterface
     /**
      * Returns the payload associated with this Response.
      *
-     * @return mixed
+     * @return mixed|Throwable
      */
     public function getPayload();
 
@@ -28,7 +30,6 @@ interface MessageBusResponseInterface
 
     /**
      * Returns the status code of this response.
-     * TODO Change return type: BC.
      */
     public function getStatusCode(): MessageBusResponseStatusCode;
 }

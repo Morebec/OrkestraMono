@@ -63,26 +63,31 @@ class MessageHandlerRouteBuilder
                 continue;
             }
 
-            $eventClass = $params[0];
-            $eventClassOb = $eventClass->getClass();
-            if (!$eventClassOb) {
+            $firstParameter = $params[0];
+            $messageClass = $firstParameter->getClass();
+            if (!$messageClass) {
                 continue;
             }
 
-            $eventClassName = $eventClassOb->getName();
-            if (!is_subclass_of($eventClassName, MessageInterface::class, true)) {
+            $messageClassName = $messageClass->getName();
+            if ($messageClassName !== MessageInterface::class && !is_subclass_of($messageClassName, MessageInterface::class, true)) {
                 continue;
             }
 
             if ($nbParameters === 2) {
-                $secondArgClass = $params[1];
-                $secondArgClassName = $secondArgClass->getClass()->getName();
-                if (!is_subclass_of($secondArgClassName, MessageHeaders::class, true)) {
+                $secondParameter = $params[1];
+                $secondParameterClassName = $secondParameter->getClass()->getName();
+                if ($secondParameterClassName !== MessageHeaders::class && !is_subclass_of($secondParameterClassName, MessageHeaders::class, true)) {
                     continue;
                 }
             }
 
-            $routes[] = new MessageRoute($eventClassName::getTypeName(), $reflectionClass->getName(), $method->getName());
+            $messageTypeName = $messageClass->getMethod('getTypeName')->isAbstract() ? $messageClassName : $messageClassName::getTypeName();
+            $routes[] = new MessageRoute(
+                $messageTypeName,
+                $reflectionClass->getName(),
+                $method->getName()
+            );
         }
 
         return new MessageRouteCollection($routes);

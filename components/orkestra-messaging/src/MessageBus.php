@@ -2,91 +2,194 @@
 
 namespace Morebec\Orkestra\Messaging;
 
+use Morebec\Orkestra\DateTime\ClockInterface;
+use Morebec\Orkestra\Messaging\Authorization\AuthorizationDecisionMakerInterface;
+use Morebec\Orkestra\Messaging\Authorization\AuthorizeMessageMiddleware;
+use Morebec\Orkestra\Messaging\Authorization\MessageAuthorizerInterface;
+use Morebec\Orkestra\Messaging\Authorization\VetoAuthorizationDecisionMaker;
+use Morebec\Orkestra\Messaging\Context\BuildMessageBusContextMiddleware;
+use Morebec\Orkestra\Messaging\Context\MessageBusContextManager;
+use Morebec\Orkestra\Messaging\Context\MessageBusContextManagerInterface;
+use Morebec\Orkestra\Messaging\Middleware\LoggerMiddleware;
+use Morebec\Orkestra\Messaging\Middleware\MessageBusMiddlewareCollection;
 use Morebec\Orkestra\Messaging\Middleware\MessageBusMiddlewareInterface;
-use Morebec\Orkestra\Messaging\Middleware\NoResponseFromMiddlewareException;
+use Morebec\Orkestra\Messaging\Normalization\MessageNormalizerInterface;
+use Morebec\Orkestra\Messaging\Routing\HandleMessageMiddleware;
+use Morebec\Orkestra\Messaging\Routing\InMemoryMessageHandlerProvider;
+use Morebec\Orkestra\Messaging\Routing\MessageHandlerInterceptorInterface;
+use Morebec\Orkestra\Messaging\Routing\MessageRouter;
+use Morebec\Orkestra\Messaging\Routing\RouteBuilder;
+use Morebec\Orkestra\Messaging\Routing\RouteMessageMiddleware;
+use Morebec\Orkestra\Messaging\Transformation\MessagingTransformationMiddleware;
+use Morebec\Orkestra\Messaging\Transformation\MessagingTransformerInterface;
+use Morebec\Orkestra\Messaging\Validation\MessageValidatorInterface;
+use Morebec\Orkestra\Messaging\Validation\ValidateMessageMiddleware;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
+use ReflectionException;
 
+/**
+ * Implementation of a message bus that uses the default middleware and which provides convenience methods
+ * to interact with it.
+ */
 class MessageBus implements MessageBusInterface
 {
-    /**
-     * @var MessageBusMiddlewareInterface[]
-     */
-    private array $middleware;
+    protected BuildMessageBusContextMiddleware $messageBusContextMiddleware;
 
-    public function __construct(iterable $middleware = [])
-    {
-        $this->middleware = [];
-        $this->replaceMiddleware($middleware);
+    protected LoggerMiddleware $loggerMiddleware;
+
+    protected ValidateMessageMiddleware $validatorMiddleware;
+
+    protected AuthorizeMessageMiddleware $authorizerMiddleware;
+
+    protected MessagingTransformationMiddleware $transformerMiddleware;
+
+    protected RouteMessageMiddleware $routerMiddleware;
+
+    protected HandleMessageMiddleware $handlerMiddleware;
+
+    protected InMemoryMessageHandlerProvider $handlerProvider;
+    private MiddlewareMessageBus $messageBus;
+
+    /**
+     * SimpleMessageBus constructor.
+     *
+     * @param LoggerInterface|null                     $logger                     if null a {@link NullLogger} is used
+     * @param AuthorizationDecisionMakerInterface|null $authorizationDecisionMaker if null a {@link VetoAuthorizationDecisionMaker} is used
+     * @param MessageBusContextManagerInterface|null   $messageBusContextManager   if null a {@link MessageBusContextManager} is used
+     */
+    public function __construct(
+        ClockInterface $clock,
+        MessageNormalizerInterface $messageNormalizer = null,
+        ?LoggerInterface $logger = null,
+        ?AuthorizationDecisionMakerInterface $authorizationDecisionMaker = null,
+        ?MessageBusContextManagerInterface $messageBusContextManager = null
+    ) {
+        $this->messageBusContextMiddleware = new BuildMessageBusContextMiddleware($clock, $messageBusContextManager ?: new MessageBusContextManager());
+        $this->loggerMiddleware = new LoggerMiddleware(
+            $logger ?: new NullLogger(),
+            $messageNormalizer
+        );
+        $this->validatorMiddleware = new ValidateMessageMiddleware();
+        $this->authorizerMiddleware = new AuthorizeMessageMiddleware($authorizationDecisionMaker ?: new VetoAuthorizationDecisionMaker());
+        $this->transformerMiddleware = new MessagingTransformationMiddleware();
+
+        $this->routerMiddleware = new RouteMessageMiddleware(new MessageRouter());
+
+        $this->handlerProvider = new InMemoryMessageHandlerProvider();
+        $this->handlerMiddleware = new HandleMessageMiddleware($this->handlerProvider);
+
+        $this->messageBus = new MiddlewareMessageBus([
+            $this->messageBusContextMiddleware,
+            $this->validatorMiddleware,
+            $this->authorizerMiddleware,
+            $this->transformerMiddleware,
+            $this->routerMiddleware,
+            $this->handlerMiddleware,
+        ]);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function sendMessage(MessageInterface $message, ?MessageHeaders $headers = null): MessageBusResponseInterface
     {
-        $next = $this->createCallableForNextMiddleware(0);
-
-        if (!$headers) {
-            $headers = new MessageHeaders();
-        }
-
-        return $next($message, $headers);
+        return $this->messageBus->sendMessage($message, $headers);
     }
 
     /**
-     * Appends new middleware to this message bus.
+     * Adds middleware to this message bus right before the {@link HandleMessageMiddleware}.
      */
-    public function appendMiddleware(MessageBusMiddlewareInterface $middleware): void
+    public function addMiddleware(MessageBusMiddlewareInterface $middleware): void
     {
-        $this->middleware[] = $middleware;
+        $this->addMiddlewareBefore(\get_class($this->handlerMiddleware), $middleware);
     }
 
     /**
-     * Prepends new middleware to this message bus.
+     * Adds middleware before a given one.
      */
-    public function prependMiddleware(MessageBusMiddlewareInterface $middleware): void
+    public function addMiddlewareBefore(string $followingMiddlewareClassName, MessageBusMiddlewareInterface $middleware): void
     {
-        array_unshift($this->middleware, $middleware);
+        $this->messageBus->getMiddleware()->addBefore($followingMiddlewareClassName, $middleware);
     }
 
     /**
-     * Completely replaces the middleware of this message bus.
+     * Adds middleware after a given one.
+     */
+    public function addMiddlewareAfter(string $precedingMiddlewareClassName, MessageBusMiddlewareInterface $middleware): void
+    {
+        $this->messageBus->getMiddleware()->addAfter($precedingMiddlewareClassName, $middleware);
+    }
+
+    /**
+     * Adds a validator to this message bus.
      *
-     * @param MessageBusMiddlewareInterface[] $middleware
+     * @return $this
      */
-    public function replaceMiddleware(iterable $middleware): void
+    public function addValidator(MessageValidatorInterface $validator): self
     {
-        $this->middleware = [];
-        foreach ($middleware as $m) {
-            $this->appendMiddleware($m);
-        }
+        $this->validatorMiddleware->addValidator($validator);
+
+        return $this;
     }
 
     /**
-     * Returns the middleware of this message bus.
+     * Adds an authorizer to this message bus.
      *
-     * @return MessageBusMiddlewareInterface[]
+     * @return $this
      */
-    public function getMiddleware(): iterable
+    public function addAuthorizer(MessageAuthorizerInterface $authorizer): self
     {
-        return $this->middleware;
+        $this->authorizerMiddleware->addAuthorizer($authorizer);
+
+        return $this;
     }
 
     /**
-     * Creates a callable for a middleware at a given index. (the $next parameter).
+     * Adds a messaging transformer to this message bus.
+     *
+     * @return $this
      */
-    protected function createCallableForNextMiddleware(int $currentMiddlewareIndex): callable
+    public function addTransformer(MessagingTransformerInterface $transformer): self
     {
-        // If we are past all the middleware, throw a default response, this would mean that no middleware decided to return a response.
-        if (!\array_key_exists($currentMiddlewareIndex, $this->middleware)) {
-            return static function (MessageInterface $message, MessageHeaders $headers): MessageBusResponseInterface {
-                throw new NoResponseFromMiddlewareException($message);
-            };
-        }
+        $this->transformerMiddleware->addTransformer($transformer);
 
-        $middleware = $this->middleware[$currentMiddlewareIndex];
+        return $this;
+    }
 
-        return function (MessageInterface $message, MessageHeaders $headers) use ($currentMiddlewareIndex, $middleware): MessageBusResponseInterface {
-            $nextCallable = $this->createCallableForNextMiddleware($currentMiddlewareIndex + 1);
+    /**
+     * Adds a message handler to this message bus.
+     *
+     * @return $this
+     *
+     * @throws ReflectionException
+     */
+    public function addMessageHandler(MessageHandlerInterface $handler): self
+    {
+        $this->handlerProvider->addMessageHandler($handler);
 
-            /* @var MessageBusMiddlewareInterface $middleware */
-            return $middleware($message, $headers, $nextCallable);
-        };
+        $this->routerMiddleware->registerRoutes(RouteBuilder::forMessageHandler(\get_class($handler))->build());
+
+        return $this;
+    }
+
+    /**
+     * Adds a message handler interceptor to this message bus.
+     *
+     * @return $this
+     */
+    public function addMessageHandlerInterceptor(MessageHandlerInterceptorInterface $interceptor): self
+    {
+        $this->handlerMiddleware->addInterceptor($interceptor);
+
+        return $this;
+    }
+
+    /**
+     * Returns the list of middleware in use by the message bus.
+     */
+    public function getMiddleware(): MessageBusMiddlewareCollection
+    {
+        return $this->messageBus->getMiddleware();
     }
 }

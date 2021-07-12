@@ -2,6 +2,7 @@
 
 namespace Tests\Morebec\Orkestra\Messaging\Authorization;
 
+use Morebec\Orkestra\Messaging\Authorization\AffirmativeAuthorizationDecisionMaker;
 use Morebec\Orkestra\Messaging\Authorization\AuthorizeMessageMiddleware;
 use Morebec\Orkestra\Messaging\Authorization\MessageAuthorizerInterface;
 use Morebec\Orkestra\Messaging\Authorization\UnauthorizedException;
@@ -32,6 +33,28 @@ class AuthorizeMessageMiddlewareTest extends TestCase
         $response = $middleware($message, new MessageHeaders(), $nextMiddleware);
 
         $this->assertInstanceOf(UnauthorizedResponse::class, $response);
+    }
+
+    public function testAddAuthorizer(): void
+    {
+        $middleware = new AuthorizeMessageMiddleware(
+            new AffirmativeAuthorizationDecisionMaker([$this->createAuthorizer()])
+        );
+
+        $message = $this->createMessage();
+
+        $authorizer = $this->getMockBuilder(MessageAuthorizerInterface::class)->getMock();
+        $authorizer->method('supportsPreAuthorization')->willReturn(true);
+
+        $middleware->addAuthorizer($authorizer);
+
+        $nextMiddleware = static function (MessageInterface $message, MessageHeaders $headers) {
+            return new MessageHandlerResponse('handlerName', MessageBusResponseStatusCode::SUCCEEDED());
+        };
+
+        $response = $middleware($message, new MessageHeaders(), $nextMiddleware);
+
+        $this->assertInstanceOf(MessageHandlerResponse::class, $response);
     }
 
     private function createAuthorizer(): MessageAuthorizerInterface

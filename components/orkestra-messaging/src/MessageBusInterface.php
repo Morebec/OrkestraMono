@@ -11,10 +11,10 @@ interface MessageBusInterface
 {
     /**
      * Sends a message through this bus.
-     * This function should never fail and should always return a response.
-     * The only cases where it is allowed to throw orkestra-exceptions is for cases of misconfiguration of the bus itself,
-     * to indicate that there is a problem with the configuration of the message bus.
-     * Otherwise all orkestra-exceptions that are thrown by handlers should be transformed to responses.
+     * This function should never fail and should always return a response representing success or failure.
+     *
+     * The only cases where it is allowed to throw exceptions is when the bus itself has encountered an unexpected problem
+     * such as misconfiguration or other internal errors.
      *
      * @param MessageHeaders|null $headers additional optional headers to be sent with the message
      */

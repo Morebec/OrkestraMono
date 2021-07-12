@@ -2,15 +2,15 @@
 
 namespace Morebec\Orkestra\Messaging\Domain;
 
-use Morebec\Orkestra\Messaging\MessageBus;
 use Morebec\Orkestra\Messaging\MessageBusResponseInterface;
 use Morebec\Orkestra\Messaging\MessageHeaders;
 use Morebec\Orkestra\Messaging\MessageInterface;
+use Morebec\Orkestra\Messaging\MiddlewareMessageBus;
 
 /**
  * Class DomainMessageBus.
  */
-class DomainMessageBus extends MessageBus implements DomainMessageBusInterface
+class DomainMessageBus extends MiddlewareMessageBus implements DomainMessageBusInterface
 {
     public function sendMessage(MessageInterface $message, ?MessageHeaders $headers = null): MessageBusResponseInterface
     {

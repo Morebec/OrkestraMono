@@ -36,7 +36,7 @@ class MessageRoute implements MessageRouteInterface
      */
     public function matches(MessageInterface $message, MessageHeaders $headers): bool
     {
-        return $this->messageTypeName === $message::getTypeName();
+        return $this->messageTypeName === $message::getTypeName() || $this->messageTypeName === MessageInterface::class;
     }
 
     public function getId(): string

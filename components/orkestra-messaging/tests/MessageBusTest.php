@@ -2,113 +2,212 @@
 
 namespace Tests\Morebec\Orkestra\Messaging;
 
+use Morebec\Orkestra\DateTime\SystemClock;
+use Morebec\Orkestra\Messaging\Authorization\MessageAuthorizerInterface;
+use Morebec\Orkestra\Messaging\Authorization\UnauthorizedException;
+use Morebec\Orkestra\Messaging\Authorization\UnauthorizedResponse;
+use Morebec\Orkestra\Messaging\Context\BuildMessageBusContextMiddleware;
 use Morebec\Orkestra\Messaging\MessageBus;
 use Morebec\Orkestra\Messaging\MessageBusResponseInterface;
 use Morebec\Orkestra\Messaging\MessageBusResponseStatusCode;
-use Morebec\Orkestra\Messaging\MessageHandlerResponse;
+use Morebec\Orkestra\Messaging\MessageHandlerInterface;
 use Morebec\Orkestra\Messaging\MessageHeaders;
 use Morebec\Orkestra\Messaging\MessageInterface;
 use Morebec\Orkestra\Messaging\Middleware\MessageBusMiddlewareInterface;
+use Morebec\Orkestra\Messaging\Normalization\MessageNormalizerInterface;
+use Morebec\Orkestra\Messaging\Routing\HandleMessageMiddleware;
+use Morebec\Orkestra\Messaging\Routing\MessageHandlerInterceptionContext;
+use Morebec\Orkestra\Messaging\Routing\MessageHandlerInterceptorInterface;
+use Morebec\Orkestra\Messaging\Transformation\AbstractResponseTransformer;
+use Morebec\Orkestra\Messaging\Validation\InvalidMessageResponse;
+use Morebec\Orkestra\Messaging\Validation\MessageValidationError;
+use Morebec\Orkestra\Messaging\Validation\MessageValidationErrorList;
+use Morebec\Orkestra\Messaging\Validation\MessageValidatorInterface;
 use PHPUnit\Framework\TestCase;
 
 class MessageBusTest extends TestCase
 {
     public function testSendMessage(): void
     {
-        $middlewares = [
-            $this->createMiddlewareA(),
-            $this->createMiddlewareB(),
-            $this->createMiddlewareC(),
-        ];
+        $clock = new SystemClock();
+        $messageNormalizer = $this->getMockBuilder(MessageNormalizerInterface::class)->getMock();
+        $messageBus = new MessageBus($clock, $messageNormalizer);
 
-        $bus = new MessageBus($middlewares);
+        $response = $messageBus->sendMessage($this->createMessage());
 
-        $message = $this->getMockBuilder(MessageInterface ::class)->getMock();
-        /** @var MessageInterface $message */
-        $response = $bus->sendMessage($message, new MessageHeaders());
-
-        $this->assertTrue($response->isSuccess());
+        self::assertTrue($response->isSuccess());
+        self::assertNull($response->getPayload());
+        self::assertEquals(MessageBusResponseStatusCode::SKIPPED(), $response->getStatusCode());
     }
 
-    public function testPrependMiddleware(): void
+    public function testAddMiddleware(): void
     {
-        $middlewareA = $this->createMiddlewareA();
-        $middlewareB = $this->createMiddlewareB();
+        $clock = new SystemClock();
+        $messageNormalizer = $this->getMockBuilder(MessageNormalizerInterface::class)->getMock();
+        $messageBus = new MessageBus($clock, $messageNormalizer);
 
-        $bus = new MessageBus([$middlewareA]);
-        $bus->prependMiddleware($middlewareB);
+        $middleware = $this->getMockBuilder(MessageBusMiddlewareInterface::class)->getMock();
+        $messageBus->addMiddleware($middleware);
 
-        $middleware = $bus->getMiddleware();
-
-        $this->assertEquals($middleware[0], $middlewareB);
-        $this->assertEquals($middleware[1], $middlewareA);
+        self::assertContains($middleware, $messageBus->getMiddleware()->toArray());
     }
 
-    public function testAppendMiddleware(): void
+    public function testAddMiddlewareBefore(): void
     {
-        $middlewareA = $this->createMiddlewareA();
-        $middlewareB = $this->createMiddlewareB();
+        $clock = new SystemClock();
+        $messageNormalizer = $this->getMockBuilder(MessageNormalizerInterface::class)->getMock();
+        $messageBus = new MessageBus($clock, $messageNormalizer);
 
-        $bus = new MessageBus([$middlewareA]);
-        $bus->appendMiddleware($middlewareB);
+        $middleware = $this->getMockBuilder(MessageBusMiddlewareInterface::class)->getMock();
+        $messageBus->addMiddlewareBefore(BuildMessageBusContextMiddleware::class, $middleware);
 
-        $middleware = $bus->getMiddleware();
-
-        $this->assertEquals($middleware[0], $middlewareA);
-        $this->assertEquals($middleware[1], $middlewareB);
+        self::assertEquals($middleware, $messageBus->getMiddleware()->getOrDefault(0));
     }
 
-    public function testGetMiddleware(): void
+    public function testAddMiddlewareAfter(): void
     {
-        $bus = new MessageBus();
-        $this->assertEmpty($bus->getMiddleware());
-        $bus->appendMiddleware($this->createMiddlewareA());
-        $this->assertNotEmpty($bus->getMiddleware());
+        $clock = new SystemClock();
+        $messageNormalizer = $this->getMockBuilder(MessageNormalizerInterface::class)->getMock();
+        $messageBus = new MessageBus($clock, $messageNormalizer);
+
+        $middleware = $this->getMockBuilder(MessageBusMiddlewareInterface::class)->getMock();
+        $messageBus->addMiddlewareAfter(HandleMessageMiddleware::class, $middleware);
+
+        $middlewareCollection = $messageBus->getMiddleware();
+        self::assertEquals($middleware, $middlewareCollection->getOrDefault(\count($middlewareCollection) - 1));
     }
 
-    public function testReplaceMiddleware(): void
+    public function testAddValidator(): void
     {
-        $bus = new MessageBus([$this->createMiddlewareA()]);
-        $middlewareB = $this->createMiddlewareB();
-        $middlewareC = $this->createMiddlewareC();
-
-        $bus->replaceMiddleware([
-            $middlewareB,
-            $middlewareC,
-        ]);
-
-        $middleware = $bus->getMiddleware();
-
-        $this->assertEquals($middleware[0], $middlewareB);
-        $this->assertEquals($middleware[1], $middlewareC);
-    }
-
-    public function createMiddlewareA(): MessageBusMiddlewareInterface
-    {
-        return new class() implements MessageBusMiddlewareInterface {
-            public function __invoke(MessageInterface $message, MessageHeaders $headers, callable $next): MessageBusResponseInterface
+        $clock = new SystemClock();
+        $messageNormalizer = $this->getMockBuilder(MessageNormalizerInterface::class)->getMock();
+        $messageBus = new MessageBus($clock, $messageNormalizer);
+        $messageBus->addValidator(new class() implements MessageValidatorInterface {
+            public function validate(MessageInterface $message, MessageHeaders $headers): MessageValidationErrorList
             {
-                return $next($message, $headers);
+                return new MessageValidationErrorList([
+                    new MessageValidationError(
+                        'invalid message',
+                        'hello',
+                        'world'
+                    ),
+                ]);
             }
-        };
-    }
 
-    public function createMiddlewareB(): MessageBusMiddlewareInterface
-    {
-        return new class() implements MessageBusMiddlewareInterface {
-            public function __invoke(MessageInterface $message, MessageHeaders $headers, callable $next): MessageBusResponseInterface
+            public function supports(MessageInterface $message, MessageHeaders $headers): bool
             {
-                return $next($message, $headers);
+                return true;
             }
-        };
+        });
+
+        $response = $messageBus->sendMessage($this->createMessage());
+
+        self::assertInstanceOf(InvalidMessageResponse::class, $response);
     }
 
-    public function createMiddlewareC(): MessageBusMiddlewareInterface
+    public function testAddAuthorizer(): void
     {
-        return new class() implements MessageBusMiddlewareInterface {
-            public function __invoke(MessageInterface $message, MessageHeaders $headers, callable $next): MessageBusResponseInterface
+        $clock = new SystemClock();
+        $messageNormalizer = $this->getMockBuilder(MessageNormalizerInterface::class)->getMock();
+        $messageBus = new MessageBus($clock, $messageNormalizer);
+        $messageBus->addAuthorizer(new class() implements MessageAuthorizerInterface {
+            public function preAuthorize(MessageInterface $message, MessageHeaders $headers): void
             {
-                return new MessageHandlerResponse('test_command_handler', MessageBusResponseStatusCode::SUCCEEDED());
+                throw new UnauthorizedException();
+            }
+
+            public function postAuthorize(MessageInterface $message, MessageHeaders $headers, MessageBusResponseInterface $response): void
+            {
+            }
+
+            public function supportsPreAuthorization(MessageInterface $message, MessageHeaders $headers): bool
+            {
+                return true;
+            }
+
+            public function supportsPostAuthorization(MessageInterface $message, MessageHeaders $headers, MessageBusResponseInterface $response): bool
+            {
+                return false;
+            }
+        });
+        $response = $messageBus->sendMessage($this->createMessage());
+
+        self::assertInstanceOf(UnauthorizedResponse::class, $response);
+    }
+
+    public function testAddTransformer(): void
+    {
+        $clock = new SystemClock();
+        $messageNormalizer = $this->getMockBuilder(MessageNormalizerInterface::class)->getMock();
+        $messageBus = new MessageBus($clock, $messageNormalizer);
+        $messageBus->addTransformer(new class() extends AbstractResponseTransformer {
+            public function transformResponse(MessageBusResponseInterface $response, MessageInterface $message, MessageHeaders $headers): MessageBusResponseInterface
+            {
+                return new UnauthorizedResponse(new UnauthorizedException());
+            }
+        });
+
+        $response = $messageBus->sendMessage($this->createMessage());
+
+        self::assertInstanceOf(UnauthorizedResponse::class, $response);
+    }
+
+    public function testAddMessageHandler(): void
+    {
+        $clock = new SystemClock();
+        $messageNormalizer = $this->getMockBuilder(MessageNormalizerInterface::class)->getMock();
+        $messageBus = new MessageBus($clock, $messageNormalizer);
+
+        $messageBus->addMessageHandler(new class() implements MessageHandlerInterface {
+            public function __invoke(MessageInterface $message)
+            {
+                return 'handler_invoked';
+            }
+        });
+
+        $response = $messageBus->sendMessage($this->createMessage());
+
+        self::assertTrue($response->isSuccess());
+        self::assertEquals(MessageBusResponseStatusCode::SUCCEEDED(), $response->getStatusCode());
+        self::assertEquals('handler_invoked', $response->getPayload());
+    }
+
+    public function testAddMessageHandlerInterceptor(): void
+    {
+        $clock = new SystemClock();
+        $messageNormalizer = $this->getMockBuilder(MessageNormalizerInterface::class)->getMock();
+        $messageBus = new MessageBus($clock, $messageNormalizer);
+
+        // Add handler so interceptor can be invoked.
+        $messageBus->addMessageHandler(new class() implements MessageHandlerInterface {
+            public function __invoke(MessageInterface $message)
+            {
+                return 'handler_invoked';
+            }
+        });
+        $messageBus->addMessageHandlerInterceptor(new class() implements MessageHandlerInterceptorInterface {
+            public function beforeHandle(MessageHandlerInterceptionContext $context): void
+            {
+                // TODO: Implement beforeHandle() method.
+            }
+
+            public function afterHandle(MessageHandlerInterceptionContext $context): void
+            {
+                $context->replaceResponse(new UnauthorizedResponse(new UnauthorizedException()));
+            }
+        });
+
+        $response = $messageBus->sendMessage($this->createMessage());
+
+        self::assertInstanceOf(UnauthorizedResponse::class, $response);
+    }
+
+    private function createMessage(): MessageInterface
+    {
+        return new class() implements MessageInterface {
+            public static function getTypeName(): string
+            {
+                return 'message.unit_test';
             }
         };
     }

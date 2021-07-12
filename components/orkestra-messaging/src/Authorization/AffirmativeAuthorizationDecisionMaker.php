@@ -38,6 +38,7 @@ class AffirmativeAuthorizationDecisionMaker implements AuthorizationDecisionMake
 
             try {
                 $authorizer->preAuthorize($message, $headers);
+                $exception = null;
                 break; // First Supported authorizer allows the process the request.
             } catch (UnauthorizedException $e) {
                 $exception = $e;
