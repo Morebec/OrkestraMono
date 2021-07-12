@@ -297,7 +297,7 @@ class Collection implements \Iterator, \Countable
         return current($this->elements);
     }
 
-    public function next()
+    public function next(): void
     {
         next($this->elements);
     }
@@ -307,17 +307,17 @@ class Collection implements \Iterator, \Countable
         return key($this->elements);
     }
 
-    public function valid()
+    public function valid(): bool
     {
         return \array_key_exists($this->key(), $this->elements);
     }
 
-    public function rewind()
+    public function rewind(): void
     {
         reset($this->elements);
     }
 
-    public function count()
+    public function count(): int
     {
         return \count($this->elements);
     }
