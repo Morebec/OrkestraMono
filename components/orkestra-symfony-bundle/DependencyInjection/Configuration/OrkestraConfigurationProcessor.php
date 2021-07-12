@@ -7,6 +7,7 @@ use Morebec\Orkestra\EventSourcing\EventStore\EventStoreInterface;
 use Morebec\Orkestra\Messaging\MessageBusInterface;
 use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\EventProcessing\EventProcessingConfigurationProcessor;
 use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\EventStore\EventStoreConfigurationProcessor;
+use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\Messaging\MessagingConfigurationProcessor;
 use Morebec\Orkestra\SymfonyBundle\OrkestraKernel;
 use ReflectionException;
 
