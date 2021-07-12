@@ -9,9 +9,9 @@ class MessagingConfiguration
     /** @var MessageBusConfiguration[] */
     public array $messageBuses = [];
 
-    public ?TimeoutProcessingConfiguration $timeoutProcessingConfiguration;
+    public ?TimeoutProcessingConfiguration $timeoutProcessingConfiguration = null;
 
-    public ?MessageNormalizerConfiguration $messageNormalizerConfiguration;
+    public ?MessageNormalizerConfiguration $messageNormalizerConfiguration = null;
 
     /**
      * Configures a message bus.
