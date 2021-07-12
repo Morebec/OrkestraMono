@@ -19,7 +19,7 @@ use Morebec\Orkestra\Messaging\Validation\ValidateMessageMiddleware;
 use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\Messaging\MessageBusConfiguration;
 use PHPUnit\Framework\TestCase;
 
-class DefaultMessageBusConfigurationTest extends TestCase
+class MessageBusConfigurationTest extends TestCase
 {
     public function testWithMessageValidator(): void
     {

@@ -8,7 +8,6 @@ use Morebec\Orkestra\Messaging\MessageBusInterface;
 use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\EventProcessing\EventProcessingConfigurationProcessor;
 use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\EventStore\EventStoreConfigurationProcessor;
 use Morebec\Orkestra\SymfonyBundle\OrkestraKernel;
-use Morebec\OrkestraSymfonyBundle\DependencyInjection\Configuration\Messaging\MessagingConfigurationProcessor;
 use ReflectionException;
 
 class OrkestraConfigurationProcessor
@@ -56,9 +55,11 @@ class OrkestraConfigurationProcessor
     public function processEventStoreConfiguration(OrkestraConfiguration $configuration): void
     {
         $processor = new EventStoreConfigurationProcessor();
-        $eventStoreConfiguration = $configuration->eventStore();
-        if ($eventStoreConfiguration) {
-            $processor->process($configuration, $eventStoreConfiguration);
+
+        try {
+            $eventStore = $configuration->eventStore();
+            $processor->process($configuration, $eventStore);
+        } catch (NotConfiguredException $exception) {
         }
     }
 
@@ -68,10 +69,11 @@ class OrkestraConfigurationProcessor
     public function processEventProcessingConfiguration(OrkestraConfiguration $configuration): void
     {
         $processor = new EventProcessingConfigurationProcessor();
-        $eventProcessingConfiguration = $configuration->eventProcessing();
 
-        if ($eventProcessingConfiguration) {
+        try {
+            $eventProcessingConfiguration = $configuration->eventProcessing();
             $processor->process($configuration, $eventProcessingConfiguration);
+        } catch (NotConfiguredException $exception) {
         }
     }
 }

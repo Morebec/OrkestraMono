@@ -1,15 +1,11 @@
 <?php
 
-namespace Morebec\OrkestraSymfonyBundle\DependencyInjection\Configuration\Messaging;
+namespace Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\Messaging;
 
 use JsonException;
 use Morebec\Orkestra\Messaging\Normalization\ClassMapMessageNormalizer;
 use Morebec\Orkestra\Messaging\Normalization\MessageClassMapInterface;
 use Morebec\Orkestra\Messaging\Normalization\MessageNormalizerInterface;
-use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\Messaging\MessageBusConfigurationProcessor;
-use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\Messaging\MessagingConfiguration;
-use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\Messaging\MiddlewareMessageBusConfiguration;
-use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\Messaging\TimeoutProcessingConfigurationProcessor;
 use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\OrkestraConfiguration;
 use Morebec\Orkestra\SymfonyBundle\DependencyInjection\SymfonyMessageClassMapFactory;
 use Morebec\Orkestra\SymfonyBundle\OrkestraKernel;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Morebec\OrkestraSymfonyBundle\DependencyInjection;
+namespace Tests\Morebec\Orkestra\SymfonyBundle\DependencyInjection;
 
 use Morebec\Orkestra\SymfonyBundle\DependencyInjection\ClassDiscoverer;
 use PHPUnit\Framework\TestCase;

@@ -155,9 +155,9 @@ class MessageBusConfiguration
      *
      * @return $this
      */
-    public function messageHandler(string $serviceId, ?string $className, bool $autoroute): self
+    public function messageHandler(string $serviceId, ?string $className): self
     {
-        $this->messageHandlers[$serviceId] = new MessageBusHandlerConfiguration($serviceId, $className, $autoroute);
+        $this->messageHandlers[$serviceId] = new MessageBusHandlerConfiguration($serviceId, $className);
 
         return $this;
     }
@@ -177,17 +177,17 @@ class MessageBusConfiguration
     /**
      * Configures a Command handler.
      */
-    public function commandHandler(string $serviceId, string $className = null, bool $autoroute = true): self
+    public function commandHandler(string $serviceId, string $className = null): self
     {
-        return $this->messageHandler($serviceId, $className, $autoroute);
+        return $this->messageHandler($serviceId, $className);
     }
 
     /**
      * Configures a Query handler.
      */
-    public function queryHandler(string $serviceId, string $className = null, bool $autoroute = true): self
+    public function queryHandler(string $serviceId, string $className = null): self
     {
-        return $this->messageHandler($serviceId, $className, $autoroute);
+        return $this->messageHandler($serviceId, $className);
     }
 
     /**
@@ -195,9 +195,9 @@ class MessageBusConfiguration
      *
      * @return $this
      */
-    public function eventHandler(string $serviceId, string $className = null, bool $autoroute = true): self
+    public function eventHandler(string $serviceId, string $className = null): self
     {
-        return $this->messageHandler($serviceId, $className, $autoroute);
+        return $this->messageHandler($serviceId, $className);
     }
 
     /**
@@ -205,9 +205,9 @@ class MessageBusConfiguration
      *
      * @return $this
      */
-    public function timeoutHandler(string $serviceId, string $className = null, bool $autoroute = true): self
+    public function timeoutHandler(string $serviceId, string $className = null): self
     {
-        return $this->messageHandler($serviceId, $className, $autoroute);
+        return $this->messageHandler($serviceId, $className);
     }
 
     /**
@@ -215,8 +215,8 @@ class MessageBusConfiguration
      *
      * @return $this
      */
-    public function processManager(string $serviceId, string $className = null, bool $autoroute = true): self
+    public function processManager(string $serviceId, string $className = null): self
     {
-        return $this->messageHandler($serviceId, $className, $autoroute);
+        return $this->messageHandler($serviceId, $className);
     }
 }

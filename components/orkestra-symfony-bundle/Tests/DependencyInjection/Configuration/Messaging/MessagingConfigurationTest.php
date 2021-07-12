@@ -3,9 +3,9 @@
 namespace Morebec\Orkestra\SymfonyBundle\Tests\DependencyInjection\Configuration\Messaging;
 
 use Morebec\Orkestra\Messaging\MessageBusInterface;
+use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\Messaging\MessageBusConfiguration;
 use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\Messaging\MessageNormalizerConfiguration;
 use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\Messaging\MessagingConfiguration;
-use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\Messaging\MiddlewareMessageBusConfiguration;
 use PHPUnit\Framework\TestCase;
 
 class MessagingConfigurationTest extends TestCase
@@ -14,7 +14,7 @@ class MessagingConfigurationTest extends TestCase
     {
         $configuration = new MessagingConfiguration();
 
-        $messageBusConfiguration = new MiddlewareMessageBusConfiguration();
+        $messageBusConfiguration = new MessageBusConfiguration();
         $messageBusConfiguration->usingServiceId(MessageBusInterface::class);
 
         $configuration->configureMessageBus($messageBusConfiguration);

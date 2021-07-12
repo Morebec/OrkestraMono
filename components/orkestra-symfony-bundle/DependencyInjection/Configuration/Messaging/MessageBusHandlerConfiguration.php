@@ -11,12 +11,9 @@ class MessageBusHandlerConfiguration
 
     public ?string $className;
 
-    public bool $autoroute;
-
-    public function __construct(string $serviceId, ?string $className, bool $autoRouted)
+    public function __construct(string $serviceId, ?string $className)
     {
         $this->serviceId = $serviceId;
         $this->className = $className;
-        $this->autoroute = $autoRouted;
     }
 }
