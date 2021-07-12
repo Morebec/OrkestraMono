@@ -52,10 +52,11 @@ class MessagingConfigurationProcessor
             );
         }
 
+        $messageNormalizerConfiguration = $messagingConfiguration->messageNormalizerConfiguration;
+
         try {
             $messageNormalizerService = $orkestraConfiguration->container()->services()->get(MessageNormalizerInterface::class);
         } catch (ServiceNotFoundException $exception) {
-            $messageNormalizerConfiguration = $messagingConfiguration->messageNormalizerConfiguration;
             $messageNormalizerService = $orkestraConfiguration->service(
                 MessageNormalizerInterface::class,
                 $messageNormalizerConfiguration->implementationClassName
