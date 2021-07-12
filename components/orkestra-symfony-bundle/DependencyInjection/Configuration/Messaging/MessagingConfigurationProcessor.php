@@ -2,14 +2,11 @@
 
 namespace Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\Messaging;
 
-use JsonException;
 use Morebec\Orkestra\Messaging\Normalization\ClassMapMessageNormalizer;
 use Morebec\Orkestra\Messaging\Normalization\MessageClassMapInterface;
 use Morebec\Orkestra\Messaging\Normalization\MessageNormalizerInterface;
 use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\OrkestraConfiguration;
 use Morebec\Orkestra\SymfonyBundle\DependencyInjection\SymfonyMessageClassMapFactory;
-use Morebec\Orkestra\SymfonyBundle\OrkestraKernel;
-use ReflectionException;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 
@@ -22,16 +19,12 @@ class MessagingConfigurationProcessor
 
     private TimeoutProcessingConfigurationProcessor $timeoutProcessingConfigurationProcessor;
 
-    public function __construct(OrkestraKernel $kernel)
+    public function __construct()
     {
-        $this->messageBusConfigurationProcessor = new MessageBusConfigurationProcessor($kernel);
+        $this->messageBusConfigurationProcessor = new MessageBusConfigurationProcessor();
         $this->timeoutProcessingConfigurationProcessor = new TimeoutProcessingConfigurationProcessor();
     }
 
-    /**
-     * @throws JsonException
-     * @throws ReflectionException
-     */
     public function process(OrkestraConfiguration $orkestraConfiguration, MessagingConfiguration $configuration): void
     {
         // Message Buses
@@ -90,11 +83,7 @@ class MessagingConfigurationProcessor
         }
     }
 
-    /**
-     * @throws JsonException
-     * @throws ReflectionException
-     */
-    protected function processMessageBus(OrkestraConfiguration $orkestraConfiguration, MiddlewareMessageBusConfiguration $messageBusConfiguration): void
+    protected function processMessageBus(OrkestraConfiguration $orkestraConfiguration, MessageBusConfiguration $messageBusConfiguration): void
     {
         $this->messageBusConfigurationProcessor->process($orkestraConfiguration, $messageBusConfiguration);
     }

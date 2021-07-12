@@ -2,12 +2,10 @@
 
 namespace Morebec\Orkestra\SymfonyBundle;
 
-use JsonException;
 use LogicException;
 use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\OrkestraConfiguration;
 use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\OrkestraConfigurationProcessor;
 use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\OrkestraModuleConfiguratorInterface;
-use ReflectionException;
 use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
@@ -132,9 +130,6 @@ class OrkestraKernel extends BaseKernel
 
     /**
      * Configures the container using the Orkestra Module Configurators.
-     *
-     * @throws JsonException
-     * @throws ReflectionException
      */
     protected function configureModuleContainer(ContainerConfigurator $container): void
     {
@@ -145,7 +140,7 @@ class OrkestraKernel extends BaseKernel
 
         // Using the configuration register services.
         // Apply configuration here since multiple module can redefine the configuration at any point.
-        $processor = new OrkestraConfigurationProcessor($this);
+        $processor = new OrkestraConfigurationProcessor();
         $processor->processConfiguration($orkestraConfiguration);
 
         // Add Compiler PAsses
