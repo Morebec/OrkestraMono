@@ -2,29 +2,8 @@
 
 namespace Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\Messaging;
 
-use JsonException;
-use Morebec\Orkestra\Messaging\Authorization\AuthorizationDecisionMakerInterface;
-use Morebec\Orkestra\Messaging\Authorization\AuthorizeMessageMiddleware;
-use Morebec\Orkestra\Messaging\Authorization\VetoAuthorizationDecisionMaker;
-use Morebec\Orkestra\Messaging\Context\BuildMessageBusContextMiddleware;
-use Morebec\Orkestra\Messaging\Context\MessageBusContextManager;
-use Morebec\Orkestra\Messaging\Context\MessageBusContextManagerInterface;
-use Morebec\Orkestra\Messaging\Context\MessageBusContextProvider;
-use Morebec\Orkestra\Messaging\Context\MessageBusContextProviderInterface;
-use Morebec\Orkestra\Messaging\Routing\ContainerMessageHandlerProvider;
-use Morebec\Orkestra\Messaging\Routing\HandleMessageMiddleware;
-use Morebec\Orkestra\Messaging\Routing\MessageHandlerProviderInterface;
-use Morebec\Orkestra\Messaging\Routing\MessageHandlerRouteBuilder;
-use Morebec\Orkestra\Messaging\Routing\MessageRouteCollection;
-use Morebec\Orkestra\Messaging\Routing\MessageRouterInterface;
-use Morebec\Orkestra\Messaging\Routing\RouteMessageMiddleware;
-use Morebec\Orkestra\Messaging\Transformation\MessagingTransformationMiddleware;
-use Morebec\Orkestra\Messaging\Validation\ValidateMessageMiddleware;
+use Morebec\Orkestra\Messaging\MessageBus;
 use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\OrkestraConfiguration;
-use Morebec\Orkestra\SymfonyBundle\Messaging\CachedMessageRouter;
-use Morebec\Orkestra\SymfonyBundle\Messaging\MessageRouterCache;
-use Morebec\Orkestra\SymfonyBundle\OrkestraKernel;
-use ReflectionException;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ServiceConfigurator;
@@ -36,69 +15,30 @@ use Symfony\Component\DependencyInjection\Loader\Configurator\ServiceConfigurato
  */
 class MessageBusConfigurationProcessor
 {
-    private OrkestraKernel $kernel;
-
-    public function __construct(OrkestraKernel $kernel)
-    {
-        $this->kernel = $kernel;
-    }
-
-    /**
-     * @throws JsonException
-     * @throws ReflectionException
-     */
     public function process(OrkestraConfiguration $orkestraConfiguration, MessageBusConfiguration $messageBusConfiguration): void
     {
         // REGISTER MESSAGE BUS
-        $messageBusService = $orkestraConfiguration->service($messageBusConfiguration->serviceId, $messageBusConfiguration->implementationClassName);
+        $messageBusService = $orkestraConfiguration->service($messageBusConfiguration->serviceId, MessageBus::class);
 
         // REGISTER MIDDLEWARE
         $this->processMiddleware($orkestraConfiguration, $messageBusConfiguration, $messageBusService);
 
         // REGISTER MESSAGE HANDLERS
-        $this->processMessageHandlers($orkestraConfiguration, $messageBusConfiguration);
+        $this->processMessageHandlers($orkestraConfiguration, $messageBusConfiguration, $messageBusService);
 
         // Authorizers
-        $this->processMessageAuthorizers($orkestraConfiguration, $messageBusConfiguration);
+        $this->processMessageAuthorizers($orkestraConfiguration, $messageBusConfiguration, $messageBusService);
 
         // Validators
-        $this->processMessageValidators($orkestraConfiguration, $messageBusConfiguration);
+        $this->processMessageValidators($orkestraConfiguration, $messageBusConfiguration, $messageBusService);
 
         // Transformers
-        $this->processMessagingTransformers($orkestraConfiguration, $messageBusConfiguration);
+        $this->processMessagingTransformers($orkestraConfiguration, $messageBusConfiguration, $messageBusService);
     }
 
     protected function processMiddleware(OrkestraConfiguration $orkestraConfiguration, MessageBusConfiguration $messageBusConfiguration, ServiceConfigurator $messageBusService): void
     {
-        $middlewareAsServiceReference = array_map(function (string $middlewareClassName) use ($orkestraConfiguration) {
-            if ($middlewareClassName === BuildMessageBusContextMiddleware::class) {
-                // Register dependencies.
-                try {
-                    $orkestraConfiguration->container()->services()->get(MessageBusContextManagerInterface::class);
-                } catch (ServiceNotFoundException $exception) {
-                    $orkestraConfiguration->service(MessageBusContextManagerInterface::class, MessageBusContextManager::class);
-                }
-
-                try {
-                    $orkestraConfiguration->container()->services()->get(MessageBusContextProviderInterface::class);
-                } catch (ServiceNotFoundException $exception) {
-                    $orkestraConfiguration->service(MessageBusContextProviderInterface::class, MessageBusContextProvider::class);
-                }
-            } elseif ($middlewareClassName === RouteMessageMiddleware::class) {
-                try {
-                    $orkestraConfiguration->container()->services()->get(MessageRouterInterface::class);
-                } catch (ServiceNotFoundException $exception) {
-                    $orkestraConfiguration->service(MessageRouterInterface::class, CachedMessageRouter::class);
-                    $orkestraConfiguration->service(MessageRouterCache::class)->args([$this->kernel->getCacheDir()]);
-                }
-
-                try {
-                    $orkestraConfiguration->container()->services()->get(MessageHandlerProviderInterface::class);
-                } catch (ServiceNotFoundException $exception) {
-                    $orkestraConfiguration->service(MessageHandlerProviderInterface::class, ContainerMessageHandlerProvider::class);
-                }
-            }
-
+        $middlewareAsServiceReference = array_map(static function (string $middlewareClassName) use ($orkestraConfiguration) {
             try {
                 $orkestraConfiguration->container()->services()->get($middlewareClassName);
             } catch (ServiceNotFoundException $exception) {
@@ -109,174 +49,81 @@ class MessageBusConfigurationProcessor
         }, $messageBusConfiguration->middleware);
 
         // Add service method call for each middleware to append.
-        if ($messageBusConfiguration->implementationClassName === DefaultMessageBusConfiguration::DEFAULT_IMPLEMENTATION_CLASS_NAME) {
-            $messageBusService->args([$middlewareAsServiceReference]);
-        } else {
-            foreach ($middlewareAsServiceReference as $middlewareServiceReference) {
-                $messageBusService->call('appendMiddleware', $middlewareServiceReference);
-            }
+        foreach ($middlewareAsServiceReference as $middlewareServiceReference) {
+            $messageBusService->call('addMiddleware', $middlewareServiceReference);
         }
     }
 
-    /**
-     * @throws JsonException
-     * @throws ReflectionException
-     */
     protected function processMessageHandlers(
         OrkestraConfiguration $orkestraConfiguration,
-        MessageBusConfiguration $messageBusConfiguration
+        MessageBusConfiguration $messageBusConfiguration,
+        ServiceConfigurator $messageBusService
     ): void {
-        try {
-            $handleMessageMiddlewareService = $orkestraConfiguration->container()->services()->get(HandleMessageMiddleware::class);
-        } catch (ServiceNotFoundException $exception) {
-            $handleMessageMiddlewareService = null;
+        // Register Handlers
+        foreach ($messageBusConfiguration->messageHandlers as $handler) {
+            try {
+                $orkestraConfiguration->container()->services()->get($handler->serviceId);
+            } catch (ServiceNotFoundException $exception) {
+                $orkestraConfiguration->service($handler->serviceId, $handler->className)->lazy()->public();
+            }
+
+            $messageBusService->call('addMessageHandler', [service($handler->serviceId)]);
         }
 
-        if ($handleMessageMiddlewareService && $messageBusConfiguration instanceof DefaultMessageBusConfiguration) {
-            $routerCache = new MessageRouterCache($this->kernel->getCacheDir());
-            $routes = new MessageRouteCollection();
-
+        // Register Message Handler Interceptors
+        foreach ($messageBusConfiguration->messageHandlerInterceptors as $interceptorClassName) {
             try {
-                $routeMiddlewareService = $orkestraConfiguration->container()->services()->get(RouteMessageMiddleware::class);
+                $orkestraConfiguration->container()->services()->get($interceptorClassName);
             } catch (ServiceNotFoundException $exception) {
-                $routeMiddlewareService = null;
+                $orkestraConfiguration->service($interceptorClassName);
             }
 
-            foreach ($messageBusConfiguration->messageHandlers as $handler) {
-                try {
-                    $orkestraConfiguration->container()->services()->get($handler->serviceId);
-                } catch (ServiceNotFoundException $exception) {
-                    $orkestraConfiguration->service($handler->serviceId, $handler->className)->lazy()->public();
-                }
-
-                if ($handler->autoroute && $routeMiddlewareService) {
-                    $routes->addAll(
-                        MessageHandlerRouteBuilder::forMessageHandler($handler->serviceId)
-                            ->build()
-                    );
-                }
-            }
-            // Symfony does not allow injecting objects as method calls in the container.
-            // To overcome this, we have to dump the routes in a file in cache along with the container
-            // and provide it a way to load these routes.
-            $routerCache->dumpRoutes($routes);
-
-            // Register Message Handler Interceptors
-            foreach ($messageBusConfiguration->messageHandlerInterceptors as $interceptorClassName) {
-                try {
-                    $orkestraConfiguration->container()->services()->get($interceptorClassName);
-                } catch (ServiceNotFoundException $exception) {
-                    $orkestraConfiguration->service($interceptorClassName);
-                }
-
-                $handleMessageMiddlewareService->call('addInterceptor', [
-                    service($interceptorClassName),
-                ]);
-            }
+            $messageBusService->call('addMessageHandlerInterceptor', [service($interceptorClassName)]);
         }
     }
 
     protected function processMessageAuthorizers(
         OrkestraConfiguration $orkestraConfiguration,
-        MessageBusConfiguration $messageBusConfiguration
+        MessageBusConfiguration $messageBusConfiguration,
+        ServiceConfigurator $messageBusService
     ): void {
-        if (!($messageBusConfiguration instanceof DefaultMessageBusConfiguration)) {
-            return;
-        }
-
-        try {
-            $orkestraConfiguration
-                ->container()
-                ->services()
-                ->get(AuthorizeMessageMiddleware::class)
-            ;
-        } catch (ServiceNotFoundException $exception) {
-            return;
-        }
-
-        $authorizerServiceReferences = [];
         foreach ($messageBusConfiguration->authorizers as $authorizerClassName) {
             try {
                 $orkestraConfiguration->container()->services()->get($authorizerClassName);
             } catch (ServiceNotFoundException $exception) {
                 $orkestraConfiguration->service($authorizerClassName);
             }
-            $authorizerServiceReferences[] = service($authorizerClassName);
-        }
-
-        try {
-            $orkestraConfiguration->container()->services()->get(AuthorizationDecisionMakerInterface::class);
-        } catch (ServiceNotFoundException $exception) {
-            $orkestraConfiguration->service(
-                AuthorizationDecisionMakerInterface::class,
-                VetoAuthorizationDecisionMaker::class
-            )->args([$authorizerServiceReferences]);
+            $messageBusService->call('addAuthorizer', [service($authorizerClassName)]);
         }
     }
 
     protected function processMessageValidators(
         OrkestraConfiguration $orkestraConfiguration,
-        MessageBusConfiguration $messageBusConfiguration
+        MessageBusConfiguration $messageBusConfiguration,
+        ServiceConfigurator $messageBusService
     ): void {
-        if (!($messageBusConfiguration instanceof DefaultMessageBusConfiguration)) {
-            return;
-        }
-
-        try {
-            $validateMessageMiddlewareService = $orkestraConfiguration
-                ->container()
-                ->services()
-                ->get(ValidateMessageMiddleware::class)
-            ;
-        } catch (ServiceNotFoundException $exception) {
-            return;
-        }
-
-        $validatorServiceReferences = [];
         foreach ($messageBusConfiguration->validators as $validatorClassName) {
             try {
                 $orkestraConfiguration->container()->services()->get($validatorClassName);
             } catch (ServiceNotFoundException $exception) {
                 $orkestraConfiguration->service($validatorClassName);
             }
-            $validatorServiceReferences[] = service($validatorClassName);
+            $messageBusService->call('addValidator', [service($validatorClassName)]);
         }
-
-        $validateMessageMiddlewareService->args([
-            $validatorServiceReferences,
-        ]);
     }
 
     protected function processMessagingTransformers(
         OrkestraConfiguration $orkestraConfiguration,
-        MessageBusConfiguration $messageBusConfiguration
+        MessageBusConfiguration $messageBusConfiguration,
+        ServiceConfigurator $messageBusService
     ): void {
-        if (!($messageBusConfiguration instanceof DefaultMessageBusConfiguration)) {
-            return;
-        }
-
-        try {
-            $messagingTransformationMiddlewareService = $orkestraConfiguration
-                ->container()
-                ->services()
-                ->get(MessagingTransformationMiddleware::class)
-            ;
-        } catch (ServiceNotFoundException $exception) {
-            return;
-        }
-
-        $transformerServiceReferences = [];
-        foreach ($messageBusConfiguration->messagingTransformers as $messagingTransformer) {
+        foreach ($messageBusConfiguration->messagingTransformers as $transformerClassName) {
             try {
-                $orkestraConfiguration->container()->services()->get($messagingTransformer);
+                $orkestraConfiguration->container()->services()->get($transformerClassName);
             } catch (ServiceNotFoundException $exception) {
-                $orkestraConfiguration->service($messagingTransformer);
+                $orkestraConfiguration->service($transformerClassName);
             }
-            $transformerServiceReferences[] = service($messagingTransformer);
+            $messageBusService->call('addTransformer', [service($transformerClassName)]);
         }
-
-        $messagingTransformationMiddlewareService->args([
-            $transformerServiceReferences,
-        ]);
     }
 }

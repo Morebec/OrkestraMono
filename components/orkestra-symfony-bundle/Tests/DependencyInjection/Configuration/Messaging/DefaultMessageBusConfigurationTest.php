@@ -2,23 +2,28 @@
 
 namespace Tests\Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\Messaging;
 
+use Baldinof\RoadRunnerBundle\Http\MiddlewareInterface;
+use Morebec\Orkestra\Messaging\Authorization\AuthorizeMessageMiddleware;
 use Morebec\Orkestra\Messaging\Authorization\MessageAuthorizerInterface;
+use Morebec\Orkestra\Messaging\Context\BuildMessageBusContextMiddleware;
 use Morebec\Orkestra\Messaging\Domain\Command\DomainCommandHandlerInterface;
 use Morebec\Orkestra\Messaging\Domain\DomainMessageHandlerInterface;
 use Morebec\Orkestra\Messaging\Domain\Event\DomainEventHandlerInterface;
 use Morebec\Orkestra\Messaging\Domain\Query\DomainQueryHandlerInterface;
+use Morebec\Orkestra\Messaging\Middleware\LoggerMiddleware;
 use Morebec\Orkestra\Messaging\Routing\MessageHandlerInterceptorInterface;
 use Morebec\Orkestra\Messaging\Timeout\TimeoutHandlerInterface;
 use Morebec\Orkestra\Messaging\Transformation\MessagingTransformerInterface;
 use Morebec\Orkestra\Messaging\Validation\MessageValidatorInterface;
-use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\Messaging\DefaultMessageBusConfiguration;
+use Morebec\Orkestra\Messaging\Validation\ValidateMessageMiddleware;
+use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\Messaging\MessageBusConfiguration;
 use PHPUnit\Framework\TestCase;
 
 class DefaultMessageBusConfigurationTest extends TestCase
 {
     public function testWithMessageValidator(): void
     {
-        $configuration = (new DefaultMessageBusConfiguration())
+        $configuration = (new MessageBusConfiguration())
             ->withMessageValidator(MessageValidatorInterface::class)
         ;
 
@@ -27,7 +32,7 @@ class DefaultMessageBusConfigurationTest extends TestCase
 
     public function testWithMessageAuthorizer(): void
     {
-        $configuration = (new DefaultMessageBusConfiguration())
+        $configuration = (new MessageBusConfiguration())
             ->withMessageAuthorizer(MessageAuthorizerInterface::class)
         ;
 
@@ -36,7 +41,7 @@ class DefaultMessageBusConfigurationTest extends TestCase
 
     public function testWithMessageHandlerInterceptor(): void
     {
-        $configuration = (new DefaultMessageBusConfiguration())
+        $configuration = (new MessageBusConfiguration())
             ->withMessageHandlerInterceptor(MessageHandlerInterceptorInterface::class)
         ;
 
@@ -45,16 +50,114 @@ class DefaultMessageBusConfigurationTest extends TestCase
 
     public function testWithMessageTransformer(): void
     {
-        $configuration = (new DefaultMessageBusConfiguration())
+        $configuration = (new MessageBusConfiguration())
             ->messagingTransformer(MessagingTransformerInterface::class)
         ;
 
         self::assertContains(MessagingTransformerInterface::class, $configuration->messagingTransformers);
     }
 
+    public function testWithPrependedMiddleware(): void
+    {
+        $configuration = (new MessageBusConfiguration())
+            ->withMiddleware(ValidateMessageMiddleware::class)
+            ->withPrependedMiddleware(LoggerMiddleware::class)
+        ;
+
+        self::assertEquals(LoggerMiddleware::class, $configuration->middleware[0]);
+    }
+
+    public function testWithMiddleware(): void
+    {
+        $configuration = (new MessageBusConfiguration())
+            ->withMiddleware(ValidateMessageMiddleware::class)
+        ;
+
+        self::assertContains(ValidateMessageMiddleware::class, $configuration->middleware);
+    }
+
+    public function testWithMiddlewareAfter(): void
+    {
+        $configuration = (new MessageBusConfiguration());
+
+        $configuration->middleware = [];
+        $configuration
+            ->withMiddleware(BuildMessageBusContextMiddleware::class)
+            ->withMiddleware(ValidateMessageMiddleware::class)
+            ->withMiddleware(AuthorizeMessageMiddleware::class)
+        ;
+
+        $configuration
+            ->withMiddlewareAfter(LoggerMiddleware::class, BuildMessageBusContextMiddleware::class)
+        ;
+
+        self::assertEquals([
+            BuildMessageBusContextMiddleware::class,
+            LoggerMiddleware::class,
+            ValidateMessageMiddleware::class,
+            AuthorizeMessageMiddleware::class,
+        ], $configuration->middleware);
+
+        // AFTER THE LAST ONE
+        $configuration = (new MessageBusConfiguration());
+
+        $configuration->middleware = [];
+
+        $configuration
+            ->withMiddleware(BuildMessageBusContextMiddleware::class)
+            ->withMiddleware(ValidateMessageMiddleware::class)
+            ->withMiddleware(AuthorizeMessageMiddleware::class)
+        ;
+
+        $configuration
+            ->withMiddlewareAfter(LoggerMiddleware::class, AuthorizeMessageMiddleware::class)
+        ;
+
+        self::assertEquals([
+            BuildMessageBusContextMiddleware::class,
+            ValidateMessageMiddleware::class,
+            AuthorizeMessageMiddleware::class,
+            LoggerMiddleware::class,
+        ], $configuration->middleware);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $configuration
+            ->withMiddlewareAfter(LoggerMiddleware::class, MiddlewareInterface::class)
+        ;
+    }
+
+    public function testWithMiddlewareBefore(): void
+    {
+        $configuration = (new MessageBusConfiguration());
+
+        $configuration->middleware = [];
+
+        $configuration
+            ->withMiddleware(BuildMessageBusContextMiddleware::class)
+            ->withMiddleware(ValidateMessageMiddleware::class)
+            ->withMiddleware(AuthorizeMessageMiddleware::class)
+        ;
+
+        $configuration
+            ->withMiddlewareBefore(LoggerMiddleware::class, AuthorizeMessageMiddleware::class)
+        ;
+
+        self::assertEquals([
+            BuildMessageBusContextMiddleware::class,
+            ValidateMessageMiddleware::class,
+            LoggerMiddleware::class,
+            AuthorizeMessageMiddleware::class,
+        ], $configuration->middleware);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $configuration
+            ->withMiddlewareAfter(LoggerMiddleware::class, MiddlewareInterface::class)
+        ;
+    }
+
     public function testCommandHandler(): void
     {
-        $configuration = (new DefaultMessageBusConfiguration())
+        $configuration = (new MessageBusConfiguration())
             ->commandHandler(DomainCommandHandlerInterface::class)
         ;
 
@@ -63,7 +166,7 @@ class DefaultMessageBusConfigurationTest extends TestCase
 
     public function testQueryHandler(): void
     {
-        $configuration = (new DefaultMessageBusConfiguration())
+        $configuration = (new MessageBusConfiguration())
             ->queryHandler(DomainQueryHandlerInterface::class)
         ;
 
@@ -72,7 +175,7 @@ class DefaultMessageBusConfigurationTest extends TestCase
 
     public function testEventHandler(): void
     {
-        $configuration = (new DefaultMessageBusConfiguration())
+        $configuration = (new MessageBusConfiguration())
             ->eventHandler(DomainEventHandlerInterface::class)
         ;
 
@@ -81,7 +184,7 @@ class DefaultMessageBusConfigurationTest extends TestCase
 
     public function testTimeoutHandler(): void
     {
-        $configuration = (new DefaultMessageBusConfiguration())
+        $configuration = (new MessageBusConfiguration())
             ->eventHandler(TimeoutHandlerInterface::class)
         ;
 
@@ -90,7 +193,7 @@ class DefaultMessageBusConfigurationTest extends TestCase
 
     public function testProcessManager(): void
     {
-        $configuration = (new DefaultMessageBusConfiguration())
+        $configuration = (new MessageBusConfiguration())
             ->eventHandler(self::class)
         ;
 
@@ -99,7 +202,7 @@ class DefaultMessageBusConfigurationTest extends TestCase
 
     public function testMessageHandler(): void
     {
-        $configuration = (new DefaultMessageBusConfiguration())
+        $configuration = (new MessageBusConfiguration())
             ->eventHandler(DomainMessageHandlerInterface::class)
         ;
 

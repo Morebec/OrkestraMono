@@ -7,7 +7,6 @@ use Morebec\Orkestra\DateTime\SystemClock;
 use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\EventProcessing\EventProcessingConfiguration;
 use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\EventStore\EventStoreConfiguration;
 use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\Messaging\MessagingConfiguration;
-use Morebec\OrkestraSymfonyBundle\Tests\DependencyInjection\Configuration\NotConfiguredException;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ServiceConfigurator;

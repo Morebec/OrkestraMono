@@ -6,9 +6,9 @@ use JsonException;
 use Morebec\Orkestra\Messaging\Normalization\ClassMapMessageNormalizer;
 use Morebec\Orkestra\Messaging\Normalization\MessageClassMapInterface;
 use Morebec\Orkestra\Messaging\Normalization\MessageNormalizerInterface;
-use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\Messaging\MessageBusConfiguration;
 use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\Messaging\MessageBusConfigurationProcessor;
 use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\Messaging\MessagingConfiguration;
+use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\Messaging\MiddlewareMessageBusConfiguration;
 use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\Messaging\TimeoutProcessingConfigurationProcessor;
 use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\OrkestraConfiguration;
 use Morebec\Orkestra\SymfonyBundle\DependencyInjection\SymfonyMessageClassMapFactory;
@@ -98,7 +98,7 @@ class MessagingConfigurationProcessor
      * @throws JsonException
      * @throws ReflectionException
      */
-    protected function processMessageBus(OrkestraConfiguration $orkestraConfiguration, MessageBusConfiguration $messageBusConfiguration): void
+    protected function processMessageBus(OrkestraConfiguration $orkestraConfiguration, MiddlewareMessageBusConfiguration $messageBusConfiguration): void
     {
         $this->messageBusConfigurationProcessor->process($orkestraConfiguration, $messageBusConfiguration);
     }

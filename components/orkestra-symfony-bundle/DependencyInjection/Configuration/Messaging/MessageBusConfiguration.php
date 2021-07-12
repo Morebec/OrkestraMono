@@ -3,66 +3,41 @@
 namespace Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\Messaging;
 
 use Morebec\Orkestra\Messaging\Authorization\AuthorizeMessageMiddleware;
-use Morebec\Orkestra\Messaging\Context\BuildMessageBusContextMiddleware;
 use Morebec\Orkestra\Messaging\MessageBus;
-use Morebec\Orkestra\Messaging\Middleware\LoggerMiddleware;
 use Morebec\Orkestra\Messaging\Routing\HandleMessageMiddleware;
-use Morebec\Orkestra\Messaging\Routing\RouteMessageMiddleware;
-use Morebec\Orkestra\Messaging\Transformation\MessagingTransformationMiddleware;
+use Morebec\Orkestra\Messaging\Transformation\MessagingTransformerInterface;
 use Morebec\Orkestra\Messaging\Validation\ValidateMessageMiddleware;
 
-/**
- * Configures the dependencies of a message bus.
- */
 class MessageBusConfiguration
 {
-    public string $serviceId;
-
-    public string $implementationClassName;
+    /** @var MessageBusHandlerConfiguration[] */
+    public array $messageHandlers = [];
 
     /** @var string[] */
-    public array $middleware;
+    public array $authorizers = [];
 
-    public ?MessageNormalizerConfiguration $messageNormalizerConfiguration;
+    /** @var string[] */
+    public array $validators = [];
+
+    /** @var string[] */
+    public array $messageHandlerInterceptors = [];
+
+    /** @var string[] */
+    public array $messagingTransformers = [];
+
+    /** @var string[] */
+    public array $middleware = [];
+
+    public string $serviceId;
 
     public function __construct()
     {
-        $this->middleware = [];
-        $this->usingDefaultImplementation();
-    }
-
-    public static function defaultConfiguration(): DefaultMessageBusConfiguration
-    {
-        return new DefaultMessageBusConfiguration();
+        $this->serviceId = MessageBus::class;
     }
 
     public function usingServiceId(string $serviceId): self
     {
         $this->serviceId = $serviceId;
-
-        return $this;
-    }
-
-    /**
-     * Allows specifying that the implementation of the interface is the default {@link MessageBus}.
-     *
-     * @return $this
-     */
-    public function usingDefaultImplementation(): self
-    {
-        $this->implementationClassName = DefaultMessageBusConfiguration::DEFAULT_IMPLEMENTATION_CLASS_NAME;
-
-        return $this;
-    }
-
-    /**
-     * Allows specifying the implementation to use for the {@link MessageBusInterface}.
-     *
-     * @return $this
-     */
-    public function usingImplementation(string $className): self
-    {
-        $this->implementationClassName = $className;
 
         return $this;
     }
@@ -87,92 +62,6 @@ class MessageBusConfiguration
     public function withMiddleware(string $middlewareClassName): self
     {
         $this->middleware[] = $middlewareClassName;
-
-        return $this;
-    }
-
-    /**
-     * Configures the message bus to use the {@link BuildMessageBusContextMiddleware}.
-     *
-     * @return $this
-     */
-    public function withBuildMessageBusContextMiddleware(): self
-    {
-        return $this->withMiddleware(BuildMessageBusContextMiddleware::class);
-    }
-
-    /**
-     * Configures the message bus to use the {@link LoggerMiddleware}.
-     *
-     * @return $this
-     */
-    public function withLoggerMiddleware(): self
-    {
-        return $this->withMiddleware(LoggerMiddleware::class);
-    }
-
-    /**
-     * Configures the message bus to use the {@link HandleMessageMiddleware}.
-     *
-     * @return $this
-     */
-    public function withRouteMessageMiddleware(): self
-    {
-        return $this->withMiddleware(RouteMessageMiddleware::class);
-    }
-
-    /**
-     * Configures this message bus to use the {@link MessagingTransformationMiddleware}.
-     *
-     * @return $this
-     */
-    public function withMessagingTransformationMiddleware(): self
-    {
-        return $this->withMiddleware(MessagingTransformationMiddleware::class);
-    }
-
-    /**
-     * Configures the message bus to use the {@link AuthorizeMessageMiddleware}.
-     *
-     * @return $this
-     */
-    public function withAuthorizeMessageMiddleware(): self
-    {
-        return $this->withMiddleware(AuthorizeMessageMiddleware::class);
-    }
-
-    /**
-     * Configures the message bus to use the {@link ValidateMessageMiddleware}.
-     *
-     * @return $this
-     */
-    public function withValidateMessageMiddleware(): self
-    {
-        return $this->withMiddleware(ValidateMessageMiddleware::class);
-    }
-
-    /**
-     * Configures the message bus to use the {@link HandleMessageMiddleware}.
-     *
-     * @return $this
-     */
-    public function withHandleMessageMiddleware(): self
-    {
-        return $this->withMiddleware(HandleMessageMiddleware::class);
-    }
-
-    /**
-     * Replaces a middleware in this configuration.
-     *
-     * @return $this
-     */
-    public function withMiddlewareReplacedBy(string $replacedMiddlewareClassName, string $substituteMiddlewareClassName): self
-    {
-        foreach ($this->middleware as $index => $m) {
-            if ($m === $replacedMiddlewareClassName) {
-                $this->middleware[$index] = $substituteMiddlewareClassName;
-            }
-        }
 
         return $this;
     }
@@ -226,16 +115,108 @@ class MessageBusConfiguration
     }
 
     /**
-     * Allows removing a middleware.
+     * Registers a message validator with the message bus with the {@link ValidateMessageMiddleware}.
      *
      * @return $this
      */
-    public function withoutMiddleware(string $middlewareClassName): self
+    public function withMessageValidator(string $className): self
     {
-        $this->middleware = array_filter($this->middleware, static function (string $className) use ($middlewareClassName) {
-            return $className !== $middlewareClassName;
-        });
+        $this->validators[] = $className;
 
         return $this;
+    }
+
+    /**
+     * Registers a Message Authorizer with the validator with the {@link AuthorizeMessageMiddleware}.
+     *
+     * @return $this
+     */
+    public function withMessageAuthorizer(string $className): self
+    {
+        $this->authorizers[] = $className;
+
+        return $this;
+    }
+
+    /**
+     * Configures a {@link MessagingTransformerInterface}.
+     *
+     * @return $this
+     */
+    public function messagingTransformer(string $className): self
+    {
+        $this->messagingTransformers[] = $className;
+
+        return $this;
+    }
+
+    /**
+     * Configures a message handler.
+     *
+     * @return $this
+     */
+    public function messageHandler(string $serviceId, ?string $className, bool $autoroute): self
+    {
+        $this->messageHandlers[$serviceId] = new MessageBusHandlerConfiguration($serviceId, $className, $autoroute);
+
+        return $this;
+    }
+
+    /**
+     * Registers a message handler interceptor with the {@link HandleMessageMiddleware}.
+     *
+     * @return $this
+     */
+    public function withMessageHandlerInterceptor(string $className): self
+    {
+        $this->messageHandlerInterceptors[] = $className;
+
+        return $this;
+    }
+
+    /**
+     * Configures a Command handler.
+     */
+    public function commandHandler(string $serviceId, string $className = null, bool $autoroute = true): self
+    {
+        return $this->messageHandler($serviceId, $className, $autoroute);
+    }
+
+    /**
+     * Configures a Query handler.
+     */
+    public function queryHandler(string $serviceId, string $className = null, bool $autoroute = true): self
+    {
+        return $this->messageHandler($serviceId, $className, $autoroute);
+    }
+
+    /**
+     * Configures an Event handler.
+     *
+     * @return $this
+     */
+    public function eventHandler(string $serviceId, string $className = null, bool $autoroute = true): self
+    {
+        return $this->messageHandler($serviceId, $className, $autoroute);
+    }
+
+    /**
+     * Configures a timeout handler.
+     *
+     * @return $this
+     */
+    public function timeoutHandler(string $serviceId, string $className = null, bool $autoroute = true): self
+    {
+        return $this->messageHandler($serviceId, $className, $autoroute);
+    }
+
+    /**
+     * Configures a process manager.
+     *
+     * @return $this
+     */
+    public function processManager(string $serviceId, string $className = null, bool $autoroute = true): self
+    {
+        return $this->messageHandler($serviceId, $className, $autoroute);
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\Messaging;
 
-use Morebec\OrkestraSymfonyBundle\Tests\DependencyInjection\Configuration\NotConfiguredException;
+use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\NotConfiguredException;
 
 class MessagingConfiguration
 {
