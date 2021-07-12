@@ -46,7 +46,10 @@ class MessagingConfigurationProcessor
         MessagingConfiguration $messagingConfiguration
     ): void {
         if (!$messagingConfiguration->messageNormalizerConfiguration) {
-            $messagingConfiguration->configureMessageNormalizer(new MessageNormalizerConfiguration());
+            $messagingConfiguration->configureMessageNormalizer(
+                (new MessageNormalizerConfiguration())
+                    ->usingDefaultImplementation()
+            );
         }
 
         try {
