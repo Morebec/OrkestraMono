@@ -13,6 +13,7 @@ interface MessageBusResponseInterface
 {
     /**
      * Returns the payload associated with this Response.
+     * If the response is a failure, an exception should be returned as payload.
      *
      * @return mixed|Throwable
      */
@@ -24,7 +25,7 @@ interface MessageBusResponseInterface
     public function isSuccess(): bool;
 
     /**
-     * Indicates if this response presents a failure sending the message.
+     * Indicates if this response represents a failure sending the message.
      */
     public function isFailure(): bool;
 

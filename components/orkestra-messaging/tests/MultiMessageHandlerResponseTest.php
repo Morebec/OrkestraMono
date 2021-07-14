@@ -12,16 +12,25 @@ class MultiMessageHandlerResponseTest extends TestCase
     public function testConstruct(): void
     {
         $responses = [
-            new MessageHandlerResponse('handler_failed', MessageBusResponseStatusCode::FAILED(), 'failure_payload'),
+            new MessageHandlerResponse('handler_failed', MessageBusResponseStatusCode::FAILED(), new \RuntimeException('failure_payload')),
             new MessageHandlerResponse('handler_succeeded', MessageBusResponseStatusCode::SUCCEEDED(), 'success_payload'),
         ];
 
-        $response = new MultiMessageHandlerResponse($responses);
+        new MultiMessageHandlerResponse($responses);
         // SHOULD NOT THROW EXCEPTION
 
+        // Test iterable support
+        $handlers = static function () {
+            yield new MessageHandlerResponse('handler_failed', MessageBusResponseStatusCode::FAILED(), new \RuntimeException('failure_payload'));
+            yield new MessageHandlerResponse('handler_succeeded', MessageBusResponseStatusCode::SUCCEEDED(), 'success_payload');
+        };
+
+        new MultiMessageHandlerResponse($handlers());
+
+        // Test Invalid argument
         $this->expectException(\InvalidArgumentException::class);
         $responses = [
-            new MessageHandlerResponse('handler_failed', MessageBusResponseStatusCode::FAILED(), 'failure_payload'),
+            new MessageHandlerResponse('handler_failed', MessageBusResponseStatusCode::FAILED(), new \RuntimeException('failure_payload')),
             new MessageHandlerResponse('handler_succeeded', MessageBusResponseStatusCode::SUCCEEDED(), 'success_payload'),
             'INVALID_RESPONSE_TYPE',
         ];
@@ -39,14 +48,14 @@ class MultiMessageHandlerResponseTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
         $multiResponse = new MultiMessageHandlerResponse([
-            new MessageHandlerResponse('handler_failed', MessageBusResponseStatusCode::FAILED(), 'failure_payload'),
+            new MessageHandlerResponse('handler_failed', MessageBusResponseStatusCode::FAILED(), new \RuntimeException('failure_payload')),
         ]);
     }
 
     public function testHasResponseWithStatus(): void
     {
         $responses = [
-            new MessageHandlerResponse('handler_failed', MessageBusResponseStatusCode::FAILED(), 'failure_payload'),
+            new MessageHandlerResponse('handler_failed', MessageBusResponseStatusCode::FAILED(), new \RuntimeException('failure_payload')),
             new MessageHandlerResponse('handler_succeeded', MessageBusResponseStatusCode::SUCCEEDED(), 'success_payload'),
         ];
 
@@ -60,7 +69,7 @@ class MultiMessageHandlerResponseTest extends TestCase
     public function testGetHandlerResponses(): void
     {
         $responses = [
-            new MessageHandlerResponse('handler_failed', MessageBusResponseStatusCode::FAILED(), 'failure_payload'),
+            new MessageHandlerResponse('handler_failed', MessageBusResponseStatusCode::FAILED(), new \RuntimeException('failure_payload')),
             new MessageHandlerResponse('handler_succeeded', MessageBusResponseStatusCode::SUCCEEDED(), 'success_payload'),
         ];
 
@@ -72,7 +81,7 @@ class MultiMessageHandlerResponseTest extends TestCase
     public function testIsFailure(): void
     {
         $responses = [
-            new MessageHandlerResponse('handler_failed', MessageBusResponseStatusCode::FAILED(), 'failure_payload'),
+            new MessageHandlerResponse('handler_failed', MessageBusResponseStatusCode::FAILED(), new \RuntimeException('failure_payload')),
             new MessageHandlerResponse('handler_succeeded', MessageBusResponseStatusCode::SUCCEEDED(), 'success_payload'),
         ];
 
@@ -84,7 +93,7 @@ class MultiMessageHandlerResponseTest extends TestCase
     public function testIsSuccess(): void
     {
         $responses = [
-            new MessageHandlerResponse('handler_failed', MessageBusResponseStatusCode::FAILED(), 'failure_payload'),
+            new MessageHandlerResponse('handler_failed', MessageBusResponseStatusCode::FAILED(), new \RuntimeException('failure_payload')),
             new MessageHandlerResponse('handler_succeeded', MessageBusResponseStatusCode::SUCCEEDED(), 'success_payload'),
         ];
 
@@ -96,7 +105,16 @@ class MultiMessageHandlerResponseTest extends TestCase
     public function testGetPayload(): void
     {
         $responses = [
-            new MessageHandlerResponse('handler_failed', MessageBusResponseStatusCode::FAILED(), 'failure_payload'),
+            new MessageHandlerResponse('handler_failed', MessageBusResponseStatusCode::FAILED(), new \RuntimeException('failure_payload')),
+            new MessageHandlerResponse('handler_succeeded', MessageBusResponseStatusCode::SUCCEEDED(), 'success_payload'),
+        ];
+
+        $multiResponse = new MultiMessageHandlerResponse($responses);
+
+        self::assertInstanceOf(\Throwable::class, $multiResponse->getPayload());
+
+        $responses = [
+            new MessageHandlerResponse('handler_failed', MessageBusResponseStatusCode::SKIPPED(), new \RuntimeException(null)),
             new MessageHandlerResponse('handler_succeeded', MessageBusResponseStatusCode::SUCCEEDED(), 'success_payload'),
         ];
 
@@ -108,7 +126,7 @@ class MultiMessageHandlerResponseTest extends TestCase
     public function testGetStatusCode(): void
     {
         $responses = [
-            new MessageHandlerResponse('handler_failed', MessageBusResponseStatusCode::FAILED(), 'failure_payload'),
+            new MessageHandlerResponse('handler_failed', MessageBusResponseStatusCode::FAILED(), new \RuntimeException('failure_payload')),
             new MessageHandlerResponse('handler_succeeded', MessageBusResponseStatusCode::SUCCEEDED(), 'success_payload'),
         ];
 
@@ -124,9 +142,9 @@ class MultiMessageHandlerResponseTest extends TestCase
         $this->assertTrue($multiResponse->getStatusCode()->isEqualTo(MessageBusResponseStatusCode::ACCEPTED()));
 
         $responses = [
-            new MessageHandlerResponse('handler_succeeded', MessageBusResponseStatusCode::REFUSED(), 'success_payload'),
-            new MessageHandlerResponse('handler_succeeded', MessageBusResponseStatusCode::INVALID(), 'success_payload'),
-            new MessageHandlerResponse('handler_succeeded', MessageBusResponseStatusCode::INVALID(), 'success_payload'),
+            new MessageHandlerResponse('handler_succeeded', MessageBusResponseStatusCode::REFUSED(), new \RuntimeException()),
+            new MessageHandlerResponse('handler_succeeded', MessageBusResponseStatusCode::INVALID(), new \RuntimeException()),
+            new MessageHandlerResponse('handler_succeeded', MessageBusResponseStatusCode::INVALID(), new \RuntimeException()),
             new MessageHandlerResponse('handler_succeeded', MessageBusResponseStatusCode::SUCCEEDED(), 'success_payload'),
         ];
         $multiResponse = new MultiMessageHandlerResponse($responses);

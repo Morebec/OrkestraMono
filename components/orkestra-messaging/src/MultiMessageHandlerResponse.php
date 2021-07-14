@@ -2,6 +2,12 @@
 
 namespace Morebec\Orkestra\Messaging;
 
+use const ARRAY_FILTER_USE_KEY;
+use function count;
+use InvalidArgumentException;
+use const SORT_NUMERIC;
+use Throwable;
+
 /**
  * Response representing the fact that multiple {@link MessageHandlerInterface} returned a response for a given {@link MessageInterface}.
  * The final status code of the response is determined by doing a specific election of the best candidate code:
@@ -18,29 +24,27 @@ class MultiMessageHandlerResponse extends AbstractMessageBusResponse
 
     public function __construct(iterable $handlerResponses)
     {
-        if (empty($handlerResponses)) {
-            throw new \InvalidArgumentException('A MultiMessageHandlerResponse cannot receive an empty array of responses');
-        }
-
-        if (\count($handlerResponses) === 1) {
-            throw new \InvalidArgumentException('A MultiMessageHandlerResponse must receive an array of responses of a length greater than 1');
-        }
-
         $this->handlerResponses = [];
         foreach ($handlerResponses as $handlerResponse) {
             if (!$handlerResponse instanceof MessageHandlerResponse) {
-                throw new \InvalidArgumentException(sprintf('A MultiMessageHandlerResponse can only accept responses of type "%s".', MessageHandlerResponse::class));
+                throw new InvalidArgumentException(sprintf('A MultiMessageHandlerResponse can only accept responses of type "%s".', MessageHandlerResponse::class));
             }
             $this->handlerResponses[] = $handlerResponse;
         }
 
-        // Determine the payloads of this response.
-        $payloads = [];
-        foreach ($this->handlerResponses as $handlerResponse) {
-            $payloads[$handlerResponse->getHandlerName()] = $handlerResponse->getPayload();
+        if (empty($this->handlerResponses)) {
+            throw new InvalidArgumentException('A MultiMessageHandlerResponse cannot receive an empty array of responses');
         }
 
-        parent::__construct($this->determineStatusCode(), $payloads);
+        if (\count($this->handlerResponses) === 1) {
+            throw new InvalidArgumentException('A MultiMessageHandlerResponse must receive an array of responses of a length greater than 1');
+        }
+
+        // Determine payload
+        $this->statusCode = $this->determineStatusCode();
+        $this->payload = $this->determinePayload();
+
+        parent::__construct($this->statusCode, $this->payload);
     }
 
     /**
@@ -112,12 +116,32 @@ class MultiMessageHandlerResponse extends AbstractMessageBusResponse
                     MessageBusResponseStatusCode::INVALID,
                     MessageBusResponseStatusCode::REFUSED,
                 ], true);
-            }, \ARRAY_FILTER_USE_KEY);
+            }, ARRAY_FILTER_USE_KEY);
         }
 
         // Sort from most common to less common.
-        arsort($codes, \SORT_NUMERIC);
+        arsort($codes, SORT_NUMERIC);
 
         return MessageBusResponseStatusCode::fromString(array_key_first($codes));
+    }
+
+    /**
+     * @return Throwable|array
+     */
+    private function determinePayload()
+    {
+        if ($this->isFailure()) {
+            $failureResponses = array_filter($this->handlerResponses, static fn (MessageHandlerResponse $r) => $r->isFailure());
+            /** @var Throwable[] $throwables */
+            $throwables = array_map(static fn (MessageHandlerResponse $r) => $r->getPayload(), $failureResponses);
+
+            if (\count($throwables) === 1) {
+                return $throwables[0];
+            }
+
+            return new MultiMessageHandlerException($throwables);
+        }
+
+        return array_map(static fn (MessageHandlerResponse $r) => $r->getPayload(), $this->handlerResponses);
     }
 }
