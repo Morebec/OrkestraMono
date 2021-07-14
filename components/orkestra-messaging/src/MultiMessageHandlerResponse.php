@@ -133,7 +133,8 @@ class MultiMessageHandlerResponse extends AbstractMessageBusResponse
         if ($this->isFailure()) {
             $failureResponses = array_filter($this->handlerResponses, static fn (MessageHandlerResponse $r) => $r->isFailure());
             /** @var Throwable[] $throwables */
-            $throwables = array_map(static fn (MessageHandlerResponse $r) => $r->getPayload(), $failureResponses);
+            // We are using array values here since array_filter preserves keys.
+            $throwables = array_map(static fn (MessageHandlerResponse $r) => $r->getPayload(), array_values($failureResponses));
 
             if (\count($throwables) === 1) {
                 return $throwables[0];

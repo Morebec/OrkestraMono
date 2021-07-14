@@ -21,8 +21,8 @@ class MultiMessageHandlerResponseTest extends TestCase
 
         // Test iterable support
         $handlers = static function () {
-            yield new MessageHandlerResponse('handler_failed', MessageBusResponseStatusCode::FAILED(), new \RuntimeException('failure_payload'));
             yield new MessageHandlerResponse('handler_succeeded', MessageBusResponseStatusCode::SUCCEEDED(), 'success_payload');
+            yield new MessageHandlerResponse('handler_failed', MessageBusResponseStatusCode::FAILED(), new \RuntimeException('failure_payload'));
         };
 
         new MultiMessageHandlerResponse($handlers());
