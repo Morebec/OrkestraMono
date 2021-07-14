@@ -175,8 +175,7 @@ abstract class AbstractEventProcessorConsoleCommand extends Command implements E
             throw new \LogicException('This processor cannot be replayed.');
         }
 
-        $this->io->writeln('Resetting processor ...');
-        $processor->reset();
+        $this->resetProcessor($processor);
 
         $events = $processor->getNextEvents();
         $this->io->writeln(sprintf('Events to replay <info>%s</info> events ...', \count($events)));
