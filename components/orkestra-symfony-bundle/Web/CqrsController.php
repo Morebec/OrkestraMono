@@ -126,7 +126,7 @@ class CqrsController extends AbstractController
             }
         }
 
-        return $this->makeFailureResponse($errorType, $errorMessage, $statusCode);
+        return $this->makeFailureResponse($errorType, $errorMessage, null, $statusCode);
     }
 
     /**
@@ -142,8 +142,8 @@ class CqrsController extends AbstractController
     /**
      * Makes a failure JSON response.
      */
-    protected function makeFailureResponse(string $errorType, string $errorMessage, int $statusCode): JsonResponse
+    protected function makeFailureResponse(string $errorType, string $errorMessage, $data, int $statusCode): JsonResponse
     {
-        return $this->jsonResponseFactory->makeFailureResponse($errorType, $errorMessage, null, $statusCode);
+        return $this->jsonResponseFactory->makeFailureResponse($errorType, $errorMessage, $data, $statusCode);
     }
 }
