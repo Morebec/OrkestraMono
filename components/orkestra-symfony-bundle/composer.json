@@ -17,6 +17,7 @@
         "morebec/orkestra-normalization": "^2.4",
         "symfony/dependency-injection": "5.*",
         "symfony/framework-bundle": "5.2.*",
+        "symfony/validator": "5.2.*",
         "symfony/config": "5.*",
         "symfony/lock": "5.*",
         "doctrine/annotations": "1.12.1",
