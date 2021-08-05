@@ -83,14 +83,14 @@ class CqrsController extends AbstractController
     /**
      * Handles a successful response from the message bus by converting it to a JsonResponse.
      */
-    protected function handleSuccessfulMessageBusResponse(MessageBusResponseInterface $response, int $statusCode): JsonResponse
+    protected function handleSuccessfulMessageBusResponse(MessageBusResponseInterface $response, int $statusCode, array $httpHeaders = []): JsonResponse
     {
         if ($response->isFailure()) {
             throw new InvalidArgumentException('The response provided was not successful.');
         }
         $data = $this->objectNormalizer->normalize($response->getPayload());
 
-        return $this->makeSuccessResponse($data, $statusCode);
+        return $this->makeSuccessResponse($data, $statusCode, $httpHeaders);
     }
 
     /**
@@ -98,7 +98,7 @@ class CqrsController extends AbstractController
      *
      * @throws ReflectionException
      */
-    protected function handleFailureMessageBusResponse(MessageBusResponseInterface $response, array $exceptionStatusCodeMapping = []): JsonResponse
+    protected function handleFailureMessageBusResponse(MessageBusResponseInterface $response, array $exceptionStatusCodeMapping = [], array $httpHeaders = []): JsonResponse
     {
         if ($response->isSuccess()) {
             throw new InvalidArgumentException('The response provided was not a failure.');
@@ -126,7 +126,7 @@ class CqrsController extends AbstractController
             }
         }
 
-        return $this->makeFailureResponse($errorType, $errorMessage, null, $statusCode);
+        return $this->makeFailureResponse($errorType, $errorMessage, null, $statusCode, $httpHeaders);
     }
 
     /**
@@ -134,16 +134,16 @@ class CqrsController extends AbstractController
      *
      * @param mixed $data
      */
-    protected function makeSuccessResponse($data, int $statusCode): JsonResponse
+    protected function makeSuccessResponse($data, int $statusCode, array $httpHeaders = []): JsonResponse
     {
-        return $this->jsonResponseFactory->makeSuccessResponse($data, $statusCode);
+        return $this->jsonResponseFactory->makeSuccessResponse($data, $statusCode, $httpHeaders);
     }
 
     /**
      * Makes a failure JSON response.
      */
-    protected function makeFailureResponse(string $errorType, string $errorMessage, $data, int $statusCode): JsonResponse
+    protected function makeFailureResponse(string $errorType, string $errorMessage, $data, int $statusCode, array $httpHeaders = []): JsonResponse
     {
-        return $this->jsonResponseFactory->makeFailureResponse($errorType, $errorMessage, $data, $statusCode);
+        return $this->jsonResponseFactory->makeFailureResponse($errorType, $errorMessage, $data, $statusCode, $httpHeaders);
     }
 }

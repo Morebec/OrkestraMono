@@ -20,21 +20,21 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class JsonResponseFactory
 {
-    public function makeSuccessResponse($data, int $statusCode = Response::HTTP_OK): JsonResponse
+    public function makeSuccessResponse($data, int $statusCode = Response::HTTP_OK, array $headers = []): JsonResponse
     {
         return new JsonResponse([
             'status' => 'success',
             'data' => $data,
-        ], $statusCode);
+        ], $statusCode, $headers);
     }
 
-    public function makeFailureResponse(string $errorType, string $errorMessage, $data, int $statusCode): JsonResponse
+    public function makeFailureResponse(string $errorType, string $errorMessage, $data, int $statusCode, array $headers = []): JsonResponse
     {
         return new JsonResponse([
             'status' => 'failure',
             'error' => $errorType,
             'message' => $errorMessage,
             'data' => $data,
-        ], $statusCode);
+        ], $statusCode, $headers);
     }
 }
