@@ -220,6 +220,26 @@ final class PostgreSqlDocumentStore
         return $documents;
     }
 
+    /**
+     * Finds all the documents in a given collection.
+     */
+    public function findAllDocuments(string $collectionName): array
+    {
+        $qb = $this->connection->createQueryBuilder();
+        $qb->select(CollectionTableColumnKeys::DATA)
+            ->from($this->prefixCollection($collectionName))
+        ;
+
+        $result = $qb->executeQuery();
+        $documents = [];
+
+        while ($doc = $result->fetchAssociative()) {
+            $documents[] = json_decode($doc[CollectionTableColumnKeys::DATA], true, 512, \JSON_THROW_ON_ERROR);
+        }
+
+        return $documents;
+    }
+
     public function removeDocument(string $collectionName, string $id): void
     {
         $this->connection->delete($this->prefixCollection($collectionName), [CollectionTableColumnKeys::ID => $id]);

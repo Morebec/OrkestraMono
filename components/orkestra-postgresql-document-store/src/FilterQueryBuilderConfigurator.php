@@ -2,6 +2,8 @@
 
 namespace Morebec\Orkestra\PostgreSqlDocumentStore;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Morebec\Orkestra\DateTime\Date;
 use Morebec\Orkestra\DateTime\DateTime;
@@ -40,7 +42,7 @@ final class FilterQueryBuilderConfigurator
         $field = $criterion->getField();
         // We need to make it so that:
         // 'field.nested.childField becomes data->nested->>childField.
-        // If it is created at, updated at, or Id we will do it on the columns directly.
+        // If it is created at, updated at, or ID we will do it on the columns directly.
         if (!\in_array($field, [CollectionTableColumnKeys::ID, CollectionTableColumnKeys::CREATED_AT, CollectionTableColumnKeys::UPDATED_AT], true)) {
             // Explode . into an array
             $parts = explode('.', $field);
@@ -98,17 +100,37 @@ final class FilterQueryBuilderConfigurator
             $operator = FilterOperator::IS();
         }
 
-        return (string) $operator;
+        $stringOperator = (string) $operator;
+
+        return str_replace('_', ' ', $stringOperator);
     }
 
     private function convertCriterionToSql(Criterion $criterion, QueryBuilder $qb): string
     {
         $field = $this->convertCriterionFieldToSql($criterion);
         $operator = $this->convertCriterionOperatorToSql($criterion);
+
+        $criterionValue = $criterion->getValue();
+        if (\is_array($criterionValue)) {
+            $type = Connection::PARAM_STR_ARRAY;
+        } elseif (\is_bool($criterionValue)) {
+            $type = ParameterType::BOOLEAN;
+        } elseif (\is_int($criterionValue)) {
+            $type = ParameterType::INTEGER;
+        } elseif ($criterionValue === null) {
+            $type = ParameterType::NULL;
+        } else {
+            $type = ParameterType::STRING;
+        }
+
         // There seem to be a problem when the value is null in a positional argument.
-        $value = $criterion->getValue() === null ? 'NULL' :
-            $qb->createPositionalParameter($this->convertCriterionValueToSql($criterion))
+        $value = $criterionValue === null ? 'NULL' :
+            $qb->createPositionalParameter($this->convertCriterionValueToSql($criterion), $type)
         ;
+
+        if (\is_array($criterionValue)) {
+            $value = "($value)";
+        }
 
         return "$field $operator $value";
     }

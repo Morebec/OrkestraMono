@@ -1,5 +1,7 @@
 <?php
 
+/** @noinspection PhpUnhandledExceptionInspection */
+
 namespace Tests\Morebec\Orkestra\PostgreSqlDocumentStore;
 
 use Doctrine\DBAL\Configuration;
@@ -87,7 +89,7 @@ class PostgreSqlDocumentStoreTest extends TestCase
         $this->assertEquals($document, $data);
 
         // FIND BY FIELD is NULL
-        // ENSURE THAT USING THE EQUAL instead of IS with null returns the indended result.
+        // ENSURE THAT USING THE EQUAL instead of IS with null returns the intended result.
         $data = $this->store->findOneDocument('test_insert_document', Filter::findByField('nullField', FilterOperator::EQUAL(), null));
         $this->assertEquals($document, $data);
 
@@ -128,17 +130,38 @@ class PostgreSqlDocumentStoreTest extends TestCase
         // Test with Cast
         $data = $this->store->findOneDocument('test_insert_document', Filter::where('nbTokens', FilterOperator::GREATER_OR_EQUAL(), 5, 'INTEGER'));
         $this->assertEquals($doc, $data);
+
+        // Filter IN
+        $data = $this->store->findOneDocument('test_insert_document', Filter::where('nbTokens', FilterOperator::IN(), [5, 7, 8, 9]));
+        $this->assertEquals($doc, $data);
+
+        // Filter NOT IN
+        $data = $this->store->findOneDocument('test_insert_document', Filter::where('nbTokens', FilterOperator::NOT_IN(), [7, 8, 9]));
+        $this->assertEquals($doc, $data);
+    }
+
+    public function testFindAllDocuments(): void
+    {
+        $id = uniqid('test_find_all', false);
+        $doc = [
+            'hello' => 'world',
+        ];
+        $this->store->insertDocument('test_find_all', $id, $doc);
+
+        $docs = $this->store->findAllDocuments('test_find_all');
+
+        self::assertEquals([$doc], $docs);
     }
 
     public function testHasCollection(): void
     {
-        $this->store->insertDocument('testDropCollection', uniqid(), []);
+        $this->store->insertDocument('testDropCollection', uniqid('', true), []);
         $this->assertTrue($this->store->hasCollection('testDropCollection'));
     }
 
     public function testDropCollection(): void
     {
-        $this->store->insertDocument('testDropCollection', uniqid(), []);
+        $this->store->insertDocument('testDropCollection', uniqid('', true), []);
         $this->store->dropCollection('testDropCollection');
         $this->assertFalse($this->store->hasCollection('testDropCollection'));
     }

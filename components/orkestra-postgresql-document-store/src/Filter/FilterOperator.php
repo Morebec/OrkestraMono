@@ -16,6 +16,8 @@ use Morebec\Orkestra\Enum\Enum;
  * @method static self BETWEEN()
  * @method static self NOT_BETWEEN()
  * @method static self LIKE()
+ * @method static self IN()
+ * @method static self NOT_IN()
  */
 class FilterOperator extends Enum
 {
@@ -36,4 +38,7 @@ class FilterOperator extends Enum
 
     public const LIKE = 'LIKE';
     public const NOT_LIKE = 'NOT LIKE';
+
+    public const IN = 'IN';
+    public const NOT_IN = 'NOT_IN';
 }
