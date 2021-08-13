@@ -9,6 +9,9 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
+/**
+ * Abstract implementation of a console command intended to run a timeout processor.
+ */
 abstract class AbstractTimeoutProcessorConsoleCommand extends Command implements SignalableCommandInterface
 {
     protected static $defaultName = 'orkestra:timeout-processor';
@@ -34,7 +37,7 @@ abstract class AbstractTimeoutProcessorConsoleCommand extends Command implements
 
         $this->io->title('Timeout Processor');
 
-        $processor = $this->getProcessor();
+        $processor = $this->getTimeoutProcessor();
 
         $this->io->writeln('Timeout Processor Started.');
         $processor->start();
