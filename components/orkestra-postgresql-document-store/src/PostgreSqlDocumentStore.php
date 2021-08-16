@@ -11,7 +11,7 @@ use Doctrine\DBAL\Schema\Table;
 use Morebec\Orkestra\DateTime\ClockInterface;
 use Morebec\Orkestra\PostgreSqlDocumentStore\Filter\Filter;
 
-final class PostgreSqlDocumentStore
+class PostgreSqlDocumentStore
 {
     public const ID_INDEX_NAME = 'primary';
 
