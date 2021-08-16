@@ -4,9 +4,6 @@ namespace Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\Event
 
 use Morebec\Orkestra\SymfonyBundle\DependencyInjection\Configuration\NotConfiguredException;
 
-/**
- * @internal
- */
 class ProjectionProcessingConfiguration
 {
     public const DEFAULT_GROUP_NAME = 'default';
