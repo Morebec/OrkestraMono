@@ -49,8 +49,8 @@ $store->insertDocument('users', 'usr123456789', [
 If the collection does not exist, it will be created automatically.
 
 ### Finding Documents
-Finding elements is done throughout the `findOneDocument` and `findManyDocuments` methods of the
-document store. This method accepts either a string representing a postgresql json query or a `Filter`
+Finding elements can be performed using the `findOneDocument` and `findManyDocuments` methods of the
+document store. These methods accept either a string representing a PostgreSQL json query or a `Filter`
 which is a simple API for a query builder with the document store:
 
 ```php
@@ -90,7 +90,7 @@ $store->findOneDocument('users', 'data->>fullname = \'Jane Doe\'');
 > This is why if you are doing a string query, you must specify the `data` column.
 
 > For even greater control, the document store exposes a `getConnection` method which returns the `DBAL` connection
-> which you can use to make more complex queries using doctrine's Query Builder.
+> which you can use to make more complex queries using doctrine's Query Builder or raw connection.
 
 ### Updating Documents
 To update a document, use the `updateDocument` method.
