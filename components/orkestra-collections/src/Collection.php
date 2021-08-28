@@ -85,7 +85,7 @@ class Collection implements \Iterator, \Countable
      */
     public function filter(callable $p): self
     {
-        return new self(array_filter($this->elements, $p));
+        return new self(array_values(array_filter($this->elements, $p)));
     }
 
     /**
