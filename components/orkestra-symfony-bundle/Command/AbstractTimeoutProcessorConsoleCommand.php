@@ -1,6 +1,6 @@
 <?php
 
-namespace Morebec\OrkestraSymfonyBundle\Command;
+namespace Morebec\Orkestra\SymfonyBundle\Command;
 
 use Morebec\Orkestra\Messaging\Timeout\TimeoutProcessorInterface;
 use Symfony\Component\Console\Command\Command;
