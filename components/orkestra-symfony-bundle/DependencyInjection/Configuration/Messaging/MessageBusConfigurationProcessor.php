@@ -50,7 +50,7 @@ class MessageBusConfigurationProcessor
 
         // Add service method call for each middleware to append.
         foreach ($middlewareAsServiceReference as $middlewareServiceReference) {
-            $messageBusService->call('addMiddleware', $middlewareServiceReference);
+            $messageBusService->call('addMiddleware', [service($middlewareServiceReference)]);
         }
     }
 
