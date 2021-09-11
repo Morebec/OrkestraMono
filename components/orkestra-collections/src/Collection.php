@@ -7,8 +7,13 @@ namespace Morebec\Orkestra\Collections;
  */
 class Collection implements \Iterator, \Countable
 {
-    protected iterable $elements;
+    /** @var T[]  */
+    protected array $elements;
 
+    /**
+     * @param T[] $elements
+     * @param bool $preserveKeys
+     */
     public function __construct(iterable $elements = [], bool $preserveKeys = false)
     {
         $this->elements = [];
@@ -151,7 +156,7 @@ class Collection implements \Iterator, \Countable
      *
      * @param mixed $default
      *
-     * @return mixed|null
+     * @return T|null
      */
     public function findFirstOrDefault(callable $p, $default = null)
     {
@@ -178,6 +183,7 @@ class Collection implements \Iterator, \Countable
 
     /**
      * Inverts the order of the elements of this collection and returns it as a new collection.
+     * @returns static<T>
      */
     public function reversed(): self
     {
