@@ -5,7 +5,7 @@ namespace Morebec\Orkestra\EventSourcing\EventProcessor;
 use Morebec\Orkestra\Worker\WorkerInterface;
 
 /**
- * Events coming out of a an application model can be used as an integration model for other systems,
+ * Events coming out of an application model can be used as an integration model for other systems,
  * to trigger side effects to the same system from which these events originated or simply, to compute read models
  * based on these events.
  *
@@ -15,7 +15,7 @@ use Morebec\Orkestra\Worker\WorkerInterface;
  *
  * In essence, the EventProcessors are responsible for handling the technical side of processing events once
  * they come out of the event store: Whether this happens in real time (subscriptions), or by moving up the history of events (tracking) is
- * up to the processor the determine.
+ * up to the processor to determine.
  *
  * In most event sourced systems, usually, there are two major types of EventProcessors:
  * - EventPublishers: that will publish the events to the registered event handlers for side effects or to a queue for integration with other systems.
@@ -33,7 +33,7 @@ interface EventProcessorInterface extends WorkerInterface
     public function getName(): string;
 
     /**
-     * Starts this event processor so it can do its work on events.
+     * Starts this event processor, so it can do its work on events.
      * Can be blocking until all the necessary events have been processed.
      */
     public function start(): void;

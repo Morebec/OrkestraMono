@@ -11,7 +11,7 @@ use RuntimeException;
 
 /**
  * A {@link TrackingEventProcessor} allows to chase the event store for events and take action
- * upon finding out new events. It delegates the actual work the an {@link EventPublisherInterface}.
+ * upon finding out new events. It delegates the actual work to an {@link EventPublisherInterface}.
  *
  * To perform this work, the {@link TrackingEventProcessor} uses a position (being a sequence number or a stream version number) from an event store
  * or queue.
@@ -47,7 +47,7 @@ class TrackingEventProcessor implements ListenableEventProcessorInterface
     protected TrackingEventProcessorOptions $options;
 
     /** @var EventProcessorListenerInterface[] */
-    protected $listeners;
+    protected array $listeners;
 
     public function __construct(
         EventPublisherInterface $publisher,
@@ -58,6 +58,7 @@ class TrackingEventProcessor implements ListenableEventProcessorInterface
         if (!$options->name) {
             throw new \InvalidArgumentException('A Tracking Event Processor must have a name.');
         }
+
         $this->running = false;
         $this->positionStorage = $storage;
         $this->publisher = $publisher;
@@ -74,11 +75,10 @@ class TrackingEventProcessor implements ListenableEventProcessorInterface
      */
     public function start(): void
     {
-        if (!$this->running) {
-            $this->running = true;
-            foreach ($this->listeners as $listener) {
-                $listener->onStart($this);
-            }
+        $this->running = true;
+
+        foreach ($this->listeners as $listener) {
+            $listener->onStart($this);
         }
 
         while (!($events = $this->getNextEvents($this->options->batchSize))->isEmpty()) {
@@ -91,6 +91,7 @@ class TrackingEventProcessor implements ListenableEventProcessorInterface
     public function stop(): void
     {
         $this->running = false;
+
         foreach ($this->listeners as $listener) {
             $listener->onStop($this);
         }
@@ -109,7 +110,14 @@ class TrackingEventProcessor implements ListenableEventProcessorInterface
         if ($this->isRunning()) {
             throw new RuntimeException('You must stop the TrackingEventProcessor before resetting it.');
         }
+
         $this->positionStorage->reset($this->options->name);
+
+        foreach ($this->listeners as $listener) {
+            if ($listener instanceof TrackingEventProcessorListenerInterface) {
+                $listener->onReset($this);
+            }
+        }
     }
 
     /**
@@ -168,6 +176,7 @@ class TrackingEventProcessor implements ListenableEventProcessorInterface
     /**
      * Allows to replay this event processor, from a given position.
      * If position is null it will be replayed from the start.
+     * This is a shorthand for reset -> start from a given position or from the beginning if null provided.
      */
     public function replay(int $position = null): void
     {

@@ -13,6 +13,9 @@ use Morebec\Orkestra\EventSourcing\EventStore\SubscriptionOptions;
  * Essentially it allows processing events in realtime.
  * It needs to be registered with the {@link EventStoreInterface}.
  *
+ * It does not track the progress in the event store, it simply allows performing some work
+ * whenever a new event is available.
+ *
  * It can be useful for example to provide an API that sends change streams to clients
  * such as Web Apps.
  */
