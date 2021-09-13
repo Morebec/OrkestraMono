@@ -16,7 +16,7 @@ class LoggerMessageAuditEventStorage implements MessageAuditEventStorageInterfac
     public function add(MessageAuditEvent $event): void
     {
         $this->logger->info(
-            "[MessageAudit][corrId:{$event->correlationId}][causId:{$event->causationId}][msgId:{$event->messageId}]: {$event->type}",
+            'Message Audit: {type} {messageTypeName}',
             (array) $event
         );
     }
