@@ -44,6 +44,15 @@ class OrkestraConfiguration
         ;
     }
 
+    public function env(string $env): self
+    {
+        if ($_ENV['APP_ENV'] === $env) {
+            return $this;
+        }
+
+        return new NullOrkestraConfiguration();
+    }
+
     public function usingClock(string $className): self
     {
         $this->service(ClockInterface::class, $className);
