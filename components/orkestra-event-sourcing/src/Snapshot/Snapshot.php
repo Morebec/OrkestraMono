@@ -20,9 +20,9 @@ class Snapshot
         EventStreamId $streamId,
         EventStreamVersion $streamVersion,
         EventSequenceNumber $sequenceNumber,
-        array $data
+        array $state
     ) {
-        $this->state = $data;
+        $this->state = $state;
         $this->streamVersion = $streamVersion;
         $this->sequenceNumber = $sequenceNumber;
         $this->streamId = $streamId;
