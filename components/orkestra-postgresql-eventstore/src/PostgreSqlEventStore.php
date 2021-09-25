@@ -151,7 +151,7 @@ class PostgreSqlEventStore implements EventStoreInterface
         $queries = $schema->toSql($this->connection->getDatabasePlatform());
 
         foreach ($queries as $query) {
-            // Since DBAL does not allow to specify JSONB, but only JSON, we specify it here.
+            // Since DBAL does not allow specifying JSONB, but only JSON, we specify it here.
             $query = str_replace('JSON', 'JSONB', $query);
             $this->connection->executeQuery($query);
         }
