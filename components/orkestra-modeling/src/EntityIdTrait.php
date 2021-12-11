@@ -8,6 +8,11 @@ trait EntityIdTrait
 {
     private string $value;
 
+    public function __construct(string $value)
+    {
+        $this->value = $value;
+    }
+
     /**
      * Converts this ID to a string.
      */
