@@ -15,7 +15,7 @@ displayHelp()
    echo "  dev [options] [COMMAND] [ARGS...]"
    echo "Commands:"
    echo "  merge-deps    Merges the composer.json of the different components."
-   echo "  make-release  Creates a new release form the state of the repository."
+   echo "  make-release  Creates a new release from the state of the repository."
    echo "  run-tests     Runs the Unit tests."
    echo "  fix-cs        Fixes the files for coding style."
    echo "  help          Displays this help message."

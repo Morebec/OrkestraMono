@@ -21,6 +21,7 @@ phpunit.xml
 /public/bundles/
 /var/
 /vendor/
+symfony.lock
 ###< symfony/framework-bundle ###
 
 ###> friendsofphp/php-cs-fixer ###

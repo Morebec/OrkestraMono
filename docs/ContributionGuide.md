@@ -149,7 +149,7 @@ The releases are made through git tags based on the commits of these branches.
 
 
 ## Versioning
-Orkestra releases follow semantic Versioning a.k.a [SemVer](ghttps://semver.org/).
+Orkestra releases follow semantic Versioning a.k.a. [SemVer](ghttps://semver.org/).
 In a nutshell the version numbers of the library are standardized and have the following form:
 
 `x.y.z` where `x`is a major version, `y` a minor version and `z` a patch version.
