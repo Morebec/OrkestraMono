@@ -14,7 +14,8 @@
         "ramsey/uuid": "^4.1",
         "morebec/orkestra-event-sourcing": "^2.4",
         "phpunit/phpunit": "^9.5",
-        "symfony/framework-bundle": "5.2.*"
+        "symfony/framework-bundle": "5.2.*",
+        "coduo/php-matcher":  "6.0.*"
     },
 
     "require-dev": {
