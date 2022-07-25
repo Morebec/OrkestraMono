@@ -141,6 +141,11 @@
             "assets:install %PUBLIC_DIR%": "symfony-cmd"
         }
     },
+    "config": {
+        "allow-plugins": {
+            "symfony/flex": true
+        }
+    },
     "minimum-stability": "dev",
     "prefer-stable": true
 }
