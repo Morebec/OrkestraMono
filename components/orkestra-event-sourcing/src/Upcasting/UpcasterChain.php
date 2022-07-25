@@ -67,7 +67,12 @@ class UpcasterChain implements UpcasterInterface
         $head = \array_slice($chain, 0, 1);
         $tail = \array_slice($chain, 1);
 
-        $events = $head[0]->upcast($event);
+
+        /** @var UpcasterInterface $upcaster */
+        $upcaster = $head[0];
+
+        $events = $upcaster->supports($event) ? $upcaster->upcast($event) : [];
+
 
         $result = [];
         foreach ($events as $msg) {

@@ -78,6 +78,11 @@ class UpcastingEventStoreDecorator implements EventStoreInterface
      */
     private function upcastEvent(RecordedEventDescriptor $event): array
     {
-        return $this->upcasterChain->upcast(UpcastableEventDescriptor::fromRecordedEventDescriptor($event));
+        $upcastableEventDescriptor = UpcastableEventDescriptor::fromRecordedEventDescriptor($event);
+        if ($this->upcasterChain->supports($upcastableEventDescriptor)) {
+            return $this->upcasterChain->upcast($upcastableEventDescriptor);
+        }
+
+        return [$event];
     }
 }
