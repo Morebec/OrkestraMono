@@ -14,8 +14,8 @@
     },
     "require": {
         "php": ">=7.4",
-        "morebec/orkestra-collections": "^2.4",
-        "morebec/orkestra-messaging": "^2.4",
+        "morebec/orkestra-collections": "^2.3.3",
+        "morebec/orkestra-messaging": "^2.3.3",
         "ramsey/uuid": "^4.1"
     },
     "require-dev": {
