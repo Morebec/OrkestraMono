@@ -64,7 +64,7 @@ class PostgreSqlEventStoreTest extends TestCase
         $this->store->clear();
     }
 
-    public function testReadStreamThrowsExceptionWhenStreamDoesNotExist(): void
+    public function testReadStreamShouldThrowExceptionWhenStreamDoesNotExist(): void
     {
         $streamId = EventStreamId::fromString('stream-not-found');
         $this->expectException(EventStreamNotFoundException::class);
@@ -180,7 +180,7 @@ class PostgreSqlEventStoreTest extends TestCase
         );
     }
 
-    public function testAppendSameEventTwice(): void
+    public function testAppendSameEventTwiceShouldThrowDuplicateEventIdException(): void
     {
         $streamId = EventStreamId::fromString('stream-test');
 
@@ -276,8 +276,8 @@ class PostgreSqlEventStoreTest extends TestCase
         $events = $this->store->readStream(
             $streamId,
             ReadStreamOptions::read()
-            ->forward()
             ->from(1)
+            ->forward()
         );
         $this->assertCount(1, $events);
 

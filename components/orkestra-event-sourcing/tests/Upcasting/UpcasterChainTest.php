@@ -110,4 +110,21 @@ class UpcasterChainTest extends TestCase
             }
         };
     }
+
+    // We are adding another upcaster that does not support the events in the test to ensure, that it does not cause
+    // any side effect in the chain.
+    private function getUpcasterC(): UpcasterInterface
+    {
+        return new class() implements UpcasterInterface {
+            public function upcast(UpcastableEventDescriptor $eventDescriptor): array
+            {
+                return [$eventDescriptor->withMetadataKeyAdded('upcasted', true)];
+            }
+
+            public function supports(UpcastableEventDescriptor $eventDescriptor): bool
+            {
+                return $eventDescriptor->getEventType()->isEqualTo(EventType::fromString('another-event-type'));
+            }
+        };
+    }
 }

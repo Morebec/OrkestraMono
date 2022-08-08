@@ -7,12 +7,11 @@ namespace Morebec\Orkestra\Collections;
  */
 class Collection implements \Iterator, \Countable
 {
-    /** @var T[]  */
+    /** @var T[] */
     protected array $elements;
 
     /**
      * @param T[] $elements
-     * @param bool $preserveKeys
      */
     public function __construct(iterable $elements = [], bool $preserveKeys = false)
     {
@@ -183,6 +182,7 @@ class Collection implements \Iterator, \Countable
 
     /**
      * Inverts the order of the elements of this collection and returns it as a new collection.
+     *
      * @returns static<T>
      */
     public function reversed(): self
