@@ -139,12 +139,17 @@ class PostgreSqlDocumentStore
     {
         $this->createCollectionIfNotExists($collectionName);
 
-        $this->connection->insert($this->prefixCollection($collectionName), [
-                CollectionTableColumnKeys::ID => $id,
-                CollectionTableColumnKeys::DATA => json_encode($data, \JSON_THROW_ON_ERROR),
-                CollectionTableColumnKeys::CREATED_AT => $this->clock->now(),
-                CollectionTableColumnKeys::UPDATED_AT => $this->clock->now(),
-        ]);
+        try {
+            $this->connection->insert($this->prefixCollection($collectionName), [
+                    CollectionTableColumnKeys::ID => $id,
+                    CollectionTableColumnKeys::DATA => json_encode($data, \JSON_THROW_ON_ERROR),
+                    CollectionTableColumnKeys::CREATED_AT => $this->clock->now(),
+                    CollectionTableColumnKeys::UPDATED_AT => $this->clock->now(),
+            ]);
+        } catch (Exception $e) {
+            $this->connection->rollBack();
+            throw $e;
+        }
     }
 
     /**
@@ -154,10 +159,15 @@ class PostgreSqlDocumentStore
      */
     public function updateDocument(string $collectionName, string $documentId, array $data): void
     {
-        $this->connection->update($this->prefixCollection($collectionName), [
-                CollectionTableColumnKeys::DATA => json_encode($data, \JSON_THROW_ON_ERROR),
-                CollectionTableColumnKeys::UPDATED_AT => $this->clock->now(),
-        ], [CollectionTableColumnKeys::ID => $documentId]);
+        try {
+            $this->connection->update($this->prefixCollection($collectionName), [
+                    CollectionTableColumnKeys::DATA => json_encode($data, \JSON_THROW_ON_ERROR),
+                    CollectionTableColumnKeys::UPDATED_AT => $this->clock->now(),
+            ], [CollectionTableColumnKeys::ID => $documentId]);
+        } catch (Exception $e) {
+            $this->connection->rollBack();
+            throw $e;
+        }
     }
 
     /**
