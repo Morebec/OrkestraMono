@@ -55,6 +55,7 @@ class PostgreSqlSnapshotStore implements SnapshotStoreInterface
 
     /**
      * @throws Exception
+     * @throws \Throwable
      */
     public function upsert(Snapshot $snapshot): void
     {
@@ -77,13 +78,16 @@ class PostgreSqlSnapshotStore implements SnapshotStoreInterface
                                {$takenAtCol} = :takenAt
             ;
             SQL;
-        $this->connection->executeStatement($sql, [
-            'streamId' => (string) $snapshot->getEventStreamId(),
-            'streamVersion' => $snapshot->getStreamVersion()->toInt(),
-            'state' => json_encode($snapshot->getState(), \JSON_THROW_ON_ERROR),
-            'sequenceNumber' => $snapshot->getSequenceNumber()->toInt(),
-            'takenAt' => $takenAt,
-        ]);
+
+        $this->connection->transactional(function (Connection $connection) use ($takenAt, $snapshot, $sql) {
+            $connection->executeStatement($sql, [
+                'streamId' => (string) $snapshot->getEventStreamId(),
+                'streamVersion' => $snapshot->getStreamVersion()->toInt(),
+                'state' => json_encode($snapshot->getState(), \JSON_THROW_ON_ERROR),
+                'sequenceNumber' => $snapshot->getSequenceNumber()->toInt(),
+                'takenAt' => $takenAt,
+            ]);
+        });
     }
 
     /**
