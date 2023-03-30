@@ -1,4 +1,4 @@
-name: 'Monorepo Split'
+name: 'Packages Split'
 
 on:
   push:
@@ -6,64 +6,124 @@ on:
       - 2.x
     tags:
       - '*'
+
+env:
+  GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+
 jobs:
-  provide_packages_json:
+  packages_split:
     runs-on: ubuntu-latest
 
-    steps:
-      - uses: actions/checkout@v3
-
-      - uses: shivammathur/setup-php@v2
-        with:
-          php-version: 7.4
-          coverage: none
-
-      - uses: "ramsey/composer-install@v1"
-
-      # get package json list
-      - id: output_data
-        run: echo "::set-output name=matrix::$(vendor/bin/monorepo-builder packages-json)"
-
-    outputs:
-      matrix: ${{ steps.output_data.outputs.matrix }}
-
-  split_monorepo:
-    needs: provide_packages_json
-
-    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        package: ${{fromJson(needs.provide_packages_json.outputs.matrix)}}
+        # define package to repository map
+        package:
+          # orkestra-collection
+          - local_path: orkestra-collections
+            split_repository: orkestra-collections
+
+            # orkestra-event-sourcing
+          - local_path: orkestra-event-sourcing
+            split_repository: orkestra-event-sourcing
+
+            #orkestra-framework
+          - local_path: orkestra-framework
+            split_repository: orkestra-framework
+
+            #orkestra-normalization
+          - local_path: orkestra-normalization
+            split_repository: orkestra-normalization
+
+            #orkestra-postgresql-personal-information-store
+          - local_path: orkestra-postgresql-personal-information-store
+            split_repository: orkestra-postgresql-personal-information-store
+
+            #orkestra-retry
+          - local_path: orkestra-retry
+            split_repository: orkestra-retry
+
+            #orkestra-datetime
+          - local_path: orkestra-datetime
+            split_repository: orkestra-datetime
+
+            #orkestra-event-sourcing-testing
+          - local_path: orkestra-event-sourcing-testing
+            split_repository: orkestra-event-sourcing-testing
+
+            #orkestra-messaging
+          - local_path: orkestra-messaging
+            split_repository: orkestra-messaging
+
+            #orkestra-postgresql-document-store
+          - local_path: orkestra-postgresql-document-store
+            split_repository: orkestra-postgresql-document-store
+
+            #orkestra-postgresql-timeout-storage
+          - local_path: orkestra-postgresql-timeout-storage
+            split_repository: orkestra-postgresql-timeout-storage
+
+            #orkestra-symfony-bundle
+          - local_path: orkestra-symfony-bundle
+            split_repository: orkestra-symfony-bundle
+
+            #orkestra-enum
+          - local_path: orkestra-enum
+            split_repository: orkestra-enum
+
+            #orkestra-exceptions
+          - local_path: orkestra-exceptions
+            split_repository: orkestra-exceptions
+
+            #orkestra-modeling
+          - local_path: orkestra-modeling
+            split_repository: orkestra-modeling
+
+            #orkestra-postgresql-eventstore
+          - local_path: orkestra-postgresql-eventstore
+            split_repository: orkestra-postgresql-eventstore
+
+            #orkestra-privacy
+          - local_path: orkestra-privacy
+            split_repository: orkestra-privacy
+
+            #orkestra-worker
+          - local_path: orkestra-worker
+            split_repository: orkestra-worker
 
     steps:
-      - uses: actions/checkout@v2
+      -   uses: actions/checkout@v2
 
-      # Untagged
-      - if: "!startsWith(github.ref, 'refs/tags/')"
-        name: Monorepo Split of ${{ matrix.package }}
-        uses: symplify/github-action-monorepo-split@2.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+      # no tag
+      -
+        if: "!startsWith(github.ref, 'refs/tags/')"
+        uses: "danharrin/monorepo-split-github-action@v2.3.0"
         with:
-          package-directory: 'components/${{ matrix.package }}'
-          split-repository-organization: 'Morebec'
-          split-repository-name: '${{ matrix.package }}'
-          user-name: "Morebot"
-          user-email: "info@morebec.com"
-          branch: "2.x"
+          # ↓ split "packages/easy-coding-standard" directory
+          package_directory: 'components/${{ matrix.package.local_path }}'
 
-      # Tagged
-      - if: "startsWith(github.ref, 'refs/tags/')"
-        name: Tagged Monorepo Split of ${{ matrix.package }}
-        uses: symplify/github-action-monorepo-split@2.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+          # ↓ into https://github.com/symplify/easy-coding-standard repository
+          repository_organization: 'Morebec'
+          repository_name: '${{ matrix.package.split_repository }}'
+
+          # ↓ the user signed under the split commit
+          user_name: "Morebot"
+          user_email: "info@morebec.com"
+
+      # with tag
+      -
+        if: "startsWith(github.ref, 'refs/tags/')"
+        uses: "symplify/monorepo-split-github-action@2.1"
         with:
           tag: ${GITHUB_REF#refs/tags/}
-          package-directory: 'components/${{ matrix.package }}'
-          split-repository-organization: 'Morebec'
-          split-repository-name: '${{ matrix.package }}'
-          user-name: "Morebot"
-          user-email: "info@morebec.com"
-          branch: "2.x"
+
+          # ↓ split "packages/easy-coding-standard" directory
+          package_directory: 'components/${{ matrix.package.local_path }}'
+
+          # ↓ into https://github.com/symplify/easy-coding-standard repository
+          repository_organization: 'Morebec'
+          repository_name: '${{ matrix.package.split_repository }}'
+
+          # ↓ the user signed under the split commit
+          user_name: "Morebot"
+          user_email: "info@morebec.com"
