@@ -10,6 +10,8 @@ use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\DBAL\Schema\Table;
 use Morebec\Orkestra\DateTime\ClockInterface;
 use Morebec\Orkestra\PostgreSqlDocumentStore\Filter\Filter;
+use Throwable;
+use const JSON_THROW_ON_ERROR;
 
 class PostgreSqlDocumentStore
 {
@@ -133,23 +135,25 @@ class PostgreSqlDocumentStore
     /**
      * Adds a new document to a collection.
      *
+     * @param string $collectionName
+     * @param string $id
+     * @param array $data
      * @throws Exception
+     * @throws SchemaException
+     * @throws Throwable
      */
     public function insertDocument(string $collectionName, string $id, array $data): void
     {
         $this->createCollectionIfNotExists($collectionName);
 
-        try {
-            $this->connection->insert($this->prefixCollection($collectionName), [
-                    CollectionTableColumnKeys::ID => $id,
-                    CollectionTableColumnKeys::DATA => json_encode($data, \JSON_THROW_ON_ERROR),
-                    CollectionTableColumnKeys::CREATED_AT => $this->clock->now(),
-                    CollectionTableColumnKeys::UPDATED_AT => $this->clock->now(),
+        $this->connection->transactional(function (Connection $connection) use ($id, $data, $collectionName) {
+            $connection->insert($this->prefixCollection($collectionName), [
+                CollectionTableColumnKeys::ID => $id,
+                CollectionTableColumnKeys::DATA => json_encode($data, JSON_THROW_ON_ERROR),
+                CollectionTableColumnKeys::CREATED_AT => $this->clock->now(),
+                CollectionTableColumnKeys::UPDATED_AT => $this->clock->now(),
             ]);
-        } catch (Exception $e) {
-            $this->connection->rollBack();
-            throw $e;
-        }
+        });
     }
 
     /**
@@ -161,7 +165,7 @@ class PostgreSqlDocumentStore
     {
         try {
             $this->connection->update($this->prefixCollection($collectionName), [
-                    CollectionTableColumnKeys::DATA => json_encode($data, \JSON_THROW_ON_ERROR),
+                    CollectionTableColumnKeys::DATA => json_encode($data, JSON_THROW_ON_ERROR),
                     CollectionTableColumnKeys::UPDATED_AT => $this->clock->now(),
             ], [CollectionTableColumnKeys::ID => $documentId]);
         } catch (Exception $e) {
@@ -197,7 +201,7 @@ class PostgreSqlDocumentStore
             return null;
         }
 
-        return json_decode($doc[CollectionTableColumnKeys::DATA], true, 512, \JSON_THROW_ON_ERROR);
+        return json_decode($doc[CollectionTableColumnKeys::DATA], true, 512, JSON_THROW_ON_ERROR);
     }
 
     /**
@@ -224,7 +228,7 @@ class PostgreSqlDocumentStore
         $documents = [];
 
         while ($doc = $result->fetchAssociative()) {
-            $documents[] = json_decode($doc[CollectionTableColumnKeys::DATA], true, 512, \JSON_THROW_ON_ERROR);
+            $documents[] = json_decode($doc[CollectionTableColumnKeys::DATA], true, 512, JSON_THROW_ON_ERROR);
         }
 
         return $documents;
@@ -244,7 +248,7 @@ class PostgreSqlDocumentStore
         $documents = [];
 
         while ($doc = $result->fetchAssociative()) {
-            $documents[] = json_decode($doc[CollectionTableColumnKeys::DATA], true, 512, \JSON_THROW_ON_ERROR);
+            $documents[] = json_decode($doc[CollectionTableColumnKeys::DATA], true, 512, JSON_THROW_ON_ERROR);
         }
 
         return $documents;
