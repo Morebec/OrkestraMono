@@ -12,12 +12,12 @@
     "require": {
         "php": ">=7.4",
         "ramsey/uuid": "^4.1",
-        "morebec/orkestra-datetime": "^2.6",
-        "morebec/orkestra-enum": "^2.6",
-        "morebec/orkestra-exceptions": "^2.6",
-        "morebec/orkestra-modeling": "^2.6",
-        "morebec/orkestra-normalization": "^2.6",
-        "morebec/orkestra-retry": "^2.6"
+        "morebec/orkestra-datetime": "^2.5.6",
+        "morebec/orkestra-enum": "^2.5.6",
+        "morebec/orkestra-exceptions": "^2.5.6",
+        "morebec/orkestra-modeling": "^2.5.6",
+        "morebec/orkestra-normalization": "^2.5.6",
+        "morebec/orkestra-retry": "^2.5.6"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.5",
