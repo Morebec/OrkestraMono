@@ -13,9 +13,9 @@
         "php": ">=7.4",
         "doctrine/dbal": "^3.0",
         "ext-json": "*",
-        "morebec/orkestra-datetime": "^2.5.5",
-        "morebec/orkestra-enum": "^2.5.5",
-        "morebec/orkestra-modeling": "^2.5.5"
+        "morebec/orkestra-datetime": "^2.6",
+        "morebec/orkestra-enum": "^2.6",
+        "morebec/orkestra-modeling": "^2.6"
     },
     "require-dev": {
         "ext-dom": "*",

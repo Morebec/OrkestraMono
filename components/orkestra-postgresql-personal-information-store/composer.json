@@ -16,9 +16,9 @@
         "ext-pdo_pgsql": "*",
         "ext-sodium": "*",
         "doctrine/dbal": "^3.0",
-        "morebec/orkestra-datetime": "^2.5.5",
-        "morebec/orkestra-privacy": "^2.5.5",
-        "morebec/orkestra-normalization": "^2.5.5"
+        "morebec/orkestra-datetime": "^2.6",
+        "morebec/orkestra-privacy": "^2.6",
+        "morebec/orkestra-normalization": "^2.6"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.5",
