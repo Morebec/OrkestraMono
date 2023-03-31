@@ -8,6 +8,7 @@ use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\DBAL\Schema\Table;
+use JsonException;
 use Morebec\Orkestra\DateTime\ClockInterface;
 use Morebec\Orkestra\PostgreSqlDocumentStore\Filter\Filter;
 use Throwable;
@@ -100,7 +101,7 @@ class PostgreSqlDocumentStore
     }
 
     /**
-     * Lists all orkestra-collections by returning their name.
+     * Lists all collections by returning their name.
      *
      * @return string[]
      *
@@ -159,25 +160,30 @@ class PostgreSqlDocumentStore
     /**
      * Updates a document of collection entirely.
      *
-     * @throws Exception
+     * @param string $collectionName
+     * @param string $documentId
+     * @param array $data
+     * @throws Throwable
      */
     public function updateDocument(string $collectionName, string $documentId, array $data): void
     {
-        try {
+        $this->connection->transactional(function (Connection $connection) use ($documentId, $data, $collectionName) {
             $this->connection->update($this->prefixCollection($collectionName), [
-                    CollectionTableColumnKeys::DATA => json_encode($data, JSON_THROW_ON_ERROR),
-                    CollectionTableColumnKeys::UPDATED_AT => $this->clock->now(),
+                CollectionTableColumnKeys::DATA => json_encode($data, JSON_THROW_ON_ERROR),
+                CollectionTableColumnKeys::UPDATED_AT => $this->clock->now(),
             ], [CollectionTableColumnKeys::ID => $documentId]);
-        } catch (Exception $e) {
-            $this->connection->rollBack();
-            throw $e;
-        }
+        });
     }
 
     /**
+     * Finds multiple documents in a collection according to a filter as a string or {@link Filter}.
+     *
+     * @param string $collectionName
      * @param string|Filter $filter
      *
+     * @return array|null
      * @throws Exception
+     * @throws JsonException
      */
     public function findOneDocument(string $collectionName, $filter): ?array
     {
@@ -205,9 +211,14 @@ class PostgreSqlDocumentStore
     }
 
     /**
+     * Finds multiple documents in a collection according to a filter as a string or {@link Filter}.
+     *
+     * @param string $collectionName
      * @param string|Filter $filter
      *
+     * @return array
      * @throws Exception
+     * @throws JsonException
      */
     public function findManyDocuments(string $collectionName, $filter): array
     {
@@ -236,6 +247,11 @@ class PostgreSqlDocumentStore
 
     /**
      * Finds all the documents in a given collection.
+     *
+     * @param string $collectionName
+     * @return array
+     * @throws Exception
+     * @throws JsonException
      */
     public function findAllDocuments(string $collectionName): array
     {
@@ -254,18 +270,33 @@ class PostgreSqlDocumentStore
         return $documents;
     }
 
+    /**
+     * Removes a document from a collection.
+     *
+     * @param string $collectionName
+     * @param string $id
+     * @return void
+     * @throws Exception
+     */
     public function removeDocument(string $collectionName, string $id): void
     {
         $this->connection->delete($this->prefixCollection($collectionName), [CollectionTableColumnKeys::ID => $id]);
     }
 
+    /**
+     * Executes a raw SQL query.
+     *
+     * @param string $query
+     * @return Result
+     * @throws Exception
+     */
     public function executeQuery(string $query): Result
     {
         return $this->connection->executeQuery($query);
     }
 
     /**
-     * Clears the whole document store dropping all orkestra-collections.
+     * Clears the whole document store dropping all collections.
      *
      * @throws Exception
      */
